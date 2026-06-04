@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMacky — Renta de Vehículos Premium</title>
+    <title>AutoMacky — Renta de Vehículos Premium Guatemala</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800;900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
@@ -48,10 +47,10 @@
         .chat-toggle:hover { transform:scale(1.1); }
         .chat-toggle .badge { position:absolute; top:-4px; right:-4px; width:20px; height:20px; background:var(--danger); border-radius:50%; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; color:#fff; animation:pulse 2s infinite; }
         @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
-        .chat-window { position:absolute; bottom:72px; right:0; width:380px; max-height:520px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:20px; display:none; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+        .chat-window { position:absolute; bottom:72px; right:0; width:380px; max-height:540px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:20px; display:none; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
         .chat-window.open { display:flex; animation:chatOpen 0.3s cubic-bezier(.16,1,.3,1); }
         @keyframes chatOpen { from{opacity:0;transform:translateY(20px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
-        .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; max-height:360px; }
+        .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; max-height:380px; }
         .chat-bubble { max-width:85%; padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.5; animation:bubbleIn 0.25s ease-out; }
         @keyframes bubbleIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
         .chat-bubble.bot { background:var(--card); border:1px solid var(--border); align-self:flex-start; border-bottom-left-radius:4px; }
@@ -65,6 +64,7 @@
         .modal-content { background:var(--bg-elevated); border:1px solid var(--border); border-radius:20px; max-width:600px; width:100%; max-height:90vh; overflow-y:auto; animation:modalIn 0.3s cubic-bezier(.16,1,.3,1); }
         @keyframes modalIn { from{opacity:0;transform:scale(0.95) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
         .modal-content-wide { max-width:850px; }
+        .modal-content-xl { max-width:980px; }
 
         .toast-container { position:fixed; top:24px; right:24px; z-index:3000; display:flex; flex-direction:column; gap:10px; }
         .toast { background:var(--card); border:1px solid var(--border); border-left:3px solid var(--accent); padding:14px 20px; border-radius:12px; min-width:300px; animation:toastIn 0.4s cubic-bezier(.16,1,.3,1); display:flex; align-items:center; gap:12px; }
@@ -139,11 +139,17 @@
         .admin-table tr:hover td { background:rgba(108,171,221,0.03); }
         .chart-bar { border-radius:6px 6px 0 0; transition:height 0.6s cubic-bezier(.16,1,.3,1); min-width:32px; }
 
-        /* Indicador de email */
-        .email-status { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; }
-        .email-status.sent { background:rgba(34,197,94,0.1); color:var(--success); }
-        .email-status.error { background:rgba(239,68,68,0.1); color:var(--danger); }
-        .email-status.sending { background:rgba(108,171,221,0.1); color:var(--accent); }
+        .comment-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; animation:bubbleIn 0.3s ease-out; }
+        .comment-card:hover { border-color:rgba(108,171,221,0.25); }
+        .live-dot { width:8px; height:8px; border-radius:50%; background:var(--success); animation:pulse 1.5s infinite; display:inline-block; }
+        .user-blocked { opacity:0.5; }
+
+        /* Profile tabs */
+        .profile-tab { padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.25s; background:transparent; color:var(--muted); border:1px solid transparent; font-family:'Outfit',sans-serif; }
+        .profile-tab.active { background:rgba(108,171,221,0.1); color:var(--accent); border-color:rgba(108,171,221,0.3); }
+
+        /* Email compose */
+        .email-chip { display:inline-flex; align-items:center; gap:6px; background:rgba(108,171,221,0.1); border:1px solid rgba(108,171,221,0.3); color:var(--accent); padding:4px 10px; border-radius:20px; font-size:12px; }
 
         @media(max-width:768px) {
             .chat-window { width:calc(100vw - 48px); right:-12px; }
@@ -173,7 +179,7 @@
                 <div class="admin-sidebar-item" onclick="switchAdminTab('usuarios',this)"><i class="fas fa-users"></i><span>Usuarios</span></div>
                 <div class="admin-sidebar-item" onclick="switchAdminTab('rentas',this)"><i class="fas fa-key"></i><span>Rentas</span></div>
                 <div class="admin-sidebar-item" onclick="switchAdminTab('flota',this)"><i class="fas fa-car"></i><span>Flota</span></div>
-                <div class="admin-sidebar-item" onclick="switchAdminTab('notificaciones',this)"><i class="fas fa-bell"></i><span>Notificaciones</span></div>
+                <div class="admin-sidebar-item" onclick="switchAdminTab('correos',this)"><i class="fas fa-envelope"></i><span>Enviar Correos</span></div>
             </div>
             <div class="mt-auto px-4"><button onclick="logoutAdmin()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all" style="background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2);" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'"><i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span></button></div>
         </div>
@@ -189,12 +195,12 @@
             <div class="hidden md:flex items-center gap-8">
                 <a href="#vehiculos" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Vehículos</a>
                 <a href="#como-funciona" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Cómo Funciona</a>
-                <a href="#testimonios" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Testimonios</a>
+                <a href="#testimonios" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Opiniones</a>
                 <a href="#contacto" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Contacto</a>
                 <button onclick="openModal('rentalsModal');renderRentals()" class="text-sm font-medium hover:text-sky-400 transition-colors flex items-center gap-2" style="color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;"><i class="fas fa-key"></i> Mis Rentas <span id="rentalNavBadge" class="hidden w-5 h-5 rounded-full text-xs font-bold items-center justify-center" style="background:var(--accent);color:var(--navy-dark);">0</span></button>
             </div>
             <div class="flex items-center gap-3">
-                <button class="btn-secondary text-sm hidden sm:flex items-center gap-2" onclick="openModal('loginModal')"><i class="fas fa-user"></i> Iniciar Sesión</button>
+                <button class="btn-secondary text-sm hidden sm:flex items-center gap-2" id="navLoginBtn" onclick="handleNavAuth()"><i class="fas fa-user"></i> <span id="navLoginText">Iniciar Sesión</span></button>
                 <button class="btn-primary text-sm" onclick="openModal('reserveModal')">Reservar Ahora</button>
             </div>
         </div>
@@ -204,35 +210,137 @@
         <div class="hero-bg"></div><div id="particles" class="absolute inset-0 pointer-events-none"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-6 py-32 w-full">
             <div class="max-w-3xl">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background:rgba(108,171,221,0.08);border:1px solid rgba(108,171,221,0.2);"><span class="w-2 h-2 rounded-full animate-pulse" style="background:var(--accent);"></span><span class="text-sm font-medium" style="color:var(--accent);">Más de 500 vehículos disponibles</span></div>
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background:rgba(108,171,221,0.08);border:1px solid rgba(108,171,221,0.2);"><span class="w-2 h-2 rounded-full animate-pulse" style="background:var(--accent);"></span><span class="text-sm font-medium" style="color:var(--accent);">Más de 500 vehículos disponibles en Guatemala</span></div>
                 <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6" style="font-family:'Space Grotesk',sans-serif;">Conduce tu<br><span style="background:linear-gradient(135deg,var(--accent),var(--accent-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">próxima aventura</span></h1>
-                <p class="text-lg md:text-xl mb-10 max-w-xl leading-relaxed" style="color:var(--muted);">Renta vehículos premium a los mejores precios.</p>
+                <p class="text-lg md:text-xl mb-10 max-w-xl leading-relaxed" style="color:var(--muted);">Renta vehículos premium en Guatemala a los mejores precios. Desde Ciudad de Guatemala hasta Antigua, Petén y más.</p>
                 <div class="flex flex-wrap gap-4"><button class="btn-primary text-base" onclick="document.getElementById('vehiculos').scrollIntoView({behavior:'smooth'})"><i class="fas fa-search mr-2"></i>Explorar Vehículos</button><button class="btn-secondary text-base" onclick="openModal('reserveModal')"><i class="fas fa-calendar-alt mr-2"></i>Reserva Rápida</button></div>
             </div>
             <div class="mt-16 p-6 rounded-2xl max-w-4xl" style="background:var(--card);border:1px solid var(--border);"><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Lugar de Recogida</label><div class="relative"><i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2" style="color:var(--accent);"></i><input type="text" placeholder="Ciudad o aeropuerto" class="input-field pl-10" id="searchLocation"></div></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Fecha de Recogida</label><div class="relative"><i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2" style="color:var(--accent);"></i><input type="date" class="input-field pl-10" id="searchPickup"></div></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Fecha de Devolución</label><div class="relative"><i class="fas fa-calendar-check absolute left-3 top-1/2 -translate-y-1/2" style="color:var(--accent);"></i><input type="date" class="input-field pl-10" id="searchReturn"></div></div><div class="flex items-end"><button class="btn-primary w-full text-base" onclick="searchVehicles()"><i class="fas fa-search mr-2"></i>Buscar</button></div></div></div>
         </div>
     </header>
 
-    <section class="py-10 overflow-hidden" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);"><div class="max-w-7xl mx-auto px-6"><div class="overflow-hidden"><div class="brands-track" style="color:var(--muted);"><span class="text-2xl font-bold whitespace-nowrap opacity-40">BMW</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mercedes-Benz</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Audi</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Porsche</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Tesla</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Range Rover</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Volvo</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Toyota</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">BMW</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mercedes-Benz</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Audi</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Porsche</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Tesla</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Range Rover</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Volvo</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Toyota</span></div></div></div></section>
+    <section class="py-10 overflow-hidden" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);"><div class="max-w-7xl mx-auto px-6"><div class="overflow-hidden"><div class="brands-track" style="color:var(--muted);"><span class="text-2xl font-bold whitespace-nowrap opacity-40">Toyota</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Hyundai</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Kia</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Nissan</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mitsubishi</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Ford</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Chevrolet</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mazda</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Toyota</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Hyundai</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Kia</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Nissan</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mitsubishi</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Ford</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Chevrolet</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mazda</span></div></div></div></section>
 
-    <section class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="grid grid-cols-2 lg:grid-cols-4 gap-8 reveal"><div class="text-center"><div class="stat-value" data-target="500" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Vehículos Disponibles</div></div><div class="text-center"><div class="stat-value" data-target="50" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Ubicaciones</div></div><div class="text-center"><div class="stat-value" data-target="12000" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Clientes Satisfechos</div></div><div class="text-center"><div class="stat-value" data-target="98" data-suffix="%">0</div><div class="text-sm mt-2" style="color:var(--muted);">Satisfacción</div></div></div></div></section>
+    <section class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="grid grid-cols-2 lg:grid-cols-4 gap-8 reveal"><div class="text-center"><div class="stat-value" data-target="500" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Vehículos Disponibles</div></div><div class="text-center"><div class="stat-value" data-target="22" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Departamentos</div></div><div class="text-center"><div class="stat-value" data-target="12000" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Clientes Satisfechos</div></div><div class="text-center"><div class="stat-value" data-target="98" data-suffix="%">0</div><div class="text-sm mt-2" style="color:var(--muted);">Satisfacción</div></div></div></div></section>
 
-    <section id="vehiculos" class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-12 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Nuestra <span style="color:var(--accent);">Flota</span></h2></div><div class="flex flex-wrap justify-center gap-3 mb-10 reveal"><button class="filter-chip active" onclick="filterVehicles('todos',this)">Todos</button><button class="filter-chip" onclick="filterVehicles('compacto',this)">Compacto</button><button class="filter-chip" onclick="filterVehicles('sedan',this)">Sedán</button><button class="filter-chip" onclick="filterVehicles('suv',this)">SUV</button><button class="filter-chip" onclick="filterVehicles('deportivo',this)">Deportivo</button><button class="filter-chip" onclick="filterVehicles('electrico',this)">Eléctrico</button><button class="filter-chip" onclick="filterVehicles('van',this)">Van</button></div><div class="flex items-center justify-center gap-4 mb-10 reveal"><span class="text-sm" style="color:var(--muted);">Precio máx:</span><input type="range" min="30" max="300" value="300" id="priceRange" oninput="updatePriceFilter(this.value)" class="w-48" style="accent-color:var(--accent);"><span class="text-sm font-bold" style="color:var(--accent);" id="priceLabel">$300/día</span></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="vehicleGrid"></div></div></section>
+    <section id="vehiculos" class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-12 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Nuestra <span style="color:var(--accent);">Flota</span></h2></div><div class="flex flex-wrap justify-center gap-3 mb-10 reveal"><button class="filter-chip active" onclick="filterVehicles('todos',this)">Todos</button><button class="filter-chip" onclick="filterVehicles('compacto',this)">Compacto</button><button class="filter-chip" onclick="filterVehicles('sedan',this)">Sedán</button><button class="filter-chip" onclick="filterVehicles('suv',this)">SUV</button><button class="filter-chip" onclick="filterVehicles('pickup',this)">Pick-up</button><button class="filter-chip" onclick="filterVehicles('van',this)">Van</button></div><div class="flex items-center justify-center gap-4 mb-10 reveal"><span class="text-sm" style="color:var(--muted);">Precio máx:</span><input type="range" min="200" max="3000" value="3000" id="priceRange" oninput="updatePriceFilter(this.value)" class="w-48" style="accent-color:var(--accent);"><span class="text-sm font-bold" style="color:var(--accent);" id="priceLabel">Q3,000/día</span></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="vehicleGrid"></div></div></section>
 
-    <section id="como-funciona" class="py-20" style="background:var(--bg-elevated);"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-14 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Cómo <span style="color:var(--accent);">Funciona</span></h2></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8 reveal"><div class="step-card"><div class="step-number">1</div><h3 class="text-xl font-bold mb-3">Elige tu Vehículo</h3><p style="color:var(--muted);">Explora el catálogo y selecciona el ideal.</p></div><div class="step-card"><div class="step-number">2</div><h3 class="text-xl font-bold mb-3">Reserva en Línea</h3><p style="color:var(--muted);">Completa el formulario y paga seguro.</p></div><div class="step-card"><div class="step-number">3</div><h3 class="text-xl font-bold mb-3">Recoge y Conduce</h3><p style="color:var(--muted);">Presenta tu ID y comienza tu aventura.</p></div></div></div></section>
+    <section id="como-funciona" class="py-20" style="background:var(--bg-elevated);"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-14 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Cómo <span style="color:var(--accent);">Funciona</span></h2></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8 reveal"><div class="step-card"><div class="step-number">1</div><h3 class="text-xl font-bold mb-3">Elige tu Vehículo</h3><p style="color:var(--muted);">Explora el catálogo y selecciona el vehículo ideal para tu aventura guatemalteca.</p></div><div class="step-card"><div class="step-number">2</div><h3 class="text-xl font-bold mb-3">Reserva en Línea</h3><p style="color:var(--muted);">Completa el formulario en segundos. Proceso 100% seguro.</p></div><div class="step-card"><div class="step-number">3</div><h3 class="text-xl font-bold mb-3">Recoge y Conduce</h3><p style="color:var(--muted);">Presenta tu DPI o pasaporte y disfruta Guatemala al volante.</p></div></div></div></section>
 
-    <section class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-14 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Por qué <span style="color:var(--accent);">Elegirnos</span></h2></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal"><div class="service-card"><div class="feature-icon-box"><i class="fas fa-shield-alt"></i></div><h4 class="font-bold mb-2">Seguro Total</h4><p class="text-sm" style="color:var(--muted);">Cobertura completa incluida.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-headset"></i></div><h4 class="font-bold mb-2">Soporte 24/7</h4><p class="text-sm" style="color:var(--muted);">Asistencia siempre disponible.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-hand-holding-usd"></i></div><h4 class="font-bold mb-2">Sin Cargos Ocultos</h4><p class="text-sm" style="color:var(--muted);">Precios transparentes.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-gas-pump"></i></div><h4 class="font-bold mb-2">Tanque Lleno</h4><p class="text-sm" style="color:var(--muted);">Recibe y devuelve lleno.</p></div></div></div></section>
+    <section class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-14 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Por qué <span style="color:var(--accent);">Elegirnos</span></h2></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal"><div class="service-card"><div class="feature-icon-box"><i class="fas fa-shield-alt"></i></div><h4 class="font-bold mb-2">Seguro Total</h4><p class="text-sm" style="color:var(--muted);">Cobertura completa incluida en toda Guatemala.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-headset"></i></div><h4 class="font-bold mb-2">Soporte 24/7</h4><p class="text-sm" style="color:var(--muted);">Asistencia en carretera siempre disponible.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-hand-holding-usd"></i></div><h4 class="font-bold mb-2">Sin Cargos Ocultos</h4><p class="text-sm" style="color:var(--muted);">Precios transparentes en Quetzales.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-gas-pump"></i></div><h4 class="font-bold mb-2">Tanque Lleno</h4><p class="text-sm" style="color:var(--muted);">Recibe y devuelve con tanque lleno.</p></div></div></div></section>
 
-    <section id="testimonios" class="py-20" style="background:var(--bg-elevated);"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-14 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Lo que Dicen <span style="color:var(--accent);">Nuestros Clientes</span></h2></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8 reveal" id="testimonialGrid"></div></div></section>
+    <!-- TESTIMONIOS -->
+    <section id="testimonios" class="py-20" style="background:var(--bg-elevated);">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-8 reveal">
+                <h2 class="text-4xl md:text-5xl font-black mb-4">Opiniones de <span style="color:var(--accent);">Nuestros Clientes</span></h2>
+                <div class="flex items-center justify-center gap-2 text-sm" style="color:var(--muted);"><span class="live-dot"></span><span>Opiniones reales de clientes verificados</span></div>
+            </div>
+            <div class="max-w-2xl mx-auto mb-10 reveal">
+                <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+                    <h3 class="font-bold mb-4 text-lg">Deja tu opinión</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                        <input type="text" id="commentName" class="input-field" placeholder="Tu nombre">
+                        <input type="text" id="commentLocation" class="input-field" placeholder="Tu ciudad (ej: Guatemala, Antigua...)">
+                    </div>
+                    <div class="flex gap-1 mb-3" id="starSelector">
+                        <button onclick="setCommentRating(1)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
+                        <button onclick="setCommentRating(2)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
+                        <button onclick="setCommentRating(3)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
+                        <button onclick="setCommentRating(4)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
+                        <button onclick="setCommentRating(5)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
+                    </div>
+                    <textarea id="commentText" class="input-field mb-3" rows="3" placeholder="Cuéntanos tu experiencia con AutoMacky..."></textarea>
+                    <button onclick="submitComment()" class="btn-primary w-full"><i class="fas fa-paper-plane mr-2"></i>Publicar Comentario</button>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="testimonialGrid"></div>
+        </div>
+    </section>
 
-    <section id="contacto" class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="grid grid-cols-1 lg:grid-cols-2 gap-12 reveal"><div><h2 class="text-4xl font-black mb-6">Contáctanos <span style="color:var(--accent);">Hoy</span></h2><p class="text-lg mb-8" style="color:var(--muted);">¿Tienes preguntas? Estamos para ayudarte.</p><div class="space-y-6"><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(108,171,221,0.1);"><i class="fas fa-phone" style="color:var(--accent);"></i></div><div><div class="text-sm" style="color:var(--muted);">Teléfono</div><div class="font-semibold">+52 (55) 1234-5678</div></div></div><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(108,171,221,0.1);"><i class="fas fa-envelope" style="color:var(--accent);"></i></div><div><div class="text-sm" style="color:var(--muted);">Email</div><div class="font-semibold">info@automacky.com</div></div></div><div class="flex items-center gap-4"><div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(108,171,221,0.1);"><i class="fas fa-map-marker-alt" style="color:var(--accent);"></i></div><div><div class="text-sm" style="color:var(--muted);">Oficina Central</div><div class="font-semibold">Av. Reforma 505, CDMX</div></div></div></div></div><div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);"><form onsubmit="submitContactForm(event)"><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre</label><input type="text" class="input-field" placeholder="Tu nombre" required></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="tu@email.com" required></div></div><div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Asunto</label><input type="text" class="input-field" placeholder="¿En qué podemos ayudarte?"></div><div class="mb-6"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Mensaje</label><textarea class="input-field" rows="4" placeholder="Escribe tu mensaje..." required></textarea></div><button type="submit" class="btn-primary w-full text-base"><i class="fas fa-paper-plane mr-2"></i>Enviar Mensaje</button></form></div></div></div></section>
+    <!-- CONTACTO -->
+    <section id="contacto" class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 reveal">
+                <div>
+                    <h2 class="text-4xl font-black mb-6">Contáctanos <span style="color:var(--accent);">Hoy</span></h2>
+                    <p class="text-lg mb-8" style="color:var(--muted);">¿Tienes preguntas? Estamos para ayudarte.</p>
+                    <div class="space-y-6">
+                        <a href="https://wa.me/50238124414" target="_blank" class="flex items-center gap-4 cursor-pointer group" style="text-decoration:none;color:inherit;">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110" style="background:rgba(37,211,102,0.1);">
+                                <i class="fab fa-whatsapp text-xl" style="color:#25d366;"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs mb-0.5" style="color:var(--muted);">WhatsApp / Teléfono</div>
+                                <div class="font-semibold group-hover:text-green-400 transition-colors">+502 3812-4414</div>
+                                <div class="text-xs" style="color:var(--muted);">Toca para abrir WhatsApp</div>
+                            </div>
+                        </a>
+                        <a href="mailto:infoautomaky@gmail.com?subject=Consulta AutoMacky" target="_blank" class="flex items-center gap-4 cursor-pointer group" style="text-decoration:none;color:inherit;">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110" style="background:rgba(234,67,53,0.1);">
+                                <i class="fas fa-envelope text-xl" style="color:#ea4335;"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs mb-0.5" style="color:var(--muted);">Correo Electrónico</div>
+                                <div class="font-semibold group-hover:text-red-400 transition-colors">infoautomaky@gmail.com</div>
+                                <div class="text-xs" style="color:var(--muted);">Toca para enviarnos un correo</div>
+                            </div>
+                        </a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Aeropuerto+Internacional+La+Aurora+Guatemala" target="_blank" class="flex items-center gap-4 cursor-pointer group" style="text-decoration:none;color:inherit;">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110" style="background:rgba(108,171,221,0.1);">
+                                <i class="fas fa-map-marker-alt text-xl" style="color:var(--accent);"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs mb-0.5" style="color:var(--muted);">Ubicación Principal</div>
+                                <div class="font-semibold group-hover:text-sky-400 transition-colors">Aeropuerto Internacional La Aurora</div>
+                                <div class="text-xs" style="color:var(--muted);">Toca para abrir en Google Maps</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+                    <form onsubmit="submitContactForm(event)">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre</label><input type="text" class="input-field" placeholder="Tu nombre" required id="contactName"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="tu@email.com" required id="contactEmail"></div></div>
+                        <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Asunto</label><input type="text" class="input-field" placeholder="¿En qué podemos ayudarte?" id="contactSubject"></div>
+                        <div class="mb-6"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Mensaje</label><textarea class="input-field" rows="4" placeholder="Escribe tu mensaje..." required id="contactMsg"></textarea></div>
+                        <button type="submit" class="btn-primary w-full text-base"><i class="fas fa-paper-plane mr-2"></i>Enviar Mensaje</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <footer class="py-12" style="background:var(--bg-elevated);border-top:1px solid var(--border);"><div class="max-w-7xl mx-auto px-6"><div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10"><div><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));"><i class="fas fa-car-side text-lg" style="color:var(--navy-dark);"></i></div><span class="text-xl font-bold">Auto<span style="color:var(--accent)">Macky</span></span></div><p class="text-sm" style="color:var(--muted);">Tu plataforma de renta premium.</p></div><div><h4 class="font-bold mb-4">Empresa</h4><ul class="space-y-2 text-sm" style="color:var(--muted);"><li><a href="#" class="hover:text-sky-400 transition-colors">Sobre Nosotros</a></li><li><a href="#" class="hover:text-sky-400 transition-colors">Empleos</a></li></ul></div><div><h4 class="font-bold mb-4">Servicios</h4><ul class="space-y-2 text-sm" style="color:var(--muted);"><li><a href="#" class="hover:text-sky-400 transition-colors">Renta por Día</a></li><li><a href="#" class="hover:text-sky-400 transition-colors">Corporativo</a></li></ul></div><div><h4 class="font-bold mb-4">Síguenos</h4><div class="flex gap-3"><a href="#" class="w-10 h-10 rounded-lg flex items-center justify-center transition-transform hover:-translate-y-1" style="background:var(--card);border:1px solid var(--border);"><i class="fab fa-facebook-f" style="color:var(--muted);"></i></a><a href="#" class="w-10 h-10 rounded-lg flex items-center justify-center transition-transform hover:-translate-y-1" style="background:var(--card);border:1px solid var(--border);"><i class="fab fa-instagram" style="color:var(--muted);"></i></a></div></div></div><div class="accent-line mb-6"></div><div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm" style="color:var(--muted);"><span>2025 AutoMacky. Todos los derechos reservados.</span><div class="flex gap-6"><a href="#" class="hover:text-sky-400 transition-colors">Privacidad</a><a href="#" class="hover:text-sky-400 transition-colors">Términos</a></div></div></div></footer>
+    <footer class="py-12" style="background:var(--bg-elevated);border-top:1px solid var(--border);">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+                <div><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));"><i class="fas fa-car-side text-lg" style="color:var(--navy-dark);"></i></div><span class="text-xl font-bold">Auto<span style="color:var(--accent)">Macky</span></span></div><p class="text-sm" style="color:var(--muted);">Tu plataforma de renta premium en Guatemala.</p></div>
+                <div><h4 class="font-bold mb-4">Servicios</h4><ul class="space-y-2 text-sm" style="color:var(--muted);"><li><a href="#" class="hover:text-sky-400 transition-colors">Renta por Día</a></li><li><a href="#" class="hover:text-sky-400 transition-colors">Corporativo</a></li><li><a href="#" class="hover:text-sky-400 transition-colors">Turismo</a></li></ul></div>
+                <div><h4 class="font-bold mb-4">Contacto</h4><div class="flex flex-col gap-3">
+                    <a href="https://wa.me/50238124414" target="_blank" class="flex items-center gap-2 transition-colors hover:text-green-400" style="color:var(--muted);text-decoration:none;"><i class="fab fa-whatsapp" style="color:#25d366;width:16px;"></i><span class="text-sm">+502 3812-4414</span></a>
+                    <a href="mailto:infoautomaky@gmail.com" target="_blank" class="flex items-center gap-2 transition-colors hover:text-red-400" style="color:var(--muted);text-decoration:none;"><i class="fas fa-envelope" style="color:#ea4335;width:16px;"></i><span class="text-sm">infoautomaky@gmail.com</span></a>
+                </div></div>
+            </div>
+            <div class="accent-line mb-6"></div>
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm" style="color:var(--muted);"><span>© 2025 AutoMacky Guatemala. Todos los derechos reservados.</span><div class="flex gap-6"><a href="#" class="hover:text-sky-400 transition-colors">Privacidad</a><a href="#" class="hover:text-sky-400 transition-colors">Términos</a></div></div>
+        </div>
+    </footer>
 </div>
 
 <div class="compare-bar" id="compareBar"><i class="fas fa-exchange-alt" style="color:var(--accent);"></i><span class="text-sm font-semibold whitespace-nowrap">Comparar: </span><div id="compareItems" class="flex gap-2 flex-wrap"></div><button class="btn-primary text-sm py-2 px-4" onclick="openCompareModal()">Comparar</button><button class="text-sm px-3 py-2 rounded-lg whitespace-nowrap" style="background:var(--card);border:1px solid var(--border);color:var(--muted);" onclick="clearCompare()">Limpiar</button></div>
 
-<div class="chat-container"><div class="chat-window" id="chatWindow"><div class="p-4 flex items-center justify-between" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.15);"><i class="fas fa-robot" style="color:var(--navy-dark);"></i></div><div><div class="font-bold text-sm" style="color:var(--navy-dark);">AutoMacky Asistente</div><div class="text-xs" style="color:rgba(13,27,62,0.6);">En línea</div></div></div><button onclick="toggleChat()" style="color:var(--navy-dark);"><i class="fas fa-times"></i></button></div><div class="chat-messages" id="chatMessages"></div><div class="chat-quick-actions" id="quickActions"></div><div class="p-3" style="border-top:1px solid var(--border);"><div class="flex gap-2"><input type="text" id="chatInput" class="input-field text-sm" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter')sendChatMessage()"><button onclick="sendChatMessage()" class="btn-primary py-2 px-4 text-sm flex-shrink-0"><i class="fas fa-paper-plane"></i></button></div></div></div><button class="chat-toggle" onclick="toggleChat()" aria-label="Chat"><i class="fas fa-comments text-xl" id="chatIcon" style="color:var(--navy-dark);"></i><div class="badge" id="chatBadge">1</div></button></div>
+<!-- CHAT -->
+<div class="chat-container">
+    <div class="chat-window" id="chatWindow">
+        <div class="p-4 flex items-center justify-between" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));">
+            <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.15);"><i class="fas fa-robot" style="color:var(--navy-dark);"></i></div><div><div class="font-bold text-sm" style="color:var(--navy-dark);">AutoMacky Asistente</div><div class="text-xs" style="color:rgba(13,27,62,0.6);">En línea • Guatemala</div></div></div>
+            <button onclick="toggleChat()" style="color:var(--navy-dark);"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-quick-actions" id="quickActions"></div>
+        <div class="p-3" style="border-top:1px solid var(--border);"><div class="flex gap-2"><input type="text" id="chatInput" class="input-field text-sm" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter')sendChatMessage()"><button onclick="sendChatMessage()" class="btn-primary py-2 px-4 text-sm flex-shrink-0"><i class="fas fa-paper-plane"></i></button></div></div>
+    </div>
+    <button class="chat-toggle" onclick="toggleChat()" aria-label="Chat"><i class="fas fa-comments text-xl" id="chatIcon" style="color:var(--navy-dark);"></i><div class="badge" id="chatBadge">1</div></button>
+</div>
 
 <!-- Modal Login -->
 <div class="modal-overlay" id="loginModal"><div class="modal-content p-8 max-w-md">
@@ -250,325 +358,1396 @@
 <div class="modal-overlay" id="registerModal"><div class="modal-content p-8 max-w-md">
     <div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Crear Cuenta</h3><button onclick="closeModal('registerModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
     <form onsubmit="submitRegister(event)">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre</label><input type="text" class="input-field" placeholder="Tu nombre" required id="regName"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Teléfono</label><input type="tel" class="input-field" placeholder="+52 55 1234 5678" required id="regPhone"></div></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre Completo</label><input type="text" class="input-field" placeholder="Tu nombre" required id="regName"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Teléfono</label><input type="tel" class="input-field" placeholder="+502 XXXX XXXX" required id="regPhone"></div></div>
         <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="tu@email.com" required id="regEmail"></div>
         <div class="mb-6"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Contraseña</label><input type="password" class="input-field" placeholder="Mínimo 6 caracteres" required id="regPassword" minlength="6"></div>
-        <button type="submit" class="btn-primary w-full text-base mb-4" id="registerBtn"><i class="fas fa-user-plus mr-2"></i>Crear Cuenta</button>
+        <button type="submit" class="btn-primary w-full text-base mb-4"><i class="fas fa-user-plus mr-2"></i>Crear Cuenta</button>
         <p class="text-center text-sm" style="color:var(--muted);">¿Ya tienes cuenta? <a href="#" style="color:var(--accent);" onclick="event.preventDefault();closeModal('registerModal');openModal('loginModal')">Inicia Sesión</a></p>
     </form>
 </div></div>
 
+<!-- Modal Perfil de Usuario -->
+<div class="modal-overlay" id="profileModal"><div class="modal-content modal-content-wide p-0">
+    <div class="p-6 flex items-center justify-between" style="border-bottom:1px solid var(--border);">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:var(--navy-dark);" id="profileAvatar">U</div>
+            <div><h3 class="text-xl font-black" id="profileName">Mi Perfil</h3><p class="text-sm" style="color:var(--muted);" id="profileEmail">usuario@email.com</p></div>
+        </div>
+        <button onclick="closeModal('profileModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button>
+    </div>
+    <div class="flex gap-2 p-4 flex-wrap" style="border-bottom:1px solid var(--border);">
+        <button class="profile-tab active" onclick="switchProfileTab('info',this)"><i class="fas fa-user mr-2"></i>Mi Información</button>
+        <button class="profile-tab" onclick="switchProfileTab('rentas',this)"><i class="fas fa-key mr-2"></i>Mis Rentas</button>
+        <button class="profile-tab" onclick="switchProfileTab('seguridad',this)"><i class="fas fa-lock mr-2"></i>Seguridad</button>
+    </div>
+    <div class="p-6" id="profileTabContent"></div>
+</div></div>
+
 <!-- Modal Mis Rentas -->
-<div class="modal-overlay" id="rentalsModal"><div class="modal-content modal-content-wide p-0"><div class="p-6 flex items-center justify-between" style="border-bottom:1px solid var(--border);"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(108,171,221,0.1);"><i class="fas fa-key" style="color:var(--accent);"></i></div><div><h3 class="text-xl font-black">Mis Rentas</h3></div></div><button onclick="closeModal('rentalsModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div><div class="flex gap-2 p-4" style="border-bottom:1px solid var(--border);" id="rentalTabs"><button class="rental-tab active" onclick="switchRentalTab('todas',this)">Todas</button><button class="rental-tab" onclick="switchRentalTab('activa',this)">Activas</button><button class="rental-tab" onclick="switchRentalTab('pendiente',this)">Pendientes</button><button class="rental-tab" onclick="switchRentalTab('completada',this)">Completadas</button></div><div class="grid grid-cols-3 gap-4 p-4" id="rentalSummary"></div><div class="p-4 space-y-4 max-h-96 overflow-y-auto" id="rentalList"></div></div></div>
+<div class="modal-overlay" id="rentalsModal"><div class="modal-content modal-content-wide p-0">
+    <div class="p-6 flex items-center justify-between" style="border-bottom:1px solid var(--border);"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(108,171,221,0.1);"><i class="fas fa-key" style="color:var(--accent);"></i></div><div><h3 class="text-xl font-black">Mis Rentas</h3></div></div><button onclick="closeModal('rentalsModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
+    <div class="flex gap-2 p-4" style="border-bottom:1px solid var(--border);" id="rentalTabs"><button class="rental-tab active" onclick="switchRentalTab('todas',this)">Todas</button><button class="rental-tab" onclick="switchRentalTab('activa',this)">Activas</button><button class="rental-tab" onclick="switchRentalTab('pendiente',this)">Pendientes</button><button class="rental-tab" onclick="switchRentalTab('completada',this)">Completadas</button></div>
+    <div class="grid grid-cols-3 gap-4 p-4" id="rentalSummary"></div>
+    <div class="p-4 space-y-4 max-h-96 overflow-y-auto" id="rentalList"></div>
+</div></div>
 
 <div class="modal-overlay" id="rentalDetailModal"><div class="modal-content modal-content-wide p-0" id="rentalDetailContent"></div></div>
 <div class="modal-overlay" id="vehicleModal"><div class="modal-content" id="vehicleModalContent"></div></div>
-<div class="modal-overlay" id="reserveModal"><div class="modal-content p-8"><div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Reserva tu Vehículo</h3><button onclick="closeModal('reserveModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div><form onsubmit="submitReservation(event)"><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre</label><input type="text" class="input-field" placeholder="Juan Pérez" required id="resName"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="juan@email.com" required id="resEmail"></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Teléfono</label><input type="tel" class="input-field" placeholder="+52 55 1234 5678" required id="resPhone"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Vehículo</label><select class="input-field" id="reserveVehicle" required><option value="">Seleccionar</option></select></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Recogida</label><input type="date" class="input-field" required id="resStart"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Devolución</label><input type="date" class="input-field" required id="resEnd"></div></div><div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Lugar</label><select class="input-field" required id="resLocation"><option value="">Seleccionar</option><option>Aeropuerto CDMX</option><option>Sucursal Reforma</option><option>Sucursal Polanco</option><option>Sucursal Santa Fe</option><option>Aeropuerto Cancún</option><option>Aeropuerto Guadalajara</option></select></div><div class="mb-6"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="w-5 h-5" style="accent-color:var(--accent);" checked><span class="text-sm" style="color:var(--muted);">Seguro total (+$15/día)</span></label></div><button type="submit" class="btn-primary w-full text-base" id="reserveBtn"><i class="fas fa-check-circle mr-2"></i>Confirmar Reserva</button></form></div></div>
+
+<!-- Modal Reserva -->
+<div class="modal-overlay" id="reserveModal"><div class="modal-content p-8">
+    <div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Reserva tu Vehículo</h3><button onclick="closeModal('reserveModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
+    <form onsubmit="submitReservation(event)">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre Completo</label><input type="text" class="input-field" placeholder="Juan García" required id="resName"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="juan@email.com" required id="resEmail"></div></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Teléfono</label><input type="tel" class="input-field" placeholder="+502 XXXX XXXX" required id="resPhone"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Vehículo</label><select class="input-field" id="reserveVehicle" required onchange="validateDates()"><option value="">Seleccionar</option></select></div></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Fecha de Recogida</label><input type="date" class="input-field" required id="resStart" onchange="validateDates()"></div>
+            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Fecha de Devolución</label><input type="date" class="input-field" required id="resEnd" onchange="validateDates()"></div>
+        </div>
+        <div id="dateError" class="hidden mb-3 p-3 rounded-xl text-sm" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--danger);"><i class="fas fa-exclamation-circle mr-2"></i>La fecha de devolución debe ser posterior a la recogida.</div>
+        <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Lugar de Recogida</label><select class="input-field" required id="resLocation"><option value="">Seleccionar</option><option>Aeropuerto Internacional La Aurora</option><option>Sucursal Zona Viva, Guatemala City</option><option>Sucursal Antigua Guatemala</option><option>Sucursal Quetzaltenango</option><option>Sucursal Cobán</option><option>Sucursal Petén / Flores</option><option>Sucursal Puerto Barrios</option><option>Sucursal Escuintla</option></select></div>
+        <div class="mb-4 p-4 rounded-xl" id="pricePreview" style="background:var(--card);border:1px solid var(--border);display:none;"><div class="flex justify-between items-center"><span style="color:var(--muted);">Total estimado:</span><span class="text-xl font-black" style="color:var(--accent);" id="pricePreviewVal"></span></div></div>
+        <div class="mb-6"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="w-5 h-5" style="accent-color:var(--accent);" checked id="resInsurance" onchange="validateDates()"><span class="text-sm" style="color:var(--muted);">Seguro total (+Q150/día)</span></label></div>
+        <button type="submit" class="btn-primary w-full text-base" id="reserveBtn"><i class="fas fa-check-circle mr-2"></i>Confirmar Reserva</button>
+    </form>
+</div></div>
+
 <div class="modal-overlay" id="compareModal"><div class="modal-content p-8 max-w-3xl" id="compareModalContent"></div></div>
 
+<!-- Modal Admin Email -->
+<div class="modal-overlay" id="adminEmailModal"><div class="modal-content p-8 max-w-lg">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-black">Enviar Correo</h3>
+        <button onclick="closeModal('adminEmailModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button>
+    </div>
+    <div id="adminEmailForm">
+        <div class="mb-4 p-3 rounded-xl text-sm" style="background:rgba(108,171,221,0.08);border:1px solid rgba(108,171,221,0.2);">
+            <span style="color:var(--muted);">De: </span><span style="color:var(--accent);">infoautomaky@gmail.com</span>
+        </div>
+        <div class="mb-4">
+            <label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Para</label>
+            <div id="emailToDisplay" class="mb-2"></div>
+        </div>
+        <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Asunto</label><input type="text" class="input-field" id="adminEmailSubject" placeholder="Asunto del correo"></div>
+        <div class="mb-6"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Mensaje</label><textarea class="input-field" id="adminEmailBody" rows="5" placeholder="Escribe tu mensaje..."></textarea></div>
+        <div class="flex gap-3">
+            <button onclick="sendAdminEmail()" class="btn-primary flex-1"><i class="fas fa-paper-plane mr-2"></i>Enviar Correo</button>
+            <button onclick="closeModal('adminEmailModal')" class="btn-secondary">Cancelar</button>
+        </div>
+    </div>
+</div></div>
+
 <script>
-// ==================================================================
-// CONFIGURACIÓN EMAILJS — Reemplaza estos valores con los tuyos
-// ==================================================================
-const EMAILJS_PUBLIC_KEY = 'EF93-KhMm-lnOWos1';      // De emailjs.com → Account → API Keys
-const EMAILJS_SERVICE_ID = 'service_9jnng79';      // De emailjs.com → Email Services
-const EMAILJS_TEMPLATE_RESERVA = 'template_msg60zn';  // Tu template ID para reservas
-const EMAILJS_TEMPLATE_REGISTRO = 'template_tv35rwn'; // Tu template ID para registros
-// ==================================================================
+// ==================== CONSTANTES ====================
+const CONTACT_EMAIL = 'infoautomaky@gmail.com';
+const ADMIN_EMAIL_CRED = "admin@automacky.com";
+const ADMIN_PASS = "Admin123!";
+const LS_USERS = 'automacky_users';
+const LS_RENTALS = 'automacky_rentals';
+const LS_TESTIMONIALS = 'automacky_testimonials';
+const LS_REVENUE = 'automacky_revenue';
+const LS_RENTAL_COUNTER = 'automacky_rental_counter';
 
-// Inicializar EmailJS
-(function() {
-    if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'EF93-KhMm-lnOWos1') {
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-    }
-})();
+// ==================== ESTADO GLOBAL ====================
+let currentSessionUser = null;
+let currentRentalTab = 'todas';
+let currentAdminTab = 'overview';
+let isAdminLoggedIn = false;
+let currentFilter = 'todos';
+let maxPrice = 3000;
+let compareList = [];
+let chatOpen = false;
+let chatInitialized = false;
+let commentRating = 0;
+let currentProfileTab = 'info';
+let adminEmailTarget = null; // { email, name } or null for broadcast
 
-// Log de notificaciones enviadas (visible en el panel admin)
-let notificationLog = [];
-
-// Función para enviar email de reserva
-async function sendReservationEmail(data) {
-    const logEntry = {
-        id: notificationLog.length + 1,
-        type: 'reserva',
-        timestamp: new Date().toLocaleString('es-MX'),
-        recipient: 'fabianmacario70@gmail.com',
-        data: data,
-        status: 'sending'
-    };
-    notificationLog.unshift(logEntry);
-
-    if (EMAILJS_PUBLIC_KEY === 'EF93-KhMm-lnOWos1') {
-        // Modo demo: EmailJS no configurado, simular éxito
-        logEntry.status = 'demo';
-        logEntry.note = 'EmailJS no configurado — ver consola para ver los datos que se enviarían';
-        console.log('📧 [MODO DEMO] Email de reserva que se enviaría a fabianmacario70@gmail.com:', data);
-        showToast('Reserva confirmada (modo demo — configura EmailJS para envío real)', 'success');
-        return;
-    }
-
+// ==================== PERSISTENCIA ====================
+function loadUsers() { try { return JSON.parse(localStorage.getItem(LS_USERS)) || []; } catch(e) { return []; } }
+function saveUsers(u) { localStorage.setItem(LS_USERS, JSON.stringify(u)); }
+function loadRentals() { try { return JSON.parse(localStorage.getItem(LS_RENTALS)) || []; } catch(e) { return []; } }
+function saveRentals(r) { localStorage.setItem(LS_RENTALS, JSON.stringify(r)); }
+function loadTestimonials() {
     try {
-        const templateParams = {
-            to_email: 'fabianmacario70@gmail.com',
-            from_name: data.name,
-            from_email: data.email,
-            vehicle: data.vehicle,
-            dates: data.dates,
-            total: data.total,
-            phone: data.phone,
-            location: data.location
-        };
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_RESERVA, templateParams);
-        logEntry.status = 'sent';
-        console.log('📧 Email de reserva enviado exitosamente a fabianmacario70@gmail.com');
-    } catch (err) {
-        logEntry.status = 'error';
-        logEntry.error = err.text || err.message;
-        console.error('📧 Error enviando email de reserva:', err);
-    }
+        const saved = JSON.parse(localStorage.getItem(LS_TESTIMONIALS));
+        if (saved && saved.length > 0) return saved;
+    } catch(e) {}
+    return getDefaultTestimonials();
+}
+function saveTestimonials(t) { localStorage.setItem(LS_TESTIMONIALS, JSON.stringify(t)); }
+function loadRevenue() {
+    try {
+        const r = JSON.parse(localStorage.getItem(LS_REVENUE));
+        if (r) return r;
+    } catch(e) {}
+    return [{month:"Ene",amount:0},{month:"Feb",amount:0},{month:"Mar",amount:0},{month:"Abr",amount:0},{month:"May",amount:0},{month:"Jun",amount:0},{month:"Jul",amount:0},{month:"Ago",amount:0},{month:"Sep",amount:0},{month:"Oct",amount:0},{month:"Nov",amount:0},{month:"Dic",amount:0}];
+}
+function saveRevenue(r) { localStorage.setItem(LS_REVENUE, JSON.stringify(r)); }
+function loadRentalCounter() { return parseInt(localStorage.getItem(LS_RENTAL_COUNTER)) || 1; }
+function saveRentalCounter(n) { localStorage.setItem(LS_RENTAL_COUNTER, n); }
+
+// Variables cargadas desde localStorage
+let registeredUsers = loadUsers();
+let rentals = loadRentals();
+let testimonials = loadTestimonials();
+let monthlyRevenue = loadRevenue();
+let rentalIdCounter = loadRentalCounter();
+let activityLog = [];
+
+function getDefaultTestimonials() {
+    return [
+        {id:1,name:"Carlos Ajú",location:"Guatemala City",text:"Excelente servicio. Renté una SUV para ir a Petén y el proceso fue muy sencillo. El vehículo en perfectas condiciones.",rating:5,date:"15 Jun 2025",isNew:false},
+        {id:2,name:"María Sincal",location:"Antigua Guatemala",text:"AutoMacky es sin duda la mejor opción en Guatemala. Precios justos en Quetzales y atención increíble. ¡Ya renté tres veces!",rating:5,date:"20 Jun 2025",isNew:false},
+        {id:3,name:"Roberto Oxlaj",location:"Quetzaltenango",text:"Rentamos una pick-up para un viaje familiar. El proceso fue rápido y el precio muy accesible. Recomendado 100%.",rating:4,date:"22 Jun 2025",isNew:false},
+        {id:4,name:"Ana López",location:"Cobán",text:"Muy buena atención al cliente. El Toyota RAV4 que renté estaba impecable. Llegué a Semuc Champey sin ningún problema.",rating:5,date:"28 Jun 2025",isNew:false},
+        {id:5,name:"Jorge Cac",location:"Flores, Petén",text:"Renté para llegar a Tikal. La camioneta 4x4 fue perfecta para los caminos de terracería. Altamente recomendado.",rating:5,date:"1 Jul 2025",isNew:false},
+        {id:6,name:"Lucía Morales",location:"Escuintla",text:"Buen precio, vehículo limpio y proceso muy fácil en línea. La entrega en el aeropuerto fue rapidísima.",rating:4,date:"5 Jul 2025",isNew:false},
+    ];
 }
 
-// Función para enviar email de nuevo registro
-async function sendRegisterEmail(data) {
-    const logEntry = {
-        id: notificationLog.length + 1,
-        type: 'registro',
-        timestamp: new Date().toLocaleString('es-MX'),
-        recipient: 'fabianmacario70@gmail.com',
-        data: data,
-        status: 'sending'
-    };
-    notificationLog.unshift(logEntry);
-
-    if (EMAILJS_PUBLIC_KEY === 'EF93-KhMm-lnOWos1') {
-        logEntry.status = 'demo';
-        logEntry.note = 'EmailJS no configurado';
-        console.log('📧 [MODO DEMO] Email de registro que se enviaría a fabianmacario70@gmail.com:', data);
-        showToast('Cuenta creada (modo demo — configura EmailJS para envío real)', 'success');
-        return;
-    }
-
-    try {
-        const templateParams = {
-            to_email: 'fabianmacario70@gmail.com',
-            from_name: data.name,
-            from_email: data.email,
-            phone: data.phone,
-            date: data.date
-        };
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_REGISTRO, templateParams);
-        logEntry.status = 'sent';
-        console.log('📧 Email de registro enviado exitosamente a fabianmacario70@gmail.com');
-    } catch (err) {
-        logEntry.status = 'error';
-        logEntry.error = err.text || err.message;
-        console.error('📧 Error enviando email de registro:', err);
-    }
-}
-
-// ==================== DATOS ====================
+// ==================== VEHÍCULOS CON IMÁGENES REALES ====================
 const vehicles = [
-    { id:1,name:"BMW Serie 3",brand:"BMW",category:"sedan",price:85,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:255,img:"https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&h=400&fit=crop",features:["Navegador GPS","Apple CarPlay","Cámara trasera","Techo panorámico"],rating:4.8 },
-    { id:2,name:"Tesla Model 3",brand:"Tesla",category:"electrico",price:95,seats:5,transmission:"Automático",fuel:"Eléctrico",year:2024,hp:283,img:"https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=600&h=400&fit=crop",features:["Autopilot","Pantalla 15\"","Supercarga","Zero emisiones"],rating:4.9 },
-    { id:3,name:"Mercedes GLE",brand:"Mercedes",category:"suv",price:145,seats:7,transmission:"Automático",fuel:"Diésel",year:2024,hp:362,img:"https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&h=400&fit=crop",features:["7 asientos","4x4","Aire zoneado","MBUX"],rating:4.7 },
-    { id:4,name:"Porsche 911",brand:"Porsche",category:"deportivo",price:280,seats:2,transmission:"Automático",fuel:"Gasolina",year:2024,hp:443,img:"https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&h=400&fit=crop",features:["0-100 en 3.5s","Sport Chrono","Escape deportivo","PASM"],rating:5.0 },
-    { id:5,name:"Toyota Corolla",brand:"Toyota",category:"compacto",price:35,seats:5,transmission:"Manual",fuel:"Gasolina",year:2023,hp:139,img:"https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&h=400&fit=crop",features:["Económico","Bluetooth","USB","Aire acondicionado"],rating:4.3 },
-    { id:6,name:"Audi Q5",brand:"Audi",category:"suv",price:120,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:261,img:"https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=600&h=400&fit=crop",features:["Quattro AWD","Virtual Cockpit","Bang & Olufsen","Asientos eléctricos"],rating:4.6 },
-    { id:7,name:"Volkswagen Golf",brand:"Volkswagen",category:"compacto",price:40,seats:5,transmission:"Manual",fuel:"Gasolina",year:2023,hp:150,img:"https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop",features:["Apple CarPlay","Sensores parqueo","Cruise control","LED"],rating:4.4 },
-    { id:8,name:"Range Rover Sport",brand:"Range Rover",category:"suv",price:195,seats:5,transmission:"Automático",fuel:"Diésel",year:2024,hp:350,img:"https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&h=400&fit=crop",features:["Terrain Response","Aire suspensión","Meridian Sound","Pantalla dual"],rating:4.8 },
-    { id:9,name:"Ford Mustang GT",brand:"Ford",category:"deportivo",price:165,seats:4,transmission:"Manual",fuel:"Gasolina",year:2024,hp:480,img:"https://images.unsplash.com/photo-1584345604476-8ec5f82d661f?w=600&h=400&fit=crop",features:["V8 5.0L","Launch Control","Brembo","Active Valve Exhaust"],rating:4.7 },
-    { id:10,name:"Tesla Model Y",brand:"Tesla",category:"electrico",price:110,seats:5,transmission:"Automático",fuel:"Eléctrico",year:2024,hp:303,img:"https://images.unsplash.com/photo-1571987502227-9231b837d92a?w=600&h=400&fit=crop",features:["Autopilot","Supercarga","5 asientos","Baúl amplio"],rating:4.8 },
-    { id:11,name:"Mercedes C-Class",brand:"Mercedes",category:"sedan",price:90,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:255,img:"https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=600&h=400&fit=crop",features:["MBUX","Burmester Sound","Asientos ventilados","Digital Light"],rating:4.6 },
-    { id:12,name:"Chevrolet Suburban",brand:"Chevrolet",category:"van",price:130,seats:8,transmission:"Automático",fuel:"Gasolina",year:2024,hp:355,img:"https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=600&h=400&fit=crop",features:["8 pasajeros","Pantallas traseras","WiFi","Carga inalámbrica"],rating:4.5 },
+    {id:1,name:"Toyota Corolla",brand:"Toyota",category:"sedan",price:350,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:139,
+     img:"https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&h=400&fit=crop",
+     features:["Bluetooth","Aire acondicionado","USB","Cámara trasera"],rating:4.5},
+    {id:2,name:"Toyota RAV4",brand:"Toyota",category:"suv",price:750,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:203,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/2019_Toyota_RAV4_XLE_%28facelift%2C_silver%29%2C_front_8.19.19.jpg/1280px-2019_Toyota_RAV4_XLE_%28facelift%2C_silver%29%2C_front_8.19.19.jpg",
+     features:["AWD","Apple CarPlay","Cámara 360°","Pantalla táctil"],rating:4.7},
+    {id:3,name:"Hyundai Tucson",brand:"Hyundai",category:"suv",price:680,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:187,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/2021_Hyundai_Tucson_%28NX4%29_Elite_2WD_wagon_%282021-08-20%29_01.jpg/1280px-2021_Hyundai_Tucson_%28NX4%29_Elite_2WD_wagon_%282021-08-20%29_01.jpg",
+     features:["Navegador GPS","Sensores parqueo","Cruise control","LED"],rating:4.6},
+    {id:4,name:"Ford Ranger",brand:"Ford",category:"pickup",price:900,seats:5,transmission:"Automático",fuel:"Diésel",year:2024,hp:213,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/2019_Ford_Ranger_XLT_%28facelift%2C_white%29%2C_front_8.10.19.jpg/1280px-2019_Ford_Ranger_XLT_%28facelift%2C_white%29%2C_front_8.10.19.jpg",
+     features:["4x4","Doble cabina","Remolque","Doble tracción"],rating:4.8},
+    {id:5,name:"Kia Sportage",brand:"Kia",category:"suv",price:620,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:180,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/2022_Kia_Sportage_HEV_%28NQ5%29_GT-Line_S_1.6_Front.jpg/1280px-2022_Kia_Sportage_HEV_%28NQ5%29_GT-Line_S_1.6_Front.jpg",
+     features:["CarPlay","Android Auto","Asientos calefactados","LED"],rating:4.4},
+    {id:6,name:"Nissan Frontier",brand:"Nissan",category:"pickup",price:850,seats:5,transmission:"Manual",fuel:"Diésel",year:2023,hp:190,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/2023_Nissan_Frontier_PRO-4X%2C_front_10.27.22.jpg/1280px-2023_Nissan_Frontier_PRO-4X%2C_front_10.27.22.jpg",
+     features:["4x4","Alta suspensión","Caja larga","Barra de carga"],rating:4.3},
+    {id:7,name:"Toyota Yaris",brand:"Toyota",category:"compacto",price:280,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:106,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/2020_Toyota_Yaris_XLE_%28facelift%2C_silver%29%2C_front_8.27.20.jpg/1280px-2020_Toyota_Yaris_XLE_%28facelift%2C_silver%29%2C_front_8.27.20.jpg",
+     features:["Económico","Bluetooth","Aire acondicionado","USB"],rating:4.2},
+    {id:8,name:"Mitsubishi Outlander",brand:"Mitsubishi",category:"suv",price:720,seats:7,transmission:"Automático",fuel:"Gasolina",year:2024,hp:181,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/2022_Mitsubishi_Outlander_SEL_S-AWC%2C_front_9.3.22.jpg/1280px-2022_Mitsubishi_Outlander_SEL_S-AWC%2C_front_9.3.22.jpg",
+     features:["7 asientos","4x4","Pantalla táctil","Cámara trasera"],rating:4.5},
+    {id:9,name:"Chevrolet Silverado",brand:"Chevrolet",category:"pickup",price:1100,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:285,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/2020_Chevrolet_Silverado_LTZ_Z71_1500_Crew_Cab%2C_front_12.20.19.jpg/1280px-2020_Chevrolet_Silverado_LTZ_Z71_1500_Crew_Cab%2C_front_12.20.19.jpg",
+     features:["V8","4x4","Doble cabina","WiFi incorporado"],rating:4.6},
+    {id:10,name:"Toyota HiAce",brand:"Toyota",category:"van",price:1200,seats:12,transmission:"Automático",fuel:"Diésel",year:2023,hp:150,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Toyota_Hiace_H300_LWB_Van_at_2019_GIIAS_%28front_view%29.jpg/1280px-Toyota_Hiace_H300_LWB_Van_at_2019_GIIAS_%28front_view%29.jpg",
+     features:["12 pasajeros","Aire acondicionado","Equipaje extra","Para grupos"],rating:4.4},
+    {id:11,name:"Mazda CX-5",brand:"Mazda",category:"suv",price:700,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:187,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/2021_Mazda_CX-5_Grand_Touring_2.5L_AWD%2C_front_3.31.21.jpg/1280px-2021_Mazda_CX-5_Grand_Touring_2.5L_AWD%2C_front_3.31.21.jpg",
+     features:["i-Activsense","CarPlay","Techo solar","Cuero"],rating:4.7},
+    {id:12,name:"Volkswagen Jetta",brand:"Volkswagen",category:"sedan",price:400,seats:5,transmission:"Automático",fuel:"Gasolina",year:2024,hp:158,
+     img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/2019_Volkswagen_Jetta_SE_%28North_America%29%2C_front_8.27.19.jpg/1280px-2019_Volkswagen_Jetta_SE_%28North_America%29%2C_front_8.27.19.jpg",
+     features:["Ventanas eléctricas","Bluetooth","Cruise control","USB"],rating:4.3},
 ];
-
-const testimonials = [
-    { name:"Carlos Mendoza",location:"CDMX",text:"Servicio excepcional. Renté un BMW y todo perfecto.",rating:5,avatar:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" },
-    { name:"María López",location:"Guadalajara",text:"AutoMacky es sin duda la mejor opción.",rating:5,avatar:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" },
-    { name:"Roberto Sánchez",location:"Cancún",text:"Rentamos una SUV para vacaciones. Proceso rápido.",rating:4,avatar:"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" },
-];
-
-const adminUsers=[{id:1,name:"Carlos Mendoza",email:"carlos@email.com",phone:"+52 55 1111 2222",joindate:"15 Ene 2024",rentals:8,totalSpent:4850,status:"activo"},{id:2,name:"María López",email:"maria@email.com",phone:"+52 33 3333 4444",joindate:"03 Mar 2024",rentals:5,totalSpent:3200,status:"activo"},{id:3,name:"Roberto Sánchez",email:"roberto@email.com",phone:"+52 99 5555 6666",joindate:"22 Feb 2024",rentals:3,totalSpent:1890,status:"activo"},{id:4,name:"Ana Torres",email:"ana@email.com",phone:"+52 55 7777 8888",joindate:"10 Abr 2024",rentals:12,totalSpent:9450,status:"activo"},{id:5,name:"Luis García",email:"luis@email.com",phone:"+52 81 9999 0000",joindate:"05 May 2024",rentals:1,totalSpent:420,status:"inactivo"},{id:6,name:"Patricia Ruiz",email:"patricia@email.com",phone:"+52 55 1234 5678",joindate:"18 Jun 2024",rentals:6,totalSpent:5100,status:"activo"}];
-const activityLog=[{time:"Hace 5 min",icon:"fa-key",text:"Nueva renta: BMW Serie 3 por Carlos Mendoza",type:"renta"},{time:"Hace 12 min",icon:"fa-user-plus",text:"Nuevo usuario registrado: Patricia Ruiz",type:"usuario"},{time:"Hace 30 min",icon:"fa-credit-card",text:"Pago recibido: $840 MXN",type:"pago"},{time:"Hace 1 hora",icon:"fa-car",text:"Vehículo devuelto: Audi Q5",type:"devolucion"},{time:"Hace 2 horas",icon:"fa-star",text:"Nueva calificación: 5 estrellas",type:"calificacion"},{time:"Hace 3 horas",icon:"fa-exclamation-triangle",text:"Cancelación: Renta #0012",type:"cancelacion"}];
-const monthlyRevenue=[{month:"Ene",amount:45200},{month:"Feb",amount:52800},{month:"Mar",amount:48900},{month:"Abr",amount:61300},{month:"May",amount:58700},{month:"Jun",amount:72400},{month:"Jul",amount:68100},{month:"Ago",amount:79500},{month:"Sep",amount:64200},{month:"Oct",amount:71800},{month:"Nov",amount:83200},{month:"Dic",amount:91500}];
-
-// ==================== RENTAS ====================
-let rentalIdCounter=4,currentRentalTab='todas',currentAdminTab='overview',isAdminLoggedIn=false;
-let rentals=[
-    {id:1,vehicleId:1,vehicleName:"BMW Serie 3",vehicleImg:vehicles[0].img,status:"activa",pickupDate:"2025-06-20",returnDate:"2025-06-27",location:"Aeropuerto CDMX",totalPrice:595,days:7,customerName:"Carlos Mendoza",customerEmail:"carlos@email.com",customerPhone:"+52 55 1111 2222",insurance:true,createdAt:"18 Jun 2025",timeline:[{step:"Reserva confirmada",date:"18 Jun, 14:30",done:true},{step:"Pago procesado",date:"18 Jun, 14:31",done:true},{step:"Vehículo entregado",date:"20 Jun, 09:00",done:true},{step:"En uso",date:"Ahora",current:true},{step:"Devolución",date:"27 Jun",done:false}]},
-    {id:2,vehicleId:4,vehicleName:"Porsche 911",vehicleImg:vehicles[3].img,status:"pendiente",pickupDate:"2025-07-05",returnDate:"2025-07-08",location:"Sucursal Polanco",totalPrice:840,days:3,customerName:"María López",customerEmail:"maria@email.com",customerPhone:"+52 33 3333 4444",insurance:true,createdAt:"22 Jun 2025",timeline:[{step:"Reserva confirmada",date:"22 Jun, 10:15",done:true},{step:"Pago procesado",date:"22 Jun, 10:16",done:true},{step:"Esperando recogida",date:"05 Jul",current:true},{step:"En uso",date:"",done:false},{step:"Devolución",date:"08 Jul",done:false}]},
-    {id:3,vehicleId:6,vehicleName:"Audi Q5",vehicleImg:vehicles[5].img,status:"completada",pickupDate:"2025-05-10",returnDate:"2025-05-17",location:"Aeropuerto Cancún",totalPrice:840,days:7,customerName:"Roberto Sánchez",customerEmail:"roberto@email.com",customerPhone:"+52 99 5555 6666",insurance:true,createdAt:"08 May 2025",timeline:[{step:"Reserva confirmada",date:"08 May",done:true},{step:"Pago procesado",date:"08 May",done:true},{step:"Vehículo entregado",date:"10 May",done:true},{step:"En uso",date:"10-17 May",done:true},{step:"Devuelto",date:"17 May",done:true}]}
-];
-
-let currentFilter='todos',maxPrice=300,compareList=[],chatOpen=false,chatInitialized=false;
 
 // ==================== INIT ====================
-document.addEventListener('DOMContentLoaded',()=>{renderVehicles();renderTestimonials();populateReserveSelect();createParticles();setupScrollAnimations();setupNavScroll();updateRentalBadge();});
+document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    const resStart = document.getElementById('resStart');
+    const resEnd = document.getElementById('resEnd');
+    if (resStart) resStart.min = today;
+    if (resEnd) resEnd.min = today;
 
-// ==================== LOGIN ====================
-const ADMIN_EMAIL="admin@automacky.com",ADMIN_PASS="Admin123!";
-function submitLogin(e){e.preventDefault();const em=document.getElementById('loginEmail').value.trim(),pw=document.getElementById('loginPassword').value,errBox=document.getElementById('loginError'),errText=document.getElementById('loginErrorText');if(em===ADMIN_EMAIL&&pw===ADMIN_PASS){errBox.classList.add('hidden');closeModal('loginModal');isAdminLoggedIn=true;openAdminDashboard();showToast('Bienvenido al Panel de Administración','success');return;}if(em&&pw.length>=4){errBox.classList.add('hidden');closeModal('loginModal');showToast(`Bienvenido de vuelta`,'success');document.getElementById('loginEmail').value='';document.getElementById('loginPassword').value='';}else{errBox.classList.remove('hidden');errText.textContent='Credenciales incorrectas.';}}
+    renderVehicles();
+    renderTestimonials();
+    populateReserveSelect();
+    createParticles();
+    setupScrollAnimations();
+    setupNavScroll();
+    updateRentalBadge();
+    updateNavAuthBtn();
+});
 
-// ==================== REGISTRO ====================
-function submitRegister(e){
-    e.preventDefault();
-    const name=document.getElementById('regName').value.trim();
-    const email=document.getElementById('regEmail').value.trim();
-    const phone=document.getElementById('regPhone').value.trim();
-    const pass=document.getElementById('regPassword').value;
-    if(!name||!email||!phone||pass.length<6){showToast('Completa todos los campos correctamente','warning');return;}
-
-    // Agregar al log de usuarios admin
-    adminUsers.push({id:adminUsers.length+1,name,email,phone,joindate:new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}),rentals:0,totalSpent:0,status:'activo'});
-
-    // Enviar email de notificación
-    sendRegisterEmail({name,email,phone,date:new Date().toLocaleString('es-MX')});
-
-    // Agregar al log de actividad
-    activityLog.unshift({time:"Ahora",icon:"fa-user-plus",text:`Nuevo usuario registrado: ${name} (${email})`,type:"usuario"});
-
-    closeModal('registerModal');
-    showToast('Cuenta creada exitosamente. ¡Bienvenido!','success');
-
-    // Limpiar formulario
-    document.getElementById('regName').value='';
-    document.getElementById('regEmail').value='';
-    document.getElementById('regPhone').value='';
-    document.getElementById('regPassword').value='';
+// ==================== VALIDACIÓN DE FECHAS ====================
+function validateDates() {
+    const s = document.getElementById('resStart').value;
+    const e = document.getElementById('resEnd').value;
+    const errDiv = document.getElementById('dateError');
+    const btn = document.getElementById('reserveBtn');
+    const preview = document.getElementById('pricePreview');
+    if (s) document.getElementById('resEnd').min = s;
+    if (s && e) {
+        if (new Date(e) <= new Date(s)) {
+            errDiv.classList.remove('hidden');
+            btn.disabled = true; btn.style.opacity = '0.5';
+            preview.style.display = 'none';
+            return false;
+        } else {
+            errDiv.classList.add('hidden');
+            btn.disabled = false; btn.style.opacity = '1';
+            const vN = document.getElementById('reserveVehicle').value;
+            const v = vehicles.find(x => x.name === vN);
+            if (v) {
+                const d = Math.max(1, Math.ceil((new Date(e) - new Date(s)) / (1000*60*60*24)));
+                const ins = document.getElementById('resInsurance')?.checked ? 150 : 0;
+                const tp = v.price * d + ins * d;
+                document.getElementById('pricePreviewVal').textContent = `Q${tp.toLocaleString()} (${d} día${d>1?'s':''})`;
+                preview.style.display = 'block';
+            }
+            return true;
+        }
+    }
+    return true;
 }
 
-// ==================== RESERVA CON EMAIL ====================
-function submitReservation(e){
+// ==================== AUTH ====================
+function handleNavAuth() {
+    if (currentSessionUser) { openProfileModal(); }
+    else { openModal('loginModal'); }
+}
+
+function updateNavAuthBtn() {
+    const btn = document.getElementById('navLoginBtn');
+    const txt = document.getElementById('navLoginText');
+    if (!btn || !txt) return;
+    if (currentSessionUser) {
+        txt.textContent = currentSessionUser.name.split(' ')[0];
+        btn.querySelector('i').className = 'fas fa-user-circle';
+    } else {
+        txt.textContent = 'Iniciar Sesión';
+        btn.querySelector('i').className = 'fas fa-user';
+    }
+}
+
+function submitLogin(e) {
     e.preventDefault();
-    const vN=document.getElementById('reserveVehicle').value,v=vehicles.find(x=>x.name===vN),sV=document.getElementById('resStart').value,eV=document.getElementById('resEnd').value,loc=document.getElementById('resLocation').value,name=document.getElementById('resName').value||'Juan Pérez',email=document.getElementById('resEmail').value||'juan@email.com',phone=document.getElementById('resPhone').value||'+52 55 1234 5678';
-    if(!v||!sV||!eV||!loc){showToast('Completa todos los campos','warning');return;}
-    const d=Math.max(1,Math.ceil((new Date(eV)-new Date(sV))/(1000*60*60*24))),tp=v.price*d+d*15;
+    const em = document.getElementById('loginEmail').value.trim();
+    const pw = document.getElementById('loginPassword').value;
+    const errBox = document.getElementById('loginError');
+    const errText = document.getElementById('loginErrorText');
 
-    rentals.unshift({id:rentalIdCounter++,vehicleId:v.id,vehicleName:v.name,vehicleImg:v.img,status:'pendiente',pickupDate:sV,returnDate:eV,location:loc,totalPrice:tp,days:d,customerName:name,customerEmail:email,customerPhone:phone,insurance:true,createdAt:new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}),timeline:[{step:"Reserva confirmada",date:"Ahora",done:true},{step:"Pago procesado",date:"Ahora",done:true},{step:"Esperando recogida",date:sV,current:true},{step:"En uso",date:"",done:false},{step:"Devolución",date:eV,done:false}]});
+    if (em === ADMIN_EMAIL_CRED && pw === ADMIN_PASS) {
+        errBox.classList.add('hidden');
+        closeModal('loginModal');
+        isAdminLoggedIn = true;
+        openAdminDashboard();
+        showToast('Bienvenido al Panel de Administración', 'success');
+        return;
+    }
 
-    // Agregar al log de actividad
-    activityLog.unshift({time:"Ahora",icon:"fa-key",text:`Nueva renta: ${v.name} por ${name}`,type:"renta"});
+    const users = loadUsers();
+    const found = users.find(u => u.email === em && u.password === pw);
+    if (found) {
+        if (found.blocked) {
+            errBox.classList.remove('hidden');
+            errText.textContent = 'Tu cuenta ha sido bloqueada. Contacta al administrador.';
+            return;
+        }
+        currentSessionUser = found;
+        errBox.classList.add('hidden');
+        closeModal('loginModal');
+        updateNavAuthBtn();
+        showToast(`¡Bienvenido de nuevo, ${found.name.split(' ')[0]}!`, 'success');
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPassword').value = '';
+        return;
+    }
 
-    // Enviar email de notificación al admin
-    sendReservationEmail({name,email,vehicle:v.name,dates:`${sV} → ${eV} (${d} días)`,total:`$${tp} MXN`,phone,location:loc});
+    const users2 = loadUsers();
+    const emailExists = users2.find(u => u.email === em);
+    errBox.classList.remove('hidden');
+    errText.textContent = emailExists ? 'Contraseña incorrecta.' : 'No existe una cuenta con ese email. ¡Regístrate!';
+}
 
-    closeModal('reserveModal');updateRentalBadge();
-    if(EMAILJS_PUBLIC_KEY!=='TU_PUBLIC_KEY')showToast('Reserva confirmada. Notificación enviada al administrador.','success');
+function submitRegister(e) {
+    e.preventDefault();
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const pass = document.getElementById('regPassword').value;
+
+    if (!name || !email || !phone || pass.length < 6) {
+        showToast('Completa todos los campos correctamente', 'warning'); return;
+    }
+
+    const users = loadUsers();
+    if (users.find(u => u.email === email)) {
+        showToast('Ya existe una cuenta con ese email.', 'warning'); return;
+    }
+
+    const newUser = {
+        id: Date.now(), name, email, phone, password: pass,
+        joindate: new Date().toLocaleDateString('es-GT', {day:'2-digit',month:'short',year:'numeric'}),
+        rentals: 0, totalSpent: 0, status: 'activo', blocked: false
+    };
+    users.push(newUser);
+    saveUsers(users);
+    registeredUsers = users;
+    currentSessionUser = newUser;
+    activityLog.unshift({time:"Ahora",icon:"fa-user-plus",text:`Nuevo usuario: ${name} (${email})`,type:"usuario"});
+    closeModal('registerModal');
+    updateNavAuthBtn();
+    showToast(`¡Bienvenido a AutoMacky, ${name.split(' ')[0]}!`, 'success');
+    document.getElementById('regName').value = '';
+    document.getElementById('regEmail').value = '';
+    document.getElementById('regPhone').value = '';
+    document.getElementById('regPassword').value = '';
+}
+
+function logoutUser() {
+    currentSessionUser = null;
+    updateNavAuthBtn();
+    closeModal('profileModal');
+    showToast('Sesión cerrada correctamente.', 'info');
+}
+
+// ==================== PERFIL DE USUARIO ====================
+function openProfileModal() {
+    if (!currentSessionUser) { openModal('loginModal'); return; }
+    document.getElementById('profileAvatar').textContent = currentSessionUser.name.charAt(0).toUpperCase();
+    document.getElementById('profileName').textContent = currentSessionUser.name;
+    document.getElementById('profileEmail').textContent = currentSessionUser.email;
+    switchProfileTab('info', null);
+    openModal('profileModal');
+}
+
+function switchProfileTab(tab, btn) {
+    currentProfileTab = tab;
+    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    else {
+        const tabs = document.querySelectorAll('.profile-tab');
+        if(tab==='info') tabs[0]?.classList.add('active');
+        else if(tab==='rentas') tabs[1]?.classList.add('active');
+        else if(tab==='seguridad') tabs[2]?.classList.add('active');
+    }
+    renderProfileTab(tab);
+}
+
+function renderProfileTab(tab) {
+    const c = document.getElementById('profileTabContent');
+    if (!c) return;
+    if (tab === 'info') {
+        c.innerHTML = `
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre Completo</label>
+                <input type="text" id="profileEditName" class="input-field" value="${currentSessionUser.name}"></div>
+                <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Teléfono</label>
+                <input type="tel" id="profileEditPhone" class="input-field" value="${currentSessionUser.phone}"></div>
+            </div>
+            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label>
+            <input type="email" class="input-field" value="${currentSessionUser.email}" disabled style="opacity:0.6;cursor:not-allowed;"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="p-4 rounded-xl text-center" style="background:var(--card);border:1px solid var(--border);">
+                    <div class="text-2xl font-black" style="color:var(--accent);">${currentSessionUser.rentals}</div>
+                    <div class="text-xs mt-1" style="color:var(--muted);">Rentas realizadas</div>
+                </div>
+                <div class="p-4 rounded-xl text-center" style="background:var(--card);border:1px solid var(--border);">
+                    <div class="text-2xl font-black" style="color:var(--success);">Q${(currentSessionUser.totalSpent||0).toLocaleString()}</div>
+                    <div class="text-xs mt-1" style="color:var(--muted);">Total gastado</div>
+                </div>
+                <div class="p-4 rounded-xl text-center" style="background:var(--card);border:1px solid var(--border);">
+                    <div class="text-2xl font-black" style="color:var(--warning);">${currentSessionUser.joindate}</div>
+                    <div class="text-xs mt-1" style="color:var(--muted);">Miembro desde</div>
+                </div>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="saveProfileInfo()" class="btn-primary"><i class="fas fa-save mr-2"></i>Guardar Cambios</button>
+                <button onclick="logoutUser()" class="btn-danger"><i class="fas fa-sign-out-alt mr-1"></i>Cerrar Sesión</button>
+            </div>
+        </div>`;
+    } else if (tab === 'rentas') {
+        const myRentals = loadRentals().filter(r => r.customerEmail === currentSessionUser.email);
+        c.innerHTML = `
+        <div class="space-y-4 max-h-96 overflow-y-auto">
+            ${myRentals.length === 0
+                ? '<div class="text-center py-12"><i class="fas fa-key text-5xl mb-4" style="color:var(--border);"></i><p class="font-bold mb-2" style="color:var(--muted);">Aún no tienes rentas</p><button onclick="closeModal(\'profileModal\');openModal(\'reserveModal\')" class="btn-primary mt-4">Hacer mi primera reserva</button></div>'
+                : myRentals.map(r => `
+                <div class="rental-card">
+                    <div class="flex flex-col sm:flex-row">
+                        <div class="sm:w-36 h-24 flex-shrink-0"><img src="${r.vehicleImg}" class="w-full h-full object-cover" style="border-radius:16px 0 0 16px;"></div>
+                        <div class="flex-1 p-4">
+                            <div class="flex items-start justify-between mb-2">
+                                <div><h4 class="font-bold">${r.vehicleName}</h4><p class="text-xs" style="color:var(--muted);">#${String(r.id).padStart(4,'0')}</p></div>
+                                <span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                                <div><span style="color:var(--muted);">Recogida: </span><span class="font-semibold">${r.pickupDate}</span></div>
+                                <div><span style="color:var(--muted);">Devolución: </span><span class="font-semibold">${r.returnDate}</span></div>
+                                <div><span style="color:var(--muted);">Lugar: </span><span class="font-semibold">${r.location}</span></div>
+                                <div><span style="color:var(--muted);">Total: </span><span class="font-semibold" style="color:var(--accent);">Q${r.totalPrice.toLocaleString()}</span></div>
+                            </div>
+                            ${r.status==='pendiente'?`<button onclick="cancelRentalFromProfile(${r.id})" class="btn-danger text-xs"><i class="fas fa-times mr-1"></i>Cancelar</button>`:''}
+                        </div>
+                    </div>
+                </div>`).join('')
+            }
+        </div>`;
+    } else if (tab === 'seguridad') {
+        c.innerHTML = `
+        <div class="space-y-4 max-w-md">
+            <h4 class="font-bold text-lg">Cambiar Contraseña</h4>
+            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Contraseña actual</label>
+            <input type="password" id="pwCurrent" class="input-field" placeholder="Contraseña actual"></div>
+            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nueva contraseña</label>
+            <input type="password" id="pwNew" class="input-field" placeholder="Mínimo 6 caracteres" minlength="6"></div>
+            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Confirmar nueva contraseña</label>
+            <input type="password" id="pwConfirm" class="input-field" placeholder="Repite la contraseña"></div>
+            <button onclick="changePassword()" class="btn-primary"><i class="fas fa-lock mr-2"></i>Cambiar Contraseña</button>
+        </div>`;
+    }
+}
+
+function saveProfileInfo() {
+    const newName = document.getElementById('profileEditName')?.value.trim();
+    const newPhone = document.getElementById('profileEditPhone')?.value.trim();
+    if (!newName) { showToast('El nombre no puede estar vacío', 'warning'); return; }
+    const users = loadUsers();
+    const idx = users.findIndex(u => u.id === currentSessionUser.id);
+    if (idx > -1) {
+        users[idx].name = newName;
+        users[idx].phone = newPhone;
+        saveUsers(users);
+        currentSessionUser.name = newName;
+        currentSessionUser.phone = newPhone;
+    }
+    document.getElementById('profileAvatar').textContent = newName.charAt(0).toUpperCase();
+    document.getElementById('profileName').textContent = newName;
+    updateNavAuthBtn();
+    showToast('Perfil actualizado correctamente', 'success');
+}
+
+function changePassword() {
+    const cur = document.getElementById('pwCurrent')?.value;
+    const nw = document.getElementById('pwNew')?.value;
+    const conf = document.getElementById('pwConfirm')?.value;
+    if (cur !== currentSessionUser.password) { showToast('Contraseña actual incorrecta', 'warning'); return; }
+    if (!nw || nw.length < 6) { showToast('La nueva contraseña debe tener al menos 6 caracteres', 'warning'); return; }
+    if (nw !== conf) { showToast('Las contraseñas no coinciden', 'warning'); return; }
+    const users = loadUsers();
+    const idx = users.findIndex(u => u.id === currentSessionUser.id);
+    if (idx > -1) { users[idx].password = nw; saveUsers(users); currentSessionUser.password = nw; }
+    showToast('Contraseña cambiada correctamente', 'success');
+    document.getElementById('pwCurrent').value = '';
+    document.getElementById('pwNew').value = '';
+    document.getElementById('pwConfirm').value = '';
+}
+
+function cancelRentalFromProfile(id) {
+    const allRentals = loadRentals();
+    const r = allRentals.find(x => x.id === id);
+    if (!r) return;
+    r.status = 'cancelada';
+    saveRentals(allRentals);
+    rentals = allRentals;
+    updateRentalBadge();
+    renderProfileTab('rentas');
+    showToast('Renta cancelada', 'info');
+}
+
+// ==================== RESERVA ====================
+function submitReservation(e) {
+    e.preventDefault();
+    if (!validateDates()) return;
+    const vN = document.getElementById('reserveVehicle').value;
+    const v = vehicles.find(x => x.name === vN);
+    const sV = document.getElementById('resStart').value;
+    const eV = document.getElementById('resEnd').value;
+    const loc = document.getElementById('resLocation').value;
+    const name = document.getElementById('resName').value || 'Cliente';
+    const email = document.getElementById('resEmail').value || 'cliente@email.com';
+    const phone = document.getElementById('resPhone').value || '+502 XXXX XXXX';
+    const insurance = document.getElementById('resInsurance').checked;
+
+    if (!v || !sV || !eV || !loc) { showToast('Completa todos los campos', 'warning'); return; }
+    if (new Date(eV) <= new Date(sV)) { showToast('La fecha de devolución debe ser posterior a la recogida', 'warning'); return; }
+
+    const d = Math.max(1, Math.ceil((new Date(eV) - new Date(sV)) / (1000*60*60*24)));
+    const ins = insurance ? 150 : 0;
+    const tp = v.price * d + ins * d;
+    const month = new Date(sV).getMonth();
+
+    const rev = loadRevenue();
+    rev[month].amount += tp;
+    saveRevenue(rev);
+    monthlyRevenue = rev;
+
+    const newRental = {
+        id: rentalIdCounter++,
+        vehicleId: v.id, vehicleName: v.name, vehicleImg: v.img,
+        status: 'pendiente',
+        pickupDate: sV, returnDate: eV, location: loc,
+        totalPrice: tp, days: d,
+        customerName: name, customerEmail: email, customerPhone: phone,
+        insurance, createdAt: new Date().toLocaleDateString('es-GT',{day:'2-digit',month:'short',year:'numeric'}),
+        timeline:[
+            {step:"Reserva confirmada",date:"Ahora",done:true},
+            {step:"Pago procesado",date:"Ahora",done:true},
+            {step:"Esperando recogida",date:sV,current:true},
+            {step:"En uso",date:"",done:false},
+            {step:"Devolución",date:eV,done:false}
+        ]
+    };
+    saveRentalCounter(rentalIdCounter);
+    const allRentals = loadRentals();
+    allRentals.unshift(newRental);
+    saveRentals(allRentals);
+    rentals = allRentals;
+
+    if (currentSessionUser) {
+        const users = loadUsers();
+        const u = users.find(x => x.id === currentSessionUser.id);
+        if (u) { u.rentals++; u.totalSpent = (u.totalSpent||0) + tp; saveUsers(users); currentSessionUser = {...currentSessionUser, rentals: u.rentals, totalSpent: u.totalSpent}; }
+    }
+    activityLog.unshift({time:"Ahora",icon:"fa-key",text:`Nueva renta: ${v.name} — Q${tp.toLocaleString()} (${d} días)`,type:"renta"});
+    closeModal('reserveModal');
+    updateRentalBadge();
+    showToast('¡Reserva confirmada exitosamente!', 'success');
+
+    // Abrir mailto para confirmar al cliente
+    setTimeout(() => {
+        const subject = encodeURIComponent(`Confirmación de reserva - ${v.name} - AutoMacky #${String(newRental.id).padStart(4,'0')}`);
+        const body = encodeURIComponent(
+`Estimado/a ${name},
+
+Su reserva ha sido confirmada:
+
+Vehículo: ${v.name}
+Fecha de recogida: ${sV}
+Fecha de devolución: ${eV}
+Lugar de recogida: ${loc}
+Total: Q${tp.toLocaleString()}
+Seguro total: ${insurance ? 'Incluido' : 'No incluido'}
+
+Para cualquier consulta, contáctenos:
+WhatsApp: +502 3812-4414
+Email: ${CONTACT_EMAIL}
+
+¡Gracias por elegir AutoMacky!`
+        );
+        window.location.href = `mailto:${email}?subject=${subject}&body=${body}&from=${CONTACT_EMAIL}`;
+    }, 800);
+
+    document.getElementById('resStart').value = '';
+    document.getElementById('resEnd').value = '';
+    document.getElementById('pricePreview').style.display = 'none';
 }
 
 // ==================== ADMIN ====================
-function openAdminDashboard(){document.getElementById('adminDashboard').classList.add('open');document.getElementById('mainPage').style.display='none';document.querySelector('.chat-container').style.display='none';document.querySelector('.compare-bar').style.display='none';renderAdminTab('overview');}
-function logoutAdmin(){isAdminLoggedIn=false;document.getElementById('adminDashboard').classList.remove('open');document.getElementById('mainPage').style.display='';document.querySelector('.chat-container').style.display='';document.querySelector('.compare-bar').style.display='';showToast('Sesión cerrada','info');}
-function switchAdminTab(tab,btn){currentAdminTab=tab;document.querySelectorAll('.admin-sidebar-item').forEach(i=>i.classList.remove('active'));if(btn)btn.classList.add('active');renderAdminTab(tab);}
-function renderAdminTab(tab){const c=document.getElementById('adminContent');switch(tab){case 'overview':c.innerHTML=renderAdminOverview();break;case 'ingresos':c.innerHTML=renderAdminIngresos();break;case 'usuarios':c.innerHTML=renderAdminUsuarios();break;case 'rentas':c.innerHTML=renderAdminRentas();break;case 'flota':c.innerHTML=renderAdminFlota();break;case 'notificaciones':c.innerHTML=renderAdminNotificaciones();break;}setTimeout(()=>{document.querySelectorAll('.chart-bar[data-h]').forEach(b=>{b.style.height=b.dataset.h;});},50);}
+function openAdminDashboard() {
+    document.getElementById('adminDashboard').classList.add('open');
+    document.getElementById('mainPage').style.display = 'none';
+    document.querySelector('.chat-container').style.display = 'none';
+    document.querySelector('.compare-bar').style.display = 'none';
+    renderAdminTab('overview');
+}
 
-function renderAdminOverview(){const tr=monthlyRevenue.reduce((s,m)=>s+m.amount,0),ar=rentals.filter(r=>r.status==='activa'||r.status==='pendiente').length;return `<div class="flex items-center justify-between mb-8"><div><h2 class="text-3xl font-black">Panel de Control</h2><p class="text-sm" style="color:var(--muted);">Bienvenido, Administrador.</p></div><div class="text-sm" style="color:var(--muted);"><i class="fas fa-clock mr-1"></i>${new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"><div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(34,197,94,0.1);color:var(--success);"><i class="fas fa-dollar-sign"></i></div><span class="text-xs font-semibold px-2 py-1 rounded-full" style="background:rgba(34,197,94,0.1);color:var(--success);">+12.5%</span></div><div class="text-3xl font-black" style="color:var(--success);">$${(tr/1000).toFixed(1)}K</div><div class="text-sm" style="color:var(--muted);">Ingresos Totales</div></div><div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(108,171,221,0.1);color:var(--accent);"><i class="fas fa-key"></i></div></div><div class="text-3xl font-black" style="color:var(--accent);">${rentals.length+35}</div><div class="text-sm" style="color:var(--muted);">Rentas Totales</div></div><div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(245,158,11,0.1);color:var(--warning);"><i class="fas fa-users"></i></div></div><div class="text-3xl font-black" style="color:var(--warning);">${adminUsers.length+120}</div><div class="text-sm" style="color:var(--muted);">Usuarios</div></div><div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;"><i class="fas fa-car"></i></div></div><div class="text-3xl font-black" style="color:#a855f7;">${vehicles.length}</div><div class="text-sm" style="color:var(--muted);">Vehículos</div></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8"><div class="lg:col-span-2 p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);"><h3 class="font-bold mb-6">Ingresos Mensuales</h3><div class="flex items-end gap-2" style="height:200px;">${monthlyRevenue.map(m=>{const p=(m.amount/100000)*100;return `<div class="flex-1 flex flex-col items-center gap-1"><div class="chart-bar w-full" data-h="${p}%" style="height:0;background:linear-gradient(180deg,var(--accent),rgba(108,171,221,0.3));"></div><span class="text-xs" style="color:var(--muted);">${m.month}</span></div>`;}).join('')}</div></div><div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);"><h3 class="font-bold mb-4">Por Categoría</h3>${['sedan','suv','deportivo','compacto','electrico','van'].map(cat=>{const c=vehicles.filter(v=>v.category===cat).length,p=Math.round(c/vehicles.length*100);return `<div class="mb-4"><div class="flex justify-between text-sm mb-1"><span style="color:var(--muted);">${cat.charAt(0).toUpperCase()+cat.slice(1)}</span><span class="font-semibold">${c} (${p}%)</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p}%;background:var(--accent);"></div></div></div>`;}).join('')}</div></div><div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);"><h3 class="font-bold mb-4">Actividad Reciente</h3><div class="space-y-3">${activityLog.slice(0,5).map(a=>{const colors={renta:'var(--accent)',usuario:'var(--success)',pago:'var(--warning)',devolucion:'var(--muted)',calificacion:'#a855f7',cancelacion:'var(--danger)'};return `<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--bg-elevated);"><div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${colors[a.type]}20;color:${colors[a.type]};"><i class="fas ${a.icon} text-xs"></i></div><div class="flex-1 text-sm">${a.text}</div><div class="text-xs whitespace-nowrap" style="color:var(--muted);">${a.time}</div></div>`;}).join('')}</div></div>`;}
+function logoutAdmin() {
+    isAdminLoggedIn = false;
+    document.getElementById('adminDashboard').classList.remove('open');
+    document.getElementById('mainPage').style.display = '';
+    document.querySelector('.chat-container').style.display = '';
+    document.querySelector('.compare-bar').style.display = '';
+    showToast('Sesión de administrador cerrada', 'info');
+}
 
-function renderAdminIngresos(){const t=monthlyRevenue.reduce((s,m)=>s+m.amount,0),avg=t/12,mx=monthlyRevenue.reduce((a,b)=>a.amount>b.amount?a:b);return `<div class="mb-8"><h2 class="text-3xl font-black mb-2">Ingresos</h2></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8"><div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(34,197,94,0.1);color:var(--success);"><i class="fas fa-chart-line"></i></div><div class="text-3xl font-black" style="color:var(--success);">$${(t/1000).toFixed(1)}K</div><div class="text-sm" style="color:var(--muted);">Anual</div></div><div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(108,171,221,0.1);color:var(--accent);"><i class="fas fa-calculator"></i></div><div class="text-3xl font-black" style="color:var(--accent);">$${Math.round(avg).toLocaleString()}</div><div class="text-sm" style="color:var(--muted);">Promedio Mensual</div></div><div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(245,158,11,0.1);color:var(--warning);"><i class="fas fa-trophy"></i></div><div class="text-3xl font-black" style="color:var(--warning);">${mx.month}</div><div class="text-sm" style="color:var(--muted);">Mejor Mes ($${(mx.amount/1000).toFixed(1)}K)</div></div></div><div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);"><h3 class="font-bold mb-4">Detalle</h3><div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Mes</th><th>Ingreso</th><th>Rentas</th></tr></thead><tbody>${monthlyRevenue.map(m=>{const r=8+Math.floor(Math.random()*15);return `<tr><td class="font-semibold">${m.month} 2024</td><td style="color:var(--accent);font-weight:700;">$${m.amount.toLocaleString()}</td><td>${r}</td></tr>`;}).join('')}</tbody></table></div></div>`;}
+function switchAdminTab(tab, btn) {
+    currentAdminTab = tab;
+    document.querySelectorAll('.admin-sidebar-item').forEach(i => i.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderAdminTab(tab);
+}
 
-function renderAdminUsuarios(){return `<div class="mb-8"><h2 class="text-3xl font-black mb-2">Usuarios</h2></div><div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);"><div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Usuario</th><th>Email</th><th>Teléfono</th><th>Registro</th><th>Rentas</th><th>Gastado</th><th>Estado</th></tr></thead><tbody>${adminUsers.map(u=>`<tr><td><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:rgba(108,171,221,0.15);color:var(--accent);">${u.name.charAt(0)}</div><span class="font-semibold">${u.name}</span></div></td><td>${u.email}</td><td>${u.phone}</td><td>${u.joindate}</td><td>${u.rentals}</td><td style="color:var(--accent);font-weight:600;">$${u.totalSpent.toLocaleString()}</td><td><span class="rental-status ${u.status==='activo'?'activa':'cancelada'}"><span class="dot"></span>${u.status==='activo'?'Activo':'Inactivo'}</span></td></tr>`).join('')}</tbody></table></div></div>`;}
+function renderAdminTab(tab) {
+    rentals = loadRentals();
+    registeredUsers = loadUsers();
+    monthlyRevenue = loadRevenue();
+    const c = document.getElementById('adminContent');
+    switch(tab) {
+        case 'overview': c.innerHTML = renderAdminOverview(); break;
+        case 'ingresos': c.innerHTML = renderAdminIngresos(); break;
+        case 'usuarios': c.innerHTML = renderAdminUsuarios(); break;
+        case 'rentas': c.innerHTML = renderAdminRentas(); break;
+        case 'flota': c.innerHTML = renderAdminFlota(); break;
+        case 'correos': c.innerHTML = renderAdminCorreos(); break;
+    }
+    setTimeout(() => { document.querySelectorAll('.chart-bar[data-h]').forEach(b => { b.style.height = b.dataset.h; }); }, 50);
+}
 
-function renderAdminRentas(){return `<div class="mb-8"><h2 class="text-3xl font-black mb-2">Rentas</h2></div><div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);"><div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>ID</th><th>Vehículo</th><th>Cliente</th><th>Fechas</th><th>Total</th><th>Estado</th></tr></thead><tbody>${rentals.map(r=>`<tr><td class="font-mono text-xs">#${String(r.id).padStart(4,'0')}</td><td class="font-semibold">${r.vehicleName}</td><td>${r.customerName}</td><td class="text-xs">${r.pickupDate} → ${r.returnDate}</td><td style="color:var(--accent);font-weight:600;">$${r.totalPrice}</td><td><span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></td></tr>`).join('')}</tbody></table></div></div>`;}
-
-function renderAdminFlota(){return `<div class="mb-8"><h2 class="text-3xl font-black mb-2">Flota</h2></div><div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);"><div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Vehículo</th><th>Categoría</th><th>Precio</th><th>Año</th><th>Rating</th></tr></thead><tbody>${vehicles.map(v=>`<tr><td><div class="flex items-center gap-3"><img src="${v.img}" class="w-10 h-8 rounded object-cover"><span class="font-semibold">${v.name}</span></div></td><td>${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</td><td style="color:var(--accent);font-weight:600;">$${v.price}</td><td>${v.year}</td><td><i class="fas fa-star" style="color:var(--accent);"></i> ${v.rating}</td></tr>`).join('')}</tbody></table></div></div>`;}
-
-// ==================== PANEL DE NOTIFICACIONES (NUEVO) ====================
-function renderAdminNotificaciones(){
-    const emailjsConfigured = EMAILJS_PUBLIC_KEY !== 'TU_PUBLIC_KEY';
+function renderAdminOverview() {
+    const tr = monthlyRevenue.reduce((s,m) => s+m.amount, 0);
+    const maxBar = Math.max(...monthlyRevenue.map(m=>m.amount), 1);
     return `
-    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Notificaciones por Email</h2><p class="text-sm" style="color:var(--muted);">Registro de correos enviados a fabianmacario70@gmail.com</p></div>
-
-    <div class="p-6 rounded-2xl mb-6" style="background:${emailjsConfigured?'rgba(34,197,94,0.08)':'rgba(245,158,11,0.08)'};border:1px solid ${emailjsConfigured?'rgba(34,197,94,0.25)':'rgba(245,158,11,0.25)'};">
-        <div class="flex items-center gap-3">
-            <i class="fas ${emailjsConfigured?'fa-check-circle':'fa-exclamation-triangle'} text-lg" style="color:${emailjsConfigured?'var(--success)':'var(--warning)'};"></i>
-            <div>
-                <div class="font-bold text-sm" style="color:${emailjsConfigured?'var(--success)':'var(--warning)'};">${emailjsConfigured?'EmailJS Configurado':'EmailJS no configurado'}</div>
-                <div class="text-xs mt-1" style="color:var(--muted);">${emailjsConfigured?'Los emails se envían automáticamente a fabianmacario70@gmail.com':'Para envío real, configura EmailJS. Mientras tanto, las notificaciones se registran en la consola y en esta tabla.'}</div>
+    <div class="flex items-center justify-between mb-8">
+        <div><h2 class="text-3xl font-black">Panel de Control</h2><p class="text-sm" style="color:var(--muted);">Vista general del negocio.</p></div>
+        <div class="text-sm" style="color:var(--muted);"><i class="fas fa-clock mr-1"></i>${new Date().toLocaleDateString('es-GT',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(34,197,94,0.1);color:var(--success);"><i class="fas fa-money-bill"></i></div></div><div class="text-3xl font-black" style="color:var(--success);">Q${tr.toLocaleString()}</div><div class="text-sm" style="color:var(--muted);">Ingresos Totales</div></div>
+        <div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(108,171,221,0.1);color:var(--accent);"><i class="fas fa-key"></i></div></div><div class="text-3xl font-black" style="color:var(--accent);">${rentals.length}</div><div class="text-sm" style="color:var(--muted);">Rentas Totales</div></div>
+        <div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(245,158,11,0.1);color:var(--warning);"><i class="fas fa-users"></i></div></div><div class="text-3xl font-black" style="color:var(--warning);">${registeredUsers.length}</div><div class="text-sm" style="color:var(--muted);">Usuarios Registrados</div></div>
+        <div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;"><i class="fas fa-car"></i></div></div><div class="text-3xl font-black" style="color:#a855f7;">${vehicles.length}</div><div class="text-sm" style="color:var(--muted);">Vehículos en Flota</div></div>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="lg:col-span-2 p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+            <h3 class="font-bold mb-6">Ingresos Mensuales (Q)</h3>
+            <div class="flex items-end gap-2" style="height:200px;">
+                ${monthlyRevenue.map(m => {
+                    const p = maxBar > 0 ? (m.amount/maxBar)*90 : 0;
+                    return `<div class="flex-1 flex flex-col items-center gap-1">
+                        <div class="chart-bar w-full" data-h="${p}%" style="height:0;background:linear-gradient(180deg,var(--accent),rgba(108,171,221,0.3));"></div>
+                        <span class="text-xs" style="color:var(--muted);">${m.month}</span>
+                    </div>`;
+                }).join('')}
             </div>
+            ${tr===0?'<p class="text-center text-sm mt-4" style="color:var(--muted);">Aún no hay ingresos. Las reservas aparecerán aquí.</p>':''}
         </div>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-        <div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(108,171,221,0.1);color:var(--accent);"><i class="fas fa-envelope"></i></div><div class="text-3xl font-black" style="color:var(--accent);">${notificationLog.length}</div><div class="text-sm" style="color:var(--muted);">Emails Registrados</div></div>
-        <div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(34,197,94,0.1);color:var(--success);"><i class="fas fa-check-double"></i></div><div class="text-3xl font-black" style="color:var(--success);">${notificationLog.filter(n=>n.status==='sent').length}</div><div class="text-sm" style="color:var(--muted);">Enviados Exitosamente</div></div>
-    </div>
-
-    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-        <h3 class="font-bold mb-4">Historial de Notificaciones</h3>
-        ${notificationLog.length===0?'<p class="text-sm py-8 text-center" style="color:var(--muted);">No hay notificaciones aún. Las reservas y registros nuevos aparecerán aquí.</p>':`
-        <div class="space-y-3">${notificationLog.map(n=>{
-            const statusColors={sent:{bg:'rgba(34,197,94,0.1)',color:'var(--success)',label:'Enviado'},error:{bg:'rgba(239,68,68,0.1)',color:'var(--danger)',label:'Error'},sending:{bg:'rgba(108,171,221,0.1)',color:'var(--accent)',label:'Enviando...'},demo:{bg:'rgba(245,158,11,0.1)',color:'var(--warning)',label:'Demo'}};
-            const st=statusColors[n.status]||statusColors.demo;
-            return `<div class="p-4 rounded-xl" style="background:var(--bg-elevated);border:1px solid var(--border);">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:${n.type==='reserva'?'rgba(108,171,221,0.1)':'rgba(34,197,94,0.1)'};color:${n.type==='reserva'?'var(--accent)':'var(--success)'};"><i class="fas ${n.type==='reserva'?'fa-key':'fa-user-plus'} text-xs"></i></div>
-                        <div><div class="text-sm font-bold">${n.type==='reserva'?'Nueva Reserva':'Nuevo Registro'}</div><div class="text-xs" style="color:var(--muted);">${n.timestamp}</div></div>
-                    </div>
-                    <span class="email-status ${n.status}" style="background:${st.bg};color:${st.color};"><i class="fas ${n.status==='sent'?'fa-check':n.status==='error'?'fa-times':n.status==='sending'?'fa-spinner fa-spin':'fa-info-circle'} mr-1"></i>${st.label}</span>
-                </div>
-                <div class="text-xs p-3 rounded-lg" style="background:var(--card);color:var(--muted);">
-                    <div class="grid grid-cols-2 gap-2">
-                        ${Object.entries(n.data).map(([k,v])=>`<div><span class="font-semibold" style="color:var(--fg);">${k}:</span> ${v}</div>`).join('')}
-                    </div>
-                    <div class="mt-2 pt-2" style="border-top:1px solid var(--border);">Destinatario: <strong style="color:var(--accent);">fabianmacario70@gmail.com</strong></div>
-                </div>
-            </div>`;}).join('')}</div>`}
+        <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+            <h3 class="font-bold mb-4">Actividad Reciente</h3>
+            ${activityLog.length === 0
+                ? '<p class="text-sm text-center py-8" style="color:var(--muted);">Aún no hay actividad.</p>'
+                : `<div class="space-y-3">${activityLog.slice(0,5).map(a => {
+                    const colors={renta:'var(--accent)',usuario:'var(--success)',pago:'var(--warning)',devolucion:'var(--muted)',cancelacion:'var(--danger)'};
+                    return `<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--bg-elevated);">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${colors[a.type]||'var(--muted)'}20;color:${colors[a.type]||'var(--muted)'};"><i class="fas ${a.icon} text-xs"></i></div>
+                        <div class="flex-1 text-sm truncate">${a.text}</div>
+                        <div class="text-xs whitespace-nowrap" style="color:var(--muted);">${a.time}</div>
+                    </div>`;
+                }).join('')}</div>`
+            }
+        </div>
     </div>`;
 }
 
-// ==================== PARTICLES, NAV, SCROLL ====================
-function createParticles(){const c=document.getElementById('particles');for(let i=0;i<20;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*4+2;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.bottom='-10px';p.style.animationDuration=(Math.random()*8+6)+'s';p.style.animationDelay=(Math.random()*6)+'s';c.appendChild(p);}}
-function setupNavScroll(){const n=document.getElementById('navbar');window.addEventListener('scroll',()=>{n.classList.toggle('scrolled',window.scrollY>50);});}
-function setupScrollAnimations(){const o=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('visible');if(en.target.querySelector('.stat-value'))animateCounters(en.target);}});},{threshold:0.15});document.querySelectorAll('.reveal').forEach(el=>o.observe(el));}
-function animateCounters(c){c.querySelectorAll('.stat-value').forEach(el=>{if(el.dataset.animated)return;el.dataset.animated='true';const t=parseInt(el.dataset.target),s=el.dataset.suffix||'';let cur=0;const steps=60,inc=t/steps;let st=0;const timer=setInterval(()=>{st++;cur+=inc;if(st>=steps){cur=t;clearInterval(timer);}el.textContent=Math.floor(cur).toLocaleString()+s;},25);});}
+function renderAdminIngresos() {
+    const t = monthlyRevenue.reduce((s,m)=>s+m.amount, 0);
+    const avg = t / 12;
+    const mx = monthlyRevenue.reduce((a,b)=>a.amount>b.amount?a:b);
+    return `
+    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Ingresos (Q)</h2></div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(34,197,94,0.1);color:var(--success);"><i class="fas fa-chart-line"></i></div><div class="text-3xl font-black" style="color:var(--success);">Q${t.toLocaleString()}</div><div class="text-sm" style="color:var(--muted);">Total Anual</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(108,171,221,0.1);color:var(--accent);"><i class="fas fa-calculator"></i></div><div class="text-3xl font-black" style="color:var(--accent);">Q${Math.round(avg).toLocaleString()}</div><div class="text-sm" style="color:var(--muted);">Promedio Mensual</div></div>
+        <div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(245,158,11,0.1);color:var(--warning);"><i class="fas fa-trophy"></i></div><div class="text-3xl font-black" style="color:var(--warning);">${mx.amount>0?mx.month:'—'}</div><div class="text-sm" style="color:var(--muted);">Mejor Mes ${mx.amount>0?'(Q'+mx.amount.toLocaleString()+')':''}</div></div>
+    </div>
+    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+        <h3 class="font-bold mb-4">Detalle Mensual</h3>
+        <div class="overflow-x-auto"><table class="admin-table">
+            <thead><tr><th>Mes</th><th>Ingreso (Q)</th><th>Rentas</th></tr></thead>
+            <tbody>${monthlyRevenue.map((m,i)=>{
+                const r=rentals.filter(x=>new Date(x.pickupDate).getMonth()===i).length;
+                return `<tr><td class="font-semibold">${m.month} 2025</td><td style="color:var(--accent);font-weight:700;">Q${m.amount.toLocaleString()}</td><td>${r}</td></tr>`;
+            }).join('')}</tbody>
+        </table></div>
+        ${t===0?'<p class="text-center text-sm mt-4 py-4" style="color:var(--muted);">Cuando se registren reservas, los ingresos aparecerán aquí.</p>':''}
+    </div>`;
+}
 
-// ==================== VEHICLES ====================
-function renderVehicles(){const g=document.getElementById('vehicleGrid'),f=vehicles.filter(v=>(currentFilter==='todos'||v.category===currentFilter)&&v.price<=maxPrice);if(!f.length){g.innerHTML='<div class="col-span-full text-center py-20"><i class="fas fa-car-crash text-5xl mb-4" style="color:var(--muted);"></i><p class="text-xl font-bold" style="color:var(--muted);">No se encontraron vehículos</p></div>';return;}g.innerHTML=f.map(v=>`<div class="vehicle-card"><div class="card-img-wrap relative"><img src="${v.img}" alt="${v.name}" loading="lazy"><div class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);">${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</div><div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:var(--navy-dark);"><i class="fas fa-star text-xs"></i> ${v.rating}</div><button class="absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" onclick="toggleCompare(${v.id})"><i class="fas fa-exchange-alt text-sm" style="${compareList.includes(v.id)?'color:var(--accent);':'color:white;'}"></i></button></div><div class="p-5"><div class="flex items-start justify-between mb-2"><div class="min-w-0"><h3 class="text-lg font-bold truncate">${v.name}</h3><p class="text-xs" style="color:var(--muted);">${v.brand} · ${v.year}</p></div><div class="text-right flex-shrink-0 ml-2"><span class="text-xl font-black" style="color:var(--accent);">$${v.price}</span><span class="text-xs block" style="color:var(--muted);">/día</span></div></div><div class="flex gap-4 my-4 text-xs" style="color:var(--muted);"><span class="whitespace-nowrap"><i class="fas fa-user mr-1"></i>${v.seats}</span><span class="whitespace-nowrap"><i class="fas fa-cog mr-1"></i>${v.transmission}</span><span class="whitespace-nowrap"><i class="fas fa-gas-pump mr-1"></i>${v.fuel}</span></div><div class="flex gap-2"><button class="btn-primary text-sm py-2 flex-1" onclick="openVehicleDetail(${v.id})">Ver Detalle</button><button class="btn-secondary text-sm py-2 px-4" onclick="quickReserve(${v.id})">Reservar</button></div></div></div>`).join('');}
-function filterVehicles(c,b){currentFilter=c;document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderVehicles();}
-function updatePriceFilter(v){maxPrice=parseInt(v);document.getElementById('priceLabel').textContent=`$${v}/día`;renderVehicles();}
+function renderAdminUsuarios() {
+    return `
+    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Usuarios</h2><p class="text-sm" style="color:var(--muted);">Gestiona los usuarios registrados.</p></div>
+    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+        ${registeredUsers.length === 0
+            ? '<div class="text-center py-16"><i class="fas fa-users text-5xl mb-4" style="color:var(--border);"></i><p class="font-bold text-lg mb-2" style="color:var(--muted);">Sin usuarios registrados</p></div>'
+            : `<div class="overflow-x-auto"><table class="admin-table">
+                <thead><tr><th>Usuario</th><th>Email</th><th>Teléfono</th><th>Registro</th><th>Rentas</th><th>Gastado</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>${registeredUsers.map(u=>`
+                    <tr class="${u.blocked?'user-blocked':''}">
+                        <td><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:rgba(108,171,221,0.15);color:var(--accent);">${u.name.charAt(0)}</div><span class="font-semibold">${u.name}</span></div></td>
+                        <td>${u.email}</td>
+                        <td>${u.phone}</td>
+                        <td>${u.joindate}</td>
+                        <td>${u.rentals}</td>
+                        <td style="color:var(--accent);font-weight:600;">Q${(u.totalSpent||0).toLocaleString()}</td>
+                        <td><span class="rental-status ${u.blocked?'cancelada':'activa'}"><span class="dot"></span>${u.blocked?'Bloqueado':'Activo'}</span></td>
+                        <td class="flex gap-1">
+                            <button onclick="toggleBlockUser(${u.id})" class="text-xs px-3 py-1 rounded-lg font-semibold transition-all" style="${u.blocked?'background:rgba(34,197,94,0.1);color:var(--success);border:1px solid rgba(34,197,94,0.3);':'background:rgba(245,158,11,0.1);color:var(--warning);border:1px solid rgba(245,158,11,0.3);'}">
+                                <i class="fas ${u.blocked?'fa-unlock':'fa-ban'} mr-1"></i>${u.blocked?'Desbloquear':'Bloquear'}
+                            </button>
+                            <button onclick="openAdminEmailTo('${u.email}','${u.name}')" class="text-xs px-3 py-1 rounded-lg font-semibold" style="background:rgba(108,171,221,0.1);color:var(--accent);border:1px solid rgba(108,171,221,0.3);">
+                                <i class="fas fa-envelope mr-1"></i>Email
+                            </button>
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table></div>`
+        }
+    </div>`;
+}
 
-function openVehicleDetail(id){const v=vehicles.find(x=>x.id===id);if(!v)return;document.getElementById('vehicleModalContent').innerHTML=`<div class="relative"><img src="${v.img}" class="w-full h-64 object-cover" style="border-radius:20px 20px 0 0;"><button onclick="closeModal('vehicleModal')" class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.6);"><i class="fas fa-times text-white"></i></button><div class="absolute bottom-4 left-4 px-4 py-2 rounded-xl" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:var(--navy-dark);font-weight:800;font-size:20px;">$${v.price}<span style="font-size:12px;font-weight:400;">/día</span></div></div><div class="p-6"><div class="flex items-start justify-between mb-4"><div><h3 class="text-2xl font-black">${v.name}</h3><p style="color:var(--muted);">${v.brand} · ${v.year} · ${v.hp} HP</p></div><div class="flex items-center gap-1 px-3 py-1 rounded-full" style="background:rgba(108,171,221,0.1);"><i class="fas fa-star text-sm" style="color:var(--accent);"></i><span class="font-bold" style="color:var(--accent);">${v.rating}</span></div></div><div class="grid grid-cols-3 gap-4 mb-6"><div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-user mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.seats}</div></div><div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-cog mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.transmission}</div></div><div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-gas-pump mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.fuel}</div></div></div><div class="flex flex-wrap gap-2 mb-6">${v.features.map(f=>`<span class="px-3 py-1 rounded-full text-xs font-medium" style="background:var(--card);border:1px solid var(--border);">${f}</span>`).join('')}</div><div class="flex gap-4 mb-6"><div class="flex-1"><label class="block text-xs font-semibold mb-1" style="color:var(--muted);">Inicio</label><input type="date" class="input-field text-sm" id="calcStart" onchange="calculateCost(${v.price})"></div><div class="flex-1"><label class="block text-xs font-semibold mb-1" style="color:var(--muted);">Fin</label><input type="date" class="input-field text-sm" id="calcEnd" onchange="calculateCost(${v.price})"></div></div><div class="p-4 rounded-xl mb-6" style="background:var(--card);border:1px solid var(--border);"><div class="flex justify-between items-center"><span style="color:var(--muted);">Costo:</span><span class="text-2xl font-black" style="color:var(--accent);" id="calcResult">--</span></div></div><button class="btn-primary w-full text-base" onclick="quickReserve(${v.id});closeModal('vehicleModal');"><i class="fas fa-car mr-2"></i>Reservar</button></div>`;openModal('vehicleModal');}
-function calculateCost(p){const s=document.getElementById('calcStart').value,e=document.getElementById('calcEnd').value;if(!s||!e)return;const d=Math.max(1,Math.ceil((new Date(e)-new Date(s))/(1000*60*60*24)));document.getElementById('calcResult').textContent=`$${(d*p).toLocaleString()} MXN (${d}d)`;}
+function toggleBlockUser(id) {
+    const users = loadUsers();
+    const u = users.find(x => x.id === id);
+    if (!u) return;
+    u.blocked = !u.blocked;
+    u.status = u.blocked ? 'bloqueado' : 'activo';
+    saveUsers(users);
+    registeredUsers = users;
+    if (currentSessionUser && currentSessionUser.id === id) currentSessionUser.blocked = u.blocked;
+    activityLog.unshift({time:"Ahora",icon:u.blocked?'fa-ban':'fa-unlock',text:`Usuario ${u.blocked?'bloqueado':'desbloqueado'}: ${u.name}`,type:'usuario'});
+    renderAdminTab('usuarios');
+    showToast(`Usuario ${u.blocked?'bloqueado':'desbloqueado'}: ${u.name}`, u.blocked?'warning':'success');
+}
 
-// ==================== COMPARE ====================
-function toggleCompare(id){const i=compareList.indexOf(id);if(i>-1)compareList.splice(i,1);else{if(compareList.length>=3){showToast('Máximo 3','warning');return;}compareList.push(id);}updateCompareBar();renderVehicles();}
-function updateCompareBar(){const b=document.getElementById('compareBar'),items=document.getElementById('compareItems');if(compareList.length>0){b.classList.add('visible');items.innerHTML=compareList.map(id=>{const v=vehicles.find(x=>x.id===id);return `<span class="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap" style="background:rgba(108,171,221,0.1);border:1px solid rgba(108,171,221,0.3);color:var(--accent);">${v.name}</span>`;}).join('');}else b.classList.remove('visible');}
-function clearCompare(){compareList=[];updateCompareBar();renderVehicles();}
-function openCompareModal(){if(compareList.length<2){showToast('Selecciona al menos 2','warning');return;}const vl=compareList.map(id=>vehicles.find(x=>x.id===id));document.getElementById('compareModalContent').innerHTML=`<div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Comparar</h3><button onclick="closeModal('compareModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div><div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Atributo</th>${vl.map(v=>`<th class="text-center"><img src="${v.img}" class="w-24 h-16 object-cover rounded-lg mx-auto mb-2"><div class="font-bold">${v.name}</div></th>`).join('')}</tr></thead><tbody><tr><td>Precio</td>${vl.map(v=>`<td class="text-center font-bold" style="color:var(--accent);">$${v.price}</td>`).join('')}</tr><tr><td>Categoría</td>${vl.map(v=>`<td class="text-center">${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</td>`).join('')}</tr><tr><td>HP</td>${vl.map(v=>`<td class="text-center">${v.hp}</td>`).join('')}</tr><tr><td>Asientos</td>${vl.map(v=>`<td class="text-center">${v.seats}</td>`).join('')}</tr><tr><td>Combustible</td>${vl.map(v=>`<td class="text-center">${v.fuel}</td>`).join('')}</tr></tbody></table></div>`;openModal('compareModal');}
+function renderAdminRentas() {
+    return `
+    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Rentas</h2><p class="text-sm" style="color:var(--muted);">Gestiona y elimina reservas.</p></div>
+    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+        ${rentals.length === 0
+            ? '<div class="text-center py-16"><i class="fas fa-key text-5xl mb-4" style="color:var(--border);"></i><p class="font-bold text-lg mb-2" style="color:var(--muted);">Sin rentas registradas</p></div>'
+            : `<div class="overflow-x-auto"><table class="admin-table">
+                <thead><tr><th>ID</th><th>Vehículo</th><th>Cliente</th><th>Email</th><th>Fechas</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>${rentals.map(r=>`
+                    <tr>
+                        <td class="font-mono text-xs">#${String(r.id).padStart(4,'0')}</td>
+                        <td class="font-semibold">${r.vehicleName}</td>
+                        <td>${r.customerName}</td>
+                        <td class="text-xs">${r.customerEmail}</td>
+                        <td class="text-xs">${r.pickupDate} → ${r.returnDate}</td>
+                        <td style="color:var(--accent);font-weight:600;">Q${r.totalPrice.toLocaleString()}</td>
+                        <td><span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></td>
+                        <td class="flex gap-1">
+                            <button onclick="openAdminEmailTo('${r.customerEmail}','${r.customerName}')" class="text-xs px-2 py-1 rounded-lg" style="background:rgba(108,171,221,0.1);color:var(--accent);border:1px solid rgba(108,171,221,0.3);"><i class="fas fa-envelope"></i></button>
+                            <button onclick="adminDeleteRental(${r.id})" class="btn-danger text-xs py-1 px-2"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table></div>`
+        }
+    </div>`;
+}
 
-// ==================== TESTIMONIALS ====================
-function renderTestimonials(){document.getElementById('testimonialGrid').innerHTML=testimonials.map(t=>`<div class="testimonial-card"><div class="stars mb-3">${'<i class="fas fa-star"></i>'.repeat(t.rating)}${'<i class="far fa-star"></i>'.repeat(5-t.rating)}</div><p class="mb-4 leading-relaxed" style="color:var(--muted);">"${t.text}"</p><div class="flex items-center gap-3"><img src="${t.avatar}" class="w-10 h-10 rounded-full object-cover flex-shrink-0"><div><div class="font-semibold text-sm">${t.name}</div><div class="text-xs" style="color:var(--muted);">${t.location}</div></div></div></div>`).join('');}
+function adminDeleteRental(id) {
+    if (!confirm('¿Eliminar esta reserva?')) return;
+    const allRentals = loadRentals();
+    const idx = allRentals.findIndex(r => r.id === id);
+    if (idx === -1) return;
+    const r = allRentals[idx];
+    const rev = loadRevenue();
+    const month = new Date(r.pickupDate).getMonth();
+    rev[month].amount = Math.max(0, rev[month].amount - r.totalPrice);
+    saveRevenue(rev);
+    monthlyRevenue = rev;
+    allRentals.splice(idx, 1);
+    saveRentals(allRentals);
+    rentals = allRentals;
+    activityLog.unshift({time:"Ahora",icon:"fa-trash",text:`Renta eliminada: ${r.vehicleName} — ${r.customerName}`,type:'cancelacion'});
+    renderAdminTab('rentas');
+    updateRentalBadge();
+    showToast('Reserva eliminada', 'info');
+}
 
-// ==================== RESERVA / RENTALS ====================
-function quickReserve(id){const v=vehicles.find(x=>x.id===id);document.getElementById('reserveVehicle').value=v.name;openModal('reserveModal');}
-function populateReserveSelect(){const s=document.getElementById('reserveVehicle');vehicles.forEach(v=>{const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} — $${v.price}/día`;s.appendChild(o);});}
-function updateRentalBadge(){const b=document.getElementById('rentalNavBadge'),c=rentals.filter(r=>r.status==='activa'||r.status==='pendiente').length;if(c>0){b.textContent=c;b.classList.remove('hidden');b.classList.add('flex');}else{b.classList.add('hidden');b.classList.remove('flex');}}
-function renderRentals(){const f=currentRentalTab==='todas'?rentals:rentals.filter(r=>r.status===currentRentalTab);renderRentalSummary();renderRentalList(f);}
-function renderRentalSummary(){document.getElementById('rentalSummary').innerHTML=`<div class="p-3 rounded-xl text-center" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);"><div class="text-2xl font-black" style="color:var(--success);">${rentals.filter(r=>r.status==='activa').length}</div><div class="text-xs" style="color:var(--muted);">Activas</div></div><div class="p-3 rounded-xl text-center" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);"><div class="text-2xl font-black" style="color:var(--warning);">${rentals.filter(r=>r.status==='pendiente').length}</div><div class="text-xs" style="color:var(--muted);">Pendientes</div></div><div class="p-3 rounded-xl text-center" style="background:rgba(108,171,221,0.08);border:1px solid rgba(108,171,221,0.2);"><div class="text-2xl font-black" style="color:var(--accent);">${rentals.filter(r=>r.status==='completada').length}</div><div class="text-xs" style="color:var(--muted);">Completadas</div></div>`;}
-function renderRentalList(f){const c=document.getElementById('rentalList');if(!f.length){c.innerHTML='<div class="text-center py-12"><p class="font-bold" style="color:var(--muted);">No hay rentas</p></div>';return;}c.innerHTML=f.map(r=>{const p=getRentalProgress(r),pc=r.status==='activa'?'var(--success)':r.status==='pendiente'?'var(--warning)':'var(--accent)';return `<div class="rental-card"><div class="flex flex-col sm:flex-row"><div class="sm:w-48 h-36 sm:h-auto flex-shrink-0"><img src="${r.vehicleImg}" class="w-full h-full object-cover" style="border-radius:16px 0 0 16px;"></div><div class="flex-1 p-5"><div class="flex items-start justify-between mb-3"><div><h4 class="text-lg font-bold">${r.vehicleName}</h4><p class="text-xs" style="color:var(--muted);">#${String(r.id).padStart(4,'0')}</p></div><span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></div><div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-xs"><div><span style="color:var(--muted);">Recogida</span><div class="font-semibold">${r.pickupDate}</div></div><div><span style="color:var(--muted);">Devolución</span><div class="font-semibold">${r.returnDate}</div></div><div><span style="color:var(--muted);">Ubicación</span><div class="font-semibold">${r.location}</div></div><div><span style="color:var(--muted);">Total</span><div class="font-semibold" style="color:var(--accent);">$${r.totalPrice}</div></div></div><div class="mb-3"><div class="flex justify-between text-xs mb-1"><span style="color:var(--muted);">Progreso</span><span>${p}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p}%;background:${pc};"></div></div></div><div class="flex gap-2"><button class="btn-primary btn-sm text-xs" onclick="openRentalDetail(${r.id})"><i class="fas fa-eye mr-1"></i>Detalle</button>${r.status==='pendiente'?`<button class="btn-danger text-xs" onclick="cancelRental(${r.id})"><i class="fas fa-times mr-1"></i>Cancelar</button>`:''}</div></div></div></div>`;}).join('');}
-function getRentalProgress(r){if(r.status==='cancelada')return 0;if(r.status==='completada')return 100;return Math.round(r.timeline.filter(t=>t.done).length/r.timeline.length*100);}
-function switchRentalTab(t,b){currentRentalTab=t;document.querySelectorAll('.rental-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderRentals();}
-function openRentalDetail(id){const r=rentals.find(x=>x.id===id);if(!r)return;document.getElementById('rentalDetailContent').innerHTML=`<div class="relative"><img src="${r.vehicleImg}" class="w-full h-48 object-cover" style="border-radius:20px 20px 0 0;"><button onclick="closeModal('rentalDetailModal')" class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.6);"><i class="fas fa-times text-white"></i></button><div class="absolute bottom-4 left-4"><span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></div></div><div class="p-6"><h3 class="text-2xl font-black mb-2">${r.vehicleName}</h3><div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6"><div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-calendar-alt mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Recogida</div><div class="text-sm font-bold">${r.pickupDate}</div></div><div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-calendar-check mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Devolución</div><div class="text-sm font-bold">${r.returnDate}</div></div><div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-map-marker-alt mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Ubicación</div><div class="text-sm font-bold">${r.location}</div></div><div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-dollar-sign mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Total</div><div class="text-sm font-bold" style="color:var(--accent);">$${r.totalPrice}</div></div></div><div class="flex gap-4 mb-6"><div class="flex flex-col items-center">${r.timeline.map((t,i)=>`<div class="timeline-dot ${t.done?'done':t.current?'current':''}"></div>${i<r.timeline.length-1?`<div class="timeline-line ${t.done?'done':''}"></div>`:''}`).join('')}</div><div class="flex flex-col gap-3">${r.timeline.map(t=>`<div class="min-h-[30px]"><div class="text-sm font-semibold ${t.done||t.current?'':'opacity-40'}">${t.step}</div><div class="text-xs" style="color:var(--muted);">${t.date}</div></div>`).join('')}</div></div><button class="btn-secondary btn-sm" onclick="closeModal('rentalDetailModal')">Cerrar</button></div>`;openModal('rentalDetailModal');}
-function cancelRental(id){const r=rentals.find(x=>x.id===id);if(!r)return;r.status='cancelada';r.timeline=r.timeline.map(t=>({...t,done:false,current:false}));renderRentals();updateRentalBadge();showToast(`Renta cancelada`,'info');}
+function renderAdminFlota() {
+    return `
+    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Flota</h2></div>
+    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+        <div class="overflow-x-auto"><table class="admin-table">
+            <thead><tr><th>Vehículo</th><th>Categoría</th><th>Precio/Día</th><th>Año</th><th>Rating</th></tr></thead>
+            <tbody>${vehicles.map(v=>`
+                <tr>
+                    <td><div class="flex items-center gap-3"><img src="${v.img}" class="w-10 h-8 rounded object-cover"><span class="font-semibold">${v.name}</span></div></td>
+                    <td>${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</td>
+                    <td style="color:var(--accent);font-weight:600;">Q${v.price.toLocaleString()}</td>
+                    <td>${v.year}</td>
+                    <td><i class="fas fa-star" style="color:var(--accent);"></i> ${v.rating}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table></div>
+    </div>`;
+}
 
-// ==================== MODALESSS Y TOASTS ====================
-function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
-function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
-document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o){o.classList.remove('open');document.body.style.overflow='';}});});
-function showToast(msg,type='info'){const c=document.getElementById('toastContainer'),t=document.createElement('div');t.className=`toast ${type==='success'?'success':''}`;const icon=type==='success'?'fa-check-circle':type==='warning'?'fa-exclamation-triangle':'fa-info-circle';const ic=type==='success'?'var(--success)':type==='warning'?'var(--warning)':'var(--accent)';t.innerHTML=`<i class="fas ${icon}" style="color:${ic};font-size:18px;flex-shrink:0;"></i><span class="text-sm">${msg}</span>`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(100px)';t.style.transition='all 0.3s';setTimeout(()=>t.remove(),300);},4000);}
-function submitContactForm(e){e.preventDefault();e.target.reset();showToast('Mensaje enviado','success');}
-function searchVehicles(){const l=document.getElementById('searchLocation').value;document.getElementById('vehiculos').scrollIntoView({behavior:'smooth'});if(l)showToast(`Buscando en ${l}...`,'info');}
+// ==================== ADMIN CORREOS ====================
+function renderAdminCorreos() {
+    const users = loadUsers();
+    return `
+    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Enviar Correos</h2><p class="text-sm" style="color:var(--muted);">Comunícate con tus clientes directamente.</p></div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+            <h3 class="font-bold mb-4 text-lg"><i class="fas fa-broadcast-tower mr-2" style="color:var(--accent);"></i>Correo Masivo</h3>
+            <p class="text-sm mb-4" style="color:var(--muted);">Envía un correo a todos los usuarios registrados (${users.length} usuarios).</p>
+            <div class="mb-3"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Asunto</label>
+            <input type="text" id="massEmailSubject" class="input-field" placeholder="Asunto del correo masivo"></div>
+            <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Mensaje</label>
+            <textarea id="massEmailBody" class="input-field" rows="5" placeholder="Escribe el mensaje para todos los usuarios..."></textarea></div>
+            <button onclick="sendMassEmail()" class="btn-primary w-full"><i class="fas fa-paper-plane mr-2"></i>Enviar a todos (${users.length})</button>
+        </div>
+        <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+            <h3 class="font-bold mb-4 text-lg"><i class="fas fa-user mr-2" style="color:var(--accent);"></i>Correo Individual</h3>
+            <p class="text-sm mb-4" style="color:var(--muted);">Selecciona un usuario para enviarle un correo personalizado.</p>
+            ${users.length === 0
+                ? '<p class="text-sm text-center py-8" style="color:var(--muted);">No hay usuarios registrados.</p>'
+                : `<div class="space-y-2 max-h-64 overflow-y-auto">${users.map(u=>`
+                    <div class="flex items-center justify-between p-3 rounded-xl" style="background:var(--bg-elevated);border:1px solid var(--border);">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:rgba(108,171,221,0.15);color:var(--accent);">${u.name.charAt(0)}</div>
+                            <div><div class="text-sm font-semibold">${u.name}</div><div class="text-xs" style="color:var(--muted);">${u.email}</div></div>
+                        </div>
+                        <button onclick="openAdminEmailTo('${u.email}','${u.name}')" class="btn-primary btn-sm text-xs"><i class="fas fa-envelope mr-1"></i>Enviar</button>
+                    </div>`).join('')}</div>`
+            }
+        </div>
+    </div>`;
+}
 
-// ==================== CHAT ====================
-function toggleChat(){chatOpen=!chatOpen;const w=document.getElementById('chatWindow'),ic=document.getElementById('chatIcon'),bg=document.getElementById('chatBadge');if(chatOpen){w.classList.add('open');ic.className='fas fa-times text-xl';ic.style.color='var(--navy-dark)';bg.style.display='none';if(!chatInitialized){initChat();chatInitialized=true;}}else{w.classList.remove('open');ic.className='fas fa-comments text-xl';ic.style.color='var(--navy-dark)';}}
-function initChat(){addBotMessage("Hola, bienvenido a AutoMacky. ¿En qué puedo ayudarte?");showQuickActions([{text:"Ver vehículos",action:"ver vehiculos"},{text:"Mis Rentas",action:"mis rentas"},{text:"Precios",action:"precios"}]);}
-function addBotMessage(t){const m=document.getElementById('chatMessages'),b=document.createElement('div');b.className='chat-bubble bot';b.innerHTML=t;m.appendChild(b);m.scrollTop=m.scrollHeight;}
-function addUserMessage(t){const m=document.getElementById('chatMessages'),b=document.createElement('div');b.className='chat-bubble user';b.textContent=t;m.appendChild(b);m.scrollTop=m.scrollHeight;}
-function showQuickActions(a){document.getElementById('quickActions').innerHTML=a.map(x=>`<button class="quick-btn" onclick="handleQuickAction('${x.action}')">${x.text}</button>`).join('');}
-function handleQuickAction(a){addUserMessage(a);setTimeout(()=>processChatResponse(a),500);}
-function sendChatMessage(){const i=document.getElementById('chatInput'),t=i.value.trim();if(!t)return;addUserMessage(t);i.value='';setTimeout(()=>{const l=t.toLowerCase();let a='default';if(l.includes('renta')||l.includes('reserva'))a='mis rentas';else if(l.includes('vehiculo')||l.includes('auto'))a='ver vehiculos';else if(l.includes('precio')||l.includes('costo'))a='precios';else if(l.includes('hola')||l.includes('hey'))a='saludo';else if(l.includes('gracia'))a='gracias';processChatResponse(a);},500);}
-function processChatResponse(action){const R={"mis rentas":{msg:"Puedes ver tus rentas en <strong>\"Mis Rentas\"</strong>.",actions:[{text:"Abrir",action:"abrir_rentas"}]},"ver vehiculos":{msg:"Tenemos más de 500 vehículos. ¿Qué categoría buscas?",actions:[{text:"SUVs",action:"categoria_suv"},{text:"Deportivos",action:"categoria_deportivo"}]},"precios":{msg:"Desde <strong>$35/día</strong> hasta <strong>$280/día</strong>. 7+ días = 15% off.",actions:[{text:"Ver vehículos",action:"ver vehiculos"}]},"saludo":{msg:"Hola, ¿en qué te ayudo?",actions:[{text:"Vehículos",action:"ver vehiculos"},{text:"Rentas",action:"mis rentas"}]},"gracias":{msg:"Con gusto!",actions:[{text:"Explorar",action:"ver vehiculos"}]},"default":{msg:"Puedo ayudarte con vehículos, rentas y precios.",actions:[{text:"Vehículos",action:"ver vehiculos"},{text:"Rentas",action:"mis rentas"},{text:"Precios",action:"precios"}]}};if(action==='abrir_rentas'){openModal('rentalsModal');renderRentals();addBotMessage("Abriendo Mis Rentas...");showQuickActions([{text:"Vehículos",action:"ver vehiculos"}]);return;}if(action.startsWith('categoria_')){const cat=action.split('_')[1],cv=vehicles.filter(v=>v.category===cat);addBotMessage(`Nuestros ${cat}s:<br>${cv.map(v=>`<strong>${v.name}</strong> ($${v.price}/día)`).join('<br>')}`);showQuickActions([{text:"Ver todos",action:"ver vehiculos"}]);return;}const r=R[action]||R['default'];addBotMessage(r.msg);showQuickActions(r.actions);}
+function openAdminEmailTo(email, name) {
+    adminEmailTarget = { email, name };
+    document.getElementById('emailToDisplay').innerHTML = `<span class="email-chip"><i class="fas fa-user mr-1"></i>${name} &lt;${email}&gt;</span>`;
+    document.getElementById('adminEmailSubject').value = '';
+    document.getElementById('adminEmailBody').value = '';
+    openModal('adminEmailModal');
+}
+
+function sendAdminEmail() {
+    const subject = document.getElementById('adminEmailSubject').value.trim();
+    const body = document.getElementById('adminEmailBody').value.trim();
+    if (!subject) { showToast('Por favor ingresa un asunto', 'warning'); return; }
+    if (!body) { showToast('El mensaje no puede estar vacío', 'warning'); return; }
+    if (!adminEmailTarget) { showToast('Error: destinatario no definido', 'warning'); return; }
+
+    const mailtoSubject = encodeURIComponent(subject);
+    const mailtoBody = encodeURIComponent(`Para: ${adminEmailTarget.name}\n\n${body}\n\n---\nAutoMacky Guatemala\nTel: +502 3812-4414\n${CONTACT_EMAIL}`);
+    window.location.href = `mailto:${adminEmailTarget.email}?subject=${mailtoSubject}&body=${mailtoBody}&from=${CONTACT_EMAIL}`;
+
+    closeModal('adminEmailModal');
+    activityLog.unshift({time:"Ahora",icon:"fa-envelope",text:`Correo enviado a: ${adminEmailTarget.name} (${adminEmailTarget.email})`,type:"usuario"});
+    showToast(`Correo preparado para ${adminEmailTarget.name}`, 'success');
+}
+
+function sendMassEmail() {
+    const subject = document.getElementById('massEmailSubject')?.value.trim();
+    const body = document.getElementById('massEmailBody')?.value.trim();
+    const users = loadUsers();
+    if (!subject) { showToast('Por favor ingresa un asunto', 'warning'); return; }
+    if (!body) { showToast('El mensaje no puede estar vacío', 'warning'); return; }
+    if (users.length === 0) { showToast('No hay usuarios registrados', 'warning'); return; }
+
+    const emails = users.map(u => u.email).join(',');
+    const mailtoSubject = encodeURIComponent(subject);
+    const mailtoBody = encodeURIComponent(`${body}\n\n---\nAutoMacky Guatemala\nTel: +502 3812-4414\n${CONTACT_EMAIL}`);
+    window.location.href = `mailto:${emails}?subject=${mailtoSubject}&body=${mailtoBody}&from=${CONTACT_EMAIL}`;
+
+    activityLog.unshift({time:"Ahora",icon:"fa-broadcast-tower",text:`Correo masivo enviado a ${users.length} usuarios`,type:"usuario"});
+    showToast(`Correo preparado para ${users.length} usuarios`, 'success');
+}
+
+// ==================== COMENTARIOS ====================
+let commentIdCounter = 100;
+
+function setCommentRating(r) {
+    commentRating = r;
+    document.querySelectorAll('.star-btn').forEach((btn, i) => {
+        btn.style.color = i < r ? 'var(--accent)' : 'var(--border)';
+    });
+}
+
+function submitComment() {
+    const name = document.getElementById('commentName').value.trim();
+    const location = document.getElementById('commentLocation').value.trim() || 'Guatemala';
+    const text = document.getElementById('commentText').value.trim();
+    if (!name) { showToast('Por favor ingresa tu nombre', 'warning'); return; }
+    if (!text) { showToast('Por favor escribe tu comentario', 'warning'); return; }
+    if (commentRating === 0) { showToast('Por favor selecciona una calificación', 'warning'); return; }
+    if (text.length < 10) { showToast('Por favor escribe una reseña más detallada', 'warning'); return; }
+
+    const allTestimonials = loadTestimonials();
+    const newComment = {
+        id: Date.now(),
+        name, location, text,
+        rating: commentRating,
+        date: new Date().toLocaleDateString('es-GT', {day:'2-digit',month:'short',year:'numeric'}),
+        isNew: true
+    };
+    allTestimonials.unshift(newComment);
+    saveTestimonials(allTestimonials);
+    testimonials = allTestimonials;
+
+    activityLog.unshift({time:"Ahora",icon:"fa-star",text:`Nueva opinión de ${name} — ${commentRating}★`,type:'calificacion'});
+    document.getElementById('commentName').value = '';
+    document.getElementById('commentLocation').value = '';
+    document.getElementById('commentText').value = '';
+    commentRating = 0;
+    setCommentRating(0);
+    renderTestimonials();
+    showToast('¡Gracias por tu opinión!', 'success');
+}
+
+function renderTestimonials() {
+    const grid = document.getElementById('testimonialGrid');
+    if (!grid) return;
+    const allT = loadTestimonials();
+    grid.innerHTML = allT.slice(0, 9).map(t => `
+        <div class="testimonial-card">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="stars">${'<i class="fas fa-star"></i>'.repeat(t.rating)}${'<i class="far fa-star"></i>'.repeat(5-t.rating)}</div>
+                ${t.isNew ? '<span class="live-dot ml-auto" title="Reciente"></span>' : ''}
+            </div>
+            <p class="mb-4 leading-relaxed text-sm" style="color:var(--muted);">"${t.text}"</p>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style="background:rgba(108,171,221,0.2);color:var(--accent);">${t.name.charAt(0).toUpperCase()}</div>
+                    <div><div class="font-semibold text-sm">${t.name}</div><div class="text-xs" style="color:var(--muted);">${t.location}</div></div>
+                </div>
+                <div class="text-xs" style="color:var(--muted);">${t.date}</div>
+            </div>
+        </div>`).join('');
+}
+
+// ==================== PARTÍCULAS / NAV / SCROLL ====================
+function createParticles() {
+    const c = document.getElementById('particles');
+    if (!c) return;
+    for (let i=0; i<20; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const s = Math.random()*4+2;
+        p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:-10px;animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*6}s;`;
+        c.appendChild(p);
+    }
+}
+
+function setupNavScroll() {
+    const n = document.getElementById('navbar');
+    if (!n) return;
+    window.addEventListener('scroll', () => { n.classList.toggle('scrolled', window.scrollY > 50); });
+}
+
+function setupScrollAnimations() {
+    const o = new IntersectionObserver(e => {
+        e.forEach(en => {
+            if (en.isIntersecting) {
+                en.target.classList.add('visible');
+                if (en.target.querySelector('.stat-value')) animateCounters(en.target);
+            }
+        });
+    }, {threshold:0.15});
+    document.querySelectorAll('.reveal').forEach(el => o.observe(el));
+}
+
+function animateCounters(c) {
+    c.querySelectorAll('.stat-value').forEach(el => {
+        if (el.dataset.animated) return;
+        el.dataset.animated = 'true';
+        const t = parseInt(el.dataset.target), s = el.dataset.suffix || '';
+        let cur = 0, steps = 60, inc = t/steps, st = 0;
+        const timer = setInterval(() => {
+            st++; cur += inc;
+            if (st >= steps) { cur = t; clearInterval(timer); }
+            el.textContent = Math.floor(cur).toLocaleString() + s;
+        }, 25);
+    });
+}
+
+// ==================== VEHÍCULOS ====================
+function renderVehicles() {
+    const g = document.getElementById('vehicleGrid');
+    const f = vehicles.filter(v => (currentFilter==='todos'||v.category===currentFilter) && v.price<=maxPrice);
+    if (!f.length) {
+        g.innerHTML = '<div class="col-span-full text-center py-20"><i class="fas fa-car-crash text-5xl mb-4" style="color:var(--muted);"></i><p class="text-xl font-bold" style="color:var(--muted);">No se encontraron vehículos</p></div>';
+        return;
+    }
+    g.innerHTML = f.map(v => `
+        <div class="vehicle-card">
+            <div class="card-img-wrap relative">
+                <img src="${v.img}" alt="${v.name}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/600x400/111d36/6CABDD?text=${encodeURIComponent(v.name)}'">
+                <div class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);">${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</div>
+                <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:var(--navy-dark);"><i class="fas fa-star text-xs"></i> ${v.rating}</div>
+                <button class="absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" onclick="toggleCompare(${v.id})"><i class="fas fa-exchange-alt text-sm" style="${compareList.includes(v.id)?'color:var(--accent);':'color:white;'}"></i></button>
+            </div>
+            <div class="p-5">
+                <div class="flex items-start justify-between mb-2">
+                    <div class="min-w-0"><h3 class="text-lg font-bold truncate">${v.name}</h3><p class="text-xs" style="color:var(--muted);">${v.brand} · ${v.year}</p></div>
+                    <div class="text-right flex-shrink-0 ml-2"><span class="text-xl font-black" style="color:var(--accent);">Q${v.price.toLocaleString()}</span><span class="text-xs block" style="color:var(--muted);">/día</span></div>
+                </div>
+                <div class="flex gap-4 my-4 text-xs" style="color:var(--muted);">
+                    <span class="whitespace-nowrap"><i class="fas fa-user mr-1"></i>${v.seats}</span>
+                    <span class="whitespace-nowrap"><i class="fas fa-cog mr-1"></i>${v.transmission}</span>
+                    <span class="whitespace-nowrap"><i class="fas fa-gas-pump mr-1"></i>${v.fuel}</span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-primary text-sm py-2 flex-1" onclick="openVehicleDetail(${v.id})">Ver Detalle</button>
+                    <button class="btn-secondary text-sm py-2 px-4" onclick="quickReserve(${v.id})">Reservar</button>
+                </div>
+            </div>
+        </div>`).join('');
+}
+
+function filterVehicles(c, b) {
+    currentFilter = c;
+    document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderVehicles();
+}
+
+function updatePriceFilter(v) {
+    maxPrice = parseInt(v);
+    document.getElementById('priceLabel').textContent = `Q${parseInt(v).toLocaleString()}/día`;
+    renderVehicles();
+}
+
+function openVehicleDetail(id) {
+    const v = vehicles.find(x => x.id === id);
+    if (!v) return;
+    document.getElementById('vehicleModalContent').innerHTML = `
+        <div class="relative">
+            <img src="${v.img}" class="w-full h-64 object-cover" style="border-radius:20px 20px 0 0;" onerror="this.onerror=null;this.src='https://placehold.co/600x400/111d36/6CABDD?text=${encodeURIComponent(v.name)}'">
+            <button onclick="closeModal('vehicleModal')" class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.6);"><i class="fas fa-times text-white"></i></button>
+            <div class="absolute bottom-4 left-4 px-4 py-2 rounded-xl" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:var(--navy-dark);font-weight:800;font-size:20px;">Q${v.price.toLocaleString()}<span style="font-size:12px;font-weight:400;">/día</span></div>
+        </div>
+        <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+                <div><h3 class="text-2xl font-black">${v.name}</h3><p style="color:var(--muted);">${v.brand} · ${v.year} · ${v.hp} HP</p></div>
+                <div class="flex items-center gap-1 px-3 py-1 rounded-full" style="background:rgba(108,171,221,0.1);"><i class="fas fa-star text-sm" style="color:var(--accent);"></i><span class="font-bold" style="color:var(--accent);">${v.rating}</span></div>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-user mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.seats} asientos</div></div>
+                <div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-cog mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.transmission}</div></div>
+                <div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-gas-pump mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.fuel}</div></div>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-6">${v.features.map(ft=>`<span class="px-3 py-1 rounded-full text-xs font-medium" style="background:var(--card);border:1px solid var(--border);">${ft}</span>`).join('')}</div>
+            <div class="flex gap-4 mb-6">
+                <div class="flex-1"><label class="block text-xs font-semibold mb-1" style="color:var(--muted);">Inicio</label><input type="date" class="input-field text-sm" id="calcStart" min="${new Date().toISOString().split('T')[0]}" onchange="calculateCost(${v.price},${v.id})"></div>
+                <div class="flex-1"><label class="block text-xs font-semibold mb-1" style="color:var(--muted);">Fin</label><input type="date" class="input-field text-sm" id="calcEnd" min="${new Date().toISOString().split('T')[0]}" onchange="calculateCost(${v.price},${v.id})"></div>
+            </div>
+            <div class="p-4 rounded-xl mb-6" style="background:var(--card);border:1px solid var(--border);">
+                <div class="flex justify-between items-center"><span style="color:var(--muted);">Costo estimado:</span><span class="text-2xl font-black" style="color:var(--accent);" id="calcResult">--</span></div>
+                <div id="calcDateError" class="hidden text-xs mt-2" style="color:var(--danger);">La fecha de devolución debe ser posterior a la recogida.</div>
+            </div>
+            <button class="btn-primary w-full text-base" onclick="quickReserve(${v.id});closeModal('vehicleModal');"><i class="fas fa-car mr-2"></i>Reservar Ahora</button>
+        </div>`;
+    openModal('vehicleModal');
+}
+
+function calculateCost(p, vid) {
+    const s = document.getElementById('calcStart').value;
+    const e = document.getElementById('calcEnd').value;
+    const errDiv = document.getElementById('calcDateError');
+    if (!s || !e) return;
+    if (document.getElementById('calcEnd')) document.getElementById('calcEnd').min = s;
+    if (new Date(e) <= new Date(s)) {
+        document.getElementById('calcResult').textContent = '--';
+        errDiv.classList.remove('hidden'); return;
+    }
+    errDiv.classList.add('hidden');
+    const d = Math.max(1, Math.ceil((new Date(e)-new Date(s))/(1000*60*60*24)));
+    document.getElementById('calcResult').textContent = `Q${(d*p).toLocaleString()} (${d} día${d>1?'s':''})`;
+}
+
+// ==================== COMPARAR ====================
+function toggleCompare(id) {
+    const i = compareList.indexOf(id);
+    if (i > -1) compareList.splice(i, 1);
+    else { if (compareList.length >= 3) { showToast('Máximo 3 vehículos', 'warning'); return; } compareList.push(id); }
+    updateCompareBar(); renderVehicles();
+}
+
+function updateCompareBar() {
+    const b = document.getElementById('compareBar'), items = document.getElementById('compareItems');
+    if (compareList.length > 0) {
+        b.classList.add('visible');
+        items.innerHTML = compareList.map(id => {
+            const v = vehicles.find(x => x.id === id);
+            return `<span class="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap" style="background:rgba(108,171,221,0.1);border:1px solid rgba(108,171,221,0.3);color:var(--accent);">${v.name}</span>`;
+        }).join('');
+    } else b.classList.remove('visible');
+}
+
+function clearCompare() { compareList = []; updateCompareBar(); renderVehicles(); }
+
+function openCompareModal() {
+    if (compareList.length < 2) { showToast('Selecciona al menos 2 vehículos', 'warning'); return; }
+    const vl = compareList.map(id => vehicles.find(x => x.id === id));
+    document.getElementById('compareModalContent').innerHTML = `
+        <div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Comparar Vehículos</h3><button onclick="closeModal('compareModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
+        <div class="overflow-x-auto"><table class="admin-table">
+            <thead><tr><th>Atributo</th>${vl.map(v=>`<th class="text-center"><img src="${v.img}" class="w-24 h-16 object-cover rounded-lg mx-auto mb-2"><div class="font-bold">${v.name}</div></th>`).join('')}</tr></thead>
+            <tbody>
+                <tr><td>Precio/día</td>${vl.map(v=>`<td class="text-center font-bold" style="color:var(--accent);">Q${v.price.toLocaleString()}</td>`).join('')}</tr>
+                <tr><td>Categoría</td>${vl.map(v=>`<td class="text-center">${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</td>`).join('')}</tr>
+                <tr><td>HP</td>${vl.map(v=>`<td class="text-center">${v.hp}</td>`).join('')}</tr>
+                <tr><td>Asientos</td>${vl.map(v=>`<td class="text-center">${v.seats}</td>`).join('')}</tr>
+                <tr><td>Combustible</td>${vl.map(v=>`<td class="text-center">${v.fuel}</td>`).join('')}</tr>
+                <tr><td>Rating</td>${vl.map(v=>`<td class="text-center"><i class="fas fa-star" style="color:var(--accent);"></i> ${v.rating}</td>`).join('')}</tr>
+            </tbody>
+        </table></div>`;
+    openModal('compareModal');
+}
+
+// ==================== RENTAS ====================
+function quickReserve(id) {
+    const v = vehicles.find(x => x.id === id);
+    if (!v) return;
+    document.getElementById('reserveVehicle').value = v.name;
+    if (currentSessionUser) {
+        document.getElementById('resName').value = currentSessionUser.name;
+        document.getElementById('resEmail').value = currentSessionUser.email;
+        document.getElementById('resPhone').value = currentSessionUser.phone;
+    }
+    openModal('reserveModal');
+}
+
+function populateReserveSelect() {
+    const s = document.getElementById('reserveVehicle');
+    vehicles.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v.name;
+        o.textContent = `${v.name} — Q${v.price.toLocaleString()}/día`;
+        s.appendChild(o);
+    });
+}
+
+function updateRentalBadge() {
+    const b = document.getElementById('rentalNavBadge');
+    const allRentals = loadRentals();
+    const c = allRentals.filter(r => r.status==='activa'||r.status==='pendiente').length;
+    if (c > 0) { b.textContent = c; b.classList.remove('hidden'); b.classList.add('flex'); }
+    else { b.classList.add('hidden'); b.classList.remove('flex'); }
+}
+
+function renderRentals() {
+    rentals = loadRentals();
+    const f = currentRentalTab==='todas' ? rentals : rentals.filter(r => r.status===currentRentalTab);
+    renderRentalSummary();
+    renderRentalList(f);
+}
+
+function renderRentalSummary() {
+    const allRentals = loadRentals();
+    document.getElementById('rentalSummary').innerHTML = `
+        <div class="p-3 rounded-xl text-center" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);"><div class="text-2xl font-black" style="color:var(--success);">${allRentals.filter(r=>r.status==='activa').length}</div><div class="text-xs" style="color:var(--muted);">Activas</div></div>
+        <div class="p-3 rounded-xl text-center" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);"><div class="text-2xl font-black" style="color:var(--warning);">${allRentals.filter(r=>r.status==='pendiente').length}</div><div class="text-xs" style="color:var(--muted);">Pendientes</div></div>
+        <div class="p-3 rounded-xl text-center" style="background:rgba(108,171,221,0.08);border:1px solid rgba(108,171,221,0.2);"><div class="text-2xl font-black" style="color:var(--accent);">${allRentals.filter(r=>r.status==='completada').length}</div><div class="text-xs" style="color:var(--muted);">Completadas</div></div>`;
+}
+
+function renderRentalList(f) {
+    const c = document.getElementById('rentalList');
+    if (!f.length) {
+        c.innerHTML = '<div class="text-center py-12"><i class="fas fa-key text-4xl mb-4" style="color:var(--border);"></i><p class="font-bold" style="color:var(--muted);">No hay rentas en esta categoría</p></div>';
+        return;
+    }
+    c.innerHTML = f.map(r => {
+        const p = getRentalProgress(r);
+        const pc = r.status==='activa'?'var(--success)':r.status==='pendiente'?'var(--warning)':'var(--accent)';
+        return `
+        <div class="rental-card">
+            <div class="flex flex-col sm:flex-row">
+                <div class="sm:w-48 h-36 sm:h-auto flex-shrink-0"><img src="${r.vehicleImg}" class="w-full h-full object-cover" style="border-radius:16px 0 0 16px;" onerror="this.onerror=null;this.style.background='var(--card)'"></div>
+                <div class="flex-1 p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <div><h4 class="text-lg font-bold">${r.vehicleName}</h4><p class="text-xs" style="color:var(--muted);">#${String(r.id).padStart(4,'0')}</p></div>
+                        <span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-xs">
+                        <div><span style="color:var(--muted);">Recogida</span><div class="font-semibold">${r.pickupDate}</div></div>
+                        <div><span style="color:var(--muted);">Devolución</span><div class="font-semibold">${r.returnDate}</div></div>
+                        <div><span style="color:var(--muted);">Ubicación</span><div class="font-semibold">${r.location}</div></div>
+                        <div><span style="color:var(--muted);">Total</span><div class="font-semibold" style="color:var(--accent);">Q${r.totalPrice.toLocaleString()}</div></div>
+                    </div>
+                    <div class="mb-3"><div class="flex justify-between text-xs mb-1"><span style="color:var(--muted);">Progreso</span><span>${p}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p}%;background:${pc};"></div></div></div>
+                    <div class="flex gap-2">
+                        <button class="btn-primary btn-sm text-xs" onclick="openRentalDetail(${r.id})"><i class="fas fa-eye mr-1"></i>Detalle</button>
+                        ${r.status==='pendiente'?`<button class="btn-danger text-xs" onclick="cancelRental(${r.id})"><i class="fas fa-times mr-1"></i>Cancelar</button>`:''}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function getRentalProgress(r) {
+    if (r.status==='cancelada') return 0;
+    if (r.status==='completada') return 100;
+    return Math.round(r.timeline.filter(t=>t.done).length/r.timeline.length*100);
+}
+
+function switchRentalTab(t, b) {
+    currentRentalTab = t;
+    document.querySelectorAll('.rental-tab').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderRentals();
+}
+
+function openRentalDetail(id) {
+    const allRentals = loadRentals();
+    const r = allRentals.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('rentalDetailContent').innerHTML = `
+        <div class="relative">
+            <img src="${r.vehicleImg}" class="w-full h-48 object-cover" style="border-radius:20px 20px 0 0;" onerror="this.onerror=null;this.style.background='var(--card)'">
+            <button onclick="closeModal('rentalDetailModal')" class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.6);"><i class="fas fa-times text-white"></i></button>
+            <div class="absolute bottom-4 left-4"><span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></div>
+        </div>
+        <div class="p-6">
+            <h3 class="text-2xl font-black mb-2">${r.vehicleName}</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                <div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-calendar-alt mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Recogida</div><div class="text-sm font-bold">${r.pickupDate}</div></div>
+                <div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-calendar-check mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Devolución</div><div class="text-sm font-bold">${r.returnDate}</div></div>
+                <div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-map-marker-alt mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Ubicación</div><div class="text-sm font-bold" style="font-size:11px;">${r.location}</div></div>
+                <div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-dollar-sign mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Total</div><div class="text-sm font-bold" style="color:var(--accent);">Q${r.totalPrice.toLocaleString()}</div></div>
+            </div>
+            <div class="flex gap-4 mb-6">
+                <div class="flex flex-col items-center">${r.timeline.map((t,i)=>`<div class="timeline-dot ${t.done?'done':t.current?'current':''}"></div>${i<r.timeline.length-1?`<div class="timeline-line ${t.done?'done':''}"></div>`:''}`).join('')}</div>
+                <div class="flex flex-col gap-3">${r.timeline.map(t=>`<div class="min-h-[30px]"><div class="text-sm font-semibold ${t.done||t.current?'':'opacity-40'}">${t.step}</div><div class="text-xs" style="color:var(--muted);">${t.date}</div></div>`).join('')}</div>
+            </div>
+            <button class="btn-secondary btn-sm" onclick="closeModal('rentalDetailModal')">Cerrar</button>
+        </div>`;
+    openModal('rentalDetailModal');
+}
+
+function cancelRental(id) {
+    const allRentals = loadRentals();
+    const r = allRentals.find(x => x.id === id);
+    if (!r) return;
+    r.status = 'cancelada';
+    r.timeline = r.timeline.map(t => ({...t,done:false,current:false}));
+    saveRentals(allRentals);
+    rentals = allRentals;
+    renderRentals();
+    updateRentalBadge();
+    showToast('Renta cancelada', 'info');
+}
+
+// ==================== MODALES ====================
+function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target===o) { o.classList.remove('open'); document.body.style.overflow=''; } });
+});
+
+function showToast(msg, type='info') {
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type==='success'?'success':''}`;
+    const icon = type==='success'?'fa-check-circle':type==='warning'?'fa-exclamation-triangle':'fa-info-circle';
+    const ic = type==='success'?'var(--success)':type==='warning'?'var(--warning)':'var(--accent)';
+    t.innerHTML = `<i class="fas ${icon}" style="color:${ic};font-size:18px;flex-shrink:0;"></i><span class="text-sm">${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 4000);
+}
+
+function submitContactForm(e) {
+    e.preventDefault();
+    const name = document.getElementById('contactName')?.value || '';
+    const email = document.getElementById('contactEmail')?.value || '';
+    const subject = document.getElementById('contactSubject')?.value || 'Consulta AutoMacky';
+    const msg = document.getElementById('contactMsg')?.value || '';
+    const mailtoSubject = encodeURIComponent(`${subject} - ${name}`);
+    const mailtoBody = encodeURIComponent(`Nombre: ${name}\nEmail de respuesta: ${email}\n\n${msg}`);
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${mailtoSubject}&body=${mailtoBody}`;
+    e.target.reset();
+    showToast('Redirigiendo a tu correo para enviar el mensaje.', 'success');
+}
+
+function searchVehicles() {
+    const l = document.getElementById('searchLocation').value;
+    document.getElementById('vehiculos').scrollIntoView({behavior:'smooth'});
+    if (l) showToast(`Buscando en ${l}...`, 'info');
+}
+
+// ==================== CHATBOT ====================
+const chatTree = {
+    main: {
+        msg: "¡Hola! Bienvenido a <strong>AutoMacky Guatemala</strong> 🇬🇹. ¿En qué puedo ayudarte hoy?",
+        actions: [
+            {text:"🚗 Ver vehículos", action:"vehiculos"},
+            {text:"📋 Mis rentas", action:"mis_rentas"},
+            {text:"📍 Ubicaciones", action:"ubicaciones"},
+            {text:"💰 Precios y tarifas", action:"precios"},
+            {text:"🛡️ Seguros", action:"seguros"},
+            {text:"📞 Contacto", action:"contacto"}
+        ]
+    },
+    vehiculos: {
+        msg: "Contamos con vehículos para cada necesidad. ¿Qué tipo buscas?",
+        actions: [
+            {text:"🚙 SUVs (Montaña/Petén)", action:"cat_suv"},
+            {text:"🚐 Vans (grupos)", action:"cat_van"},
+            {text:"🛻 Pick-ups (4x4)", action:"cat_pickup"},
+            {text:"🚗 Sedanes/Compactos", action:"cat_sedan"},
+            {text:"⬅️ Menú principal", action:"main"}
+        ]
+    },
+    cat_suv: {msg:"Nuestras SUVs son ideales para montaña, Petén, y carreteras guatemaltecas. Precios desde <strong>Q620/día</strong>.",actions:[{text:"Reservar SUV",action:"reservar"},{text:"⬅️ Tipos",action:"vehiculos"}]},
+    cat_van: {msg:"Toyota HiAce hasta <strong>12 pasajeros</strong>. Desde <strong>Q1,200/día</strong>.",actions:[{text:"Reservar van",action:"reservar"},{text:"⬅️ Tipos",action:"vehiculos"}]},
+    cat_pickup: {msg:"Pick-ups 4x4 desde <strong>Q850/día</strong>.",actions:[{text:"Reservar pick-up",action:"reservar"},{text:"⬅️ Tipos",action:"vehiculos"}]},
+    cat_sedan: {msg:"Vehículos económicos desde <strong>Q280/día</strong>.",actions:[{text:"Reservar sedan",action:"reservar"},{text:"⬅️ Tipos",action:"vehiculos"}]},
+    mis_rentas: {
+        msg:"Puedes ver el estado de tus reservas, seguimiento en tiempo real y cancelar si necesitas.",
+        actions:[{text:"📂 Abrir mis rentas",action:"abrir_rentas"},{text:"❌ ¿Cómo cancelo?",action:"cancelar_renta"},{text:"⬅️ Menú principal",action:"main"}]
+    },
+    cancelar_renta: {msg:"Ve a <strong>'Mis Rentas'</strong> → selecciona la renta pendiente → toca <strong>'Cancelar'</strong>.",actions:[{text:"📂 Ir a Mis Rentas",action:"abrir_rentas"},{text:"⬅️ Volver",action:"mis_rentas"}]},
+    ubicaciones: {
+        msg:"Tenemos puntos de entrega en toda Guatemala:",
+        actions:[{text:"✈️ Aeropuerto La Aurora",action:"loc_aeropuerto"},{text:"🌺 Antigua Guatemala",action:"loc_antigua"},{text:"🌿 Petén / Flores",action:"loc_peten"},{text:"🏔️ Quetzaltenango",action:"loc_xela"},{text:"⬅️ Menú principal",action:"main"}]
+    },
+    loc_aeropuerto: {msg:"Punto principal en <strong>Aeropuerto Internacional La Aurora</strong>. El vehículo te espera a tu llegada.",actions:[{text:"Reservar aquí",action:"reservar"},{text:"⬅️ Ubicaciones",action:"ubicaciones"}]},
+    loc_antigua: {msg:"Sucursal Antigua Guatemala para el centro histórico y alrededores.",actions:[{text:"Reservar en Antigua",action:"reservar"},{text:"⬅️ Ubicaciones",action:"ubicaciones"}]},
+    loc_peten: {msg:"Sucursal Petén / Flores para Tikal y reservas mayas. Recomendamos 4x4.",actions:[{text:"Ver SUVs/Pick-ups",action:"cat_suv"},{text:"⬅️ Ubicaciones",action:"ubicaciones"}]},
+    loc_xela: {msg:"Sucursal Quetzaltenango para el altiplano guatemalteco.",actions:[{text:"Reservar en Xela",action:"reservar"},{text:"⬅️ Ubicaciones",action:"ubicaciones"}]},
+    precios: {
+        msg:"Tarifas en Quetzales (GTQ):<br>🚗 Compactos: desde <strong style='color:var(--accent)'>Q280/día</strong><br>🚙 Sedanes: desde <strong style='color:var(--accent)'>Q350/día</strong><br>🚗 SUVs: desde <strong style='color:var(--accent)'>Q620/día</strong><br>🛻 Pick-ups: desde <strong style='color:var(--accent)'>Q850/día</strong><br>🚐 Vans: desde <strong style='color:var(--accent)'>Q1,200/día</strong>",
+        actions:[{text:"💳 ¿Qué incluye?",action:"incluye"},{text:"📅 Descuentos",action:"descuentos"},{text:"⬅️ Menú principal",action:"main"}]
+    },
+    descuentos: {msg:"<strong>Descuentos:</strong><br>• 3–6 días: 5% off<br>• 7–13 días: 10% off<br>• 14+ días: 15% off<br><br>Aplica contactando por WhatsApp.",actions:[{text:"💬 WhatsApp",action:"whatsapp"},{text:"⬅️ Precios",action:"precios"}]},
+    incluye: {msg:"✅ Seguro básico<br>✅ Tanque lleno<br>✅ Asistencia 24/7<br>✅ Sin límite de kilómetros<br><br>Seguro total (+Q150/día) cubre colisión y robo.",actions:[{text:"📋 Reservar",action:"reservar"},{text:"⬅️ Menú principal",action:"main"}]},
+    seguros: {msg:"<strong>Básico (incluido):</strong> Daños a terceros + asistencia.<br><strong>Total (+Q150/día):</strong> Colisión, robo, daños propios y grúa.",actions:[{text:"📋 Reservar con seguro total",action:"reservar"},{text:"⬅️ Menú principal",action:"main"}]},
+    contacto: {msg:"📱 <strong>WhatsApp:</strong> +502 3812-4414<br>📧 <strong>Email:</strong> infoautomaky@gmail.com<br>📍 <strong>Aeropuerto La Aurora</strong>",actions:[{text:"💬 Abrir WhatsApp",action:"whatsapp"},{text:"📧 Enviar email",action:"email"},{text:"⬅️ Menú principal",action:"main"}]},
+    default: {msg:"No entendí bien tu consulta. Aquí las opciones:",actions:[{text:"🚗 Vehículos",action:"vehiculos"},{text:"💰 Precios",action:"precios"},{text:"📞 Contacto",action:"contacto"},{text:"📋 Mis rentas",action:"mis_rentas"}]}
+};
+
+function toggleChat() {
+    chatOpen = !chatOpen;
+    const w = document.getElementById('chatWindow');
+    const ic = document.getElementById('chatIcon');
+    const bg = document.getElementById('chatBadge');
+    if (chatOpen) {
+        w.classList.add('open');
+        ic.className = 'fas fa-times text-xl';
+        ic.style.color = 'var(--navy-dark)';
+        bg.style.display = 'none';
+        if (!chatInitialized) { initChat(); chatInitialized = true; }
+    } else {
+        w.classList.remove('open');
+        ic.className = 'fas fa-comments text-xl';
+        ic.style.color = 'var(--navy-dark)';
+    }
+}
+
+function initChat() { addBotMessage(chatTree.main.msg); showQuickActions(chatTree.main.actions); }
+function addBotMessage(t) { const m=document.getElementById('chatMessages'); const b=document.createElement('div'); b.className='chat-bubble bot'; b.innerHTML=t; m.appendChild(b); m.scrollTop=m.scrollHeight; }
+function addUserMessage(t) { const m=document.getElementById('chatMessages'); const b=document.createElement('div'); b.className='chat-bubble user'; b.textContent=t; m.appendChild(b); m.scrollTop=m.scrollHeight; }
+function showQuickActions(actions) { document.getElementById('quickActions').innerHTML=actions.map(x=>`<button class="quick-btn" onclick="handleChatAction('${x.action}','${x.text}')">${x.text}</button>`).join(''); }
+function handleChatAction(action, label) { addUserMessage(label); setTimeout(()=>processChatAction(action),400); }
+
+function processChatAction(action) {
+    if (action==='abrir_rentas') { openModal('rentalsModal'); renderRentals(); addBotMessage("Abriendo tus rentas... ¿Algo más?"); showQuickActions(chatTree.main.actions); return; }
+    if (action==='reservar') { openModal('reserveModal'); addBotMessage("Abriendo el formulario de reserva. ¡Espero que encuentres el vehículo perfecto!"); showQuickActions([{text:"⬅️ Menú principal",action:"main"}]); return; }
+    if (action==='whatsapp') { window.open('https://wa.me/50238124414','_blank'); addBotMessage("Abriendo WhatsApp... ¡Estamos para ayudarte!"); showQuickActions([{text:"⬅️ Menú principal",action:"main"}]); return; }
+    if (action==='email') { window.location.href=`mailto:${CONTACT_EMAIL}?subject=Consulta AutoMacky`; addBotMessage("Abriendo tu correo. 📧"); showQuickActions([{text:"⬅️ Menú principal",action:"main"}]); return; }
+    const node = chatTree[action] || chatTree.default;
+    addBotMessage(node.msg);
+    showQuickActions(node.actions);
+}
+
+function sendChatMessage() {
+    const i = document.getElementById('chatInput');
+    const t = i.value.trim();
+    if (!t) return;
+    addUserMessage(t); i.value = '';
+    setTimeout(() => {
+        const l = t.toLowerCase();
+        let action = 'default';
+        if (l.includes('hola')||l.includes('buenos')||l.includes('hi')) action='main';
+        else if (l.includes('renta')||l.includes('reserva')||l.includes('mis rent')) action='mis_rentas';
+        else if (l.includes('suv')||l.includes('camioneta')) action='cat_suv';
+        else if (l.includes('pick')||l.includes('4x4')) action='cat_pickup';
+        else if (l.includes('van')||l.includes('grupo')) action='cat_van';
+        else if (l.includes('sedan')||l.includes('compacto')||l.includes('auto')) action='cat_sedan';
+        else if (l.includes('precio')||l.includes('costo')||l.includes('cuanto')) action='precios';
+        else if (l.includes('descuento')) action='descuentos';
+        else if (l.includes('seguro')||l.includes('cobertura')) action='seguros';
+        else if (l.includes('ubicacion')||l.includes('donde')||l.includes('aeropuerto')) action='ubicaciones';
+        else if (l.includes('contacto')||l.includes('telefono')||l.includes('whatsapp')) action='contacto';
+        else if (l.includes('cancel')) action='cancelar_renta';
+        else if (l.includes('incluye')||l.includes('incluido')) action='incluye';
+        processChatAction(action);
+    }, 500);
+}
 </script>
 </body>
 </html>
