@@ -1,1791 +1,651 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMacky — Renta de Vehículos Premium Guatemala</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;800;900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #060b18; --bg-elevated: #0c1528; --card: #111d36; --border: #1a2d52;
-            --fg: #e4e8f2; --muted: #7b8fb2; --accent: #6CABDD; --accent-light: #98c5e9;
-            --accent-glow: rgba(108,171,221,0.22); --navy: #1C2C5B; --navy-dark: #0d1b3e;
-            --success: #22c55e; --danger: #ef4444; --warning: #f59e0b;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html { scroll-behavior:smooth; }
-        body { font-family:'Outfit',sans-serif; background:var(--bg); color:var(--fg); overflow-x:hidden; }
-        h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif; }
-        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--bg); } ::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
-
-        .hero-bg { position:absolute; inset:0; background: radial-gradient(ellipse 80% 60% at 50% 0%,rgba(108,171,221,0.1) 0%,transparent 60%), radial-gradient(ellipse 50% 40% at 80% 20%,rgba(28,44,91,0.3) 0%,transparent 50%), linear-gradient(180deg,var(--bg) 0%,#080e1e 100%); z-index:0; }
-        .hero-bg::after { content:''; position:absolute; inset:0; background-image: radial-gradient(circle at 20% 50%,rgba(108,171,221,0.025) 1px,transparent 1px), radial-gradient(circle at 80% 30%,rgba(108,171,221,0.02) 1px,transparent 1px); background-size:60px 60px,40px 40px; animation:gridDrift 25s linear infinite; }
-        @keyframes gridDrift { 0%{transform:translate(0,0)} 100%{transform:translate(60px,60px)} }
-        .particle { position:absolute; border-radius:50%; background:var(--accent); opacity:0; animation:floatParticle linear infinite; pointer-events:none; }
-        @keyframes floatParticle { 0%{opacity:0;transform:translateY(0) scale(0)} 15%{opacity:0.5;transform:scale(1)} 85%{opacity:0.2} 100%{opacity:0;transform:translateY(-400px) scale(0.5)} }
-        .accent-line { height:3px; background:linear-gradient(90deg,transparent,var(--accent),transparent); animation:shimmer 3s ease-in-out infinite; }
-        @keyframes shimmer { 0%,100%{opacity:0.4} 50%{opacity:1} }
-
-        .vehicle-card { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; transition:transform 0.4s cubic-bezier(.16,1,.3,1),box-shadow 0.4s cubic-bezier(.16,1,.3,1),border-color 0.4s; position:relative; will-change:transform; backface-visibility:hidden; }
-        .vehicle-card:hover { transform:translateY(-8px); border-color:rgba(108,171,221,0.35); box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 50px var(--accent-glow); }
-        .vehicle-card .card-img-wrap { overflow:hidden; height:200px; }
-        .vehicle-card img { width:100%; height:100%; object-fit:cover; transition:transform 0.6s cubic-bezier(.16,1,.3,1); will-change:transform; }
-        .vehicle-card:hover img { transform:scale(1.08); }
-
-        .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent-light)); color:var(--navy-dark); font-weight:700; padding:12px 28px; border-radius:10px; border:none; cursor:pointer; transition:transform 0.25s,box-shadow 0.25s; position:relative; overflow:hidden; font-family:'Outfit',sans-serif; font-size:14px; }
-        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px var(--accent-glow); }
-        .btn-secondary { background:transparent; color:var(--fg); border:1px solid var(--border); padding:12px 28px; border-radius:10px; cursor:pointer; font-weight:600; transition:all 0.25s; font-family:'Outfit',sans-serif; font-size:14px; }
-        .btn-secondary:hover { border-color:var(--accent); color:var(--accent); background:rgba(108,171,221,0.06); }
-        .btn-danger { background:transparent; color:var(--danger); border:1px solid rgba(239,68,68,0.3); padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; transition:all 0.25s; font-family:'Outfit',sans-serif; font-size:13px; }
-        .btn-danger:hover { background:rgba(239,68,68,0.1); border-color:var(--danger); }
-        .btn-sm { padding:8px 16px; font-size:13px; border-radius:8px; }
-
-        .chat-container { position:fixed; bottom:24px; right:24px; z-index:1000; }
-        .chat-toggle { width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-light)); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 24px var(--accent-glow); transition:transform 0.25s; position:relative; }
-        .chat-toggle:hover { transform:scale(1.1); }
-        .chat-toggle .badge { position:absolute; top:-4px; right:-4px; width:20px; height:20px; background:var(--danger); border-radius:50%; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; color:#fff; animation:pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
-        .chat-window { position:absolute; bottom:72px; right:0; width:380px; max-height:540px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:20px; display:none; flex-direction:column; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
-        .chat-window.open { display:flex; animation:chatOpen 0.3s cubic-bezier(.16,1,.3,1); }
-        @keyframes chatOpen { from{opacity:0;transform:translateY(20px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
-        .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; max-height:380px; }
-        .chat-bubble { max-width:85%; padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.5; animation:bubbleIn 0.25s ease-out; }
-        @keyframes bubbleIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        .chat-bubble.bot { background:var(--card); border:1px solid var(--border); align-self:flex-start; border-bottom-left-radius:4px; }
-        .chat-bubble.user { background:linear-gradient(135deg,var(--accent),var(--accent-light)); color:var(--navy-dark); align-self:flex-end; border-bottom-right-radius:4px; font-weight:500; }
-        .chat-quick-actions { display:flex; gap:6px; flex-wrap:wrap; padding:0 16px 12px; }
-        .quick-btn { background:var(--card); border:1px solid var(--border); color:var(--fg); padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer; transition:all 0.2s; font-family:'Outfit',sans-serif; }
-        .quick-btn:hover { border-color:var(--accent); color:var(--accent); }
-
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
-        .modal-overlay.open { display:flex; }
-        .modal-content { background:var(--bg-elevated); border:1px solid var(--border); border-radius:20px; max-width:600px; width:100%; max-height:90vh; overflow-y:auto; animation:modalIn 0.3s cubic-bezier(.16,1,.3,1); }
-        @keyframes modalIn { from{opacity:0;transform:scale(0.95) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
-        .modal-content-wide { max-width:850px; }
-        .modal-content-xl { max-width:980px; }
-
-        .toast-container { position:fixed; top:24px; right:24px; z-index:3000; display:flex; flex-direction:column; gap:10px; }
-        .toast { background:var(--card); border:1px solid var(--border); border-left:3px solid var(--accent); padding:14px 20px; border-radius:12px; min-width:300px; animation:toastIn 0.4s cubic-bezier(.16,1,.3,1); display:flex; align-items:center; gap:12px; }
-        .toast.success { border-left-color:var(--success); }
-        @keyframes toastIn { from{opacity:0;transform:translateX(100px)} to{opacity:1;transform:translateX(0)} }
-
-        .filter-chip { background:var(--card); border:1px solid var(--border); color:var(--muted); padding:8px 18px; border-radius:30px; cursor:pointer; transition:all 0.25s; font-size:14px; font-weight:500; font-family:'Outfit',sans-serif; }
-        .filter-chip.active,.filter-chip:hover { background:rgba(108,171,221,0.1); border-color:var(--accent); color:var(--accent); }
-
-        .compare-bar { position:fixed; bottom:-100px; left:50%; transform:translateX(-50%); background:var(--bg-elevated); border:1px solid var(--border); border-radius:16px; padding:16px 24px; display:flex; align-items:center; gap:16px; z-index:900; transition:bottom 0.4s cubic-bezier(.16,1,.3,1); box-shadow:0 -10px 40px rgba(0,0,0,0.5); }
-        .compare-bar.visible { bottom:24px; }
-
-        .step-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px 24px; text-align:center; transition:all 0.3s; will-change:transform; }
-        .step-card:hover { border-color:var(--accent); transform:translateY(-4px); }
-        .step-number { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent-light)); color:var(--navy-dark); font-weight:800; font-size:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
-        .stat-value { font-size:48px; font-weight:900; font-family:'Space Grotesk',sans-serif; background:linear-gradient(135deg,var(--accent),var(--accent-light)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; min-width:100px; text-align:center; }
-        .testimonial-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px; transition:all 0.3s; }
-        .testimonial-card:hover { border-color:rgba(108,171,221,0.3); box-shadow:0 10px 30px rgba(0,0,0,0.3); }
-        .stars { color:var(--accent); }
-        .input-field { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 16px; color:var(--fg); font-size:14px; width:100%; outline:none; transition:border-color 0.25s; font-family:'Outfit',sans-serif; }
-        .input-field:focus { border-color:var(--accent); }
-        .input-field::placeholder { color:var(--muted); }
-        .reveal { opacity:0; transform:translateY(30px); transition:all 0.7s cubic-bezier(.16,1,.3,1); }
-        .reveal.visible { opacity:1; transform:translateY(0); }
-        nav { transition:background 0.3s,border-color 0.3s,backdrop-filter 0.3s; }
-        nav.scrolled { background:rgba(6,11,24,0.92) !important; backdrop-filter:blur(20px); border-bottom:1px solid var(--border); }
-        .brands-track { display:flex; gap:60px; animation:scrollBrands 20s linear infinite; }
-        @keyframes scrollBrands { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-        .feature-icon-box { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; background:rgba(108,171,221,0.1); }
-        .feature-icon-box i { color:var(--accent); font-size:22px; }
-        .service-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px 20px; text-align:center; transition:all 0.3s; will-change:transform; }
-        .service-card:hover { border-color:rgba(108,171,221,0.3); transform:translateY(-4px); }
-
-        .rental-status { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
-        .rental-status.activa { background:rgba(34,197,94,0.12); color:var(--success); border:1px solid rgba(34,197,94,0.25); }
-        .rental-status.pendiente { background:rgba(245,158,11,0.12); color:var(--warning); border:1px solid rgba(245,158,11,0.25); }
-        .rental-status.completada { background:rgba(108,171,221,0.12); color:var(--accent); border:1px solid rgba(108,171,221,0.25); }
-        .rental-status.cancelada { background:rgba(239,68,68,0.12); color:var(--danger); border:1px solid rgba(239,68,68,0.25); }
-        .rental-status .dot { width:6px; height:6px; border-radius:50%; }
-        .rental-status.activa .dot { background:var(--success); }
-        .rental-status.pendiente .dot { background:var(--warning); }
-        .rental-status.completada .dot { background:var(--accent); }
-        .rental-status.cancelada .dot { background:var(--danger); }
-
-        .rental-card { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; transition:all 0.3s; }
-        .rental-card:hover { border-color:rgba(108,171,221,0.25); box-shadow:0 8px 30px rgba(0,0,0,0.3); }
-        .rental-tab { padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.25s; background:transparent; color:var(--muted); border:1px solid transparent; font-family:'Outfit',sans-serif; }
-        .rental-tab.active { background:rgba(108,171,221,0.1); color:var(--accent); border-color:rgba(108,171,221,0.3); }
-        .rental-tab:hover:not(.active) { color:var(--fg); }
-        .progress-bar { height:6px; border-radius:3px; background:var(--border); overflow:hidden; }
-        .progress-bar-fill { height:100%; border-radius:3px; transition:width 0.6s cubic-bezier(.16,1,.3,1); }
-        .timeline-dot { width:12px; height:12px; border-radius:50%; border:2px solid var(--border); background:var(--bg); flex-shrink:0; position:relative; z-index:1; }
-        .timeline-dot.done { border-color:var(--accent); background:var(--accent); }
-        .timeline-dot.current { border-color:var(--accent); background:var(--bg); box-shadow:0 0 0 3px var(--accent-glow); }
-        .timeline-line { width:2px; min-height:30px; background:var(--border); margin-left:5px; }
-        .timeline-line.done { background:var(--accent); }
-
-        .admin-overlay { position:fixed; inset:0; z-index:5000; background:var(--bg); display:none; flex-direction:column; overflow:hidden; }
-        .admin-overlay.open { display:flex; animation:fadeIn 0.3s ease; }
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-        .admin-sidebar { width:260px; background:var(--bg-elevated); border-right:1px solid var(--border); padding:20px 0; flex-shrink:0; display:flex; flex-direction:column; }
-        .admin-sidebar-item { display:flex; align-items:center; gap:12px; padding:12px 24px; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.2s; color:var(--muted); border-left:3px solid transparent; }
-        .admin-sidebar-item:hover { background:rgba(108,171,221,0.05); color:var(--fg); }
-        .admin-sidebar-item.active { background:rgba(108,171,221,0.08); color:var(--accent); border-left-color:var(--accent); }
-        .admin-sidebar-item i { width:20px; text-align:center; }
-        .admin-stat-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; transition:all 0.3s; }
-        .admin-stat-card:hover { border-color:rgba(108,171,221,0.3); transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.2); }
-        .admin-stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; }
-        .admin-table { width:100%; border-collapse:separate; border-spacing:0; }
-        .admin-table th { text-align:left; padding:12px 16px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); border-bottom:1px solid var(--border); }
-        .admin-table td { padding:12px 16px; font-size:14px; border-bottom:1px solid var(--border); }
-        .admin-table tr:hover td { background:rgba(108,171,221,0.03); }
-        .chart-bar { border-radius:6px 6px 0 0; transition:height 0.6s cubic-bezier(.16,1,.3,1); min-width:32px; }
-
-        .comment-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; animation:bubbleIn 0.3s ease-out; }
-        .comment-card:hover { border-color:rgba(108,171,221,0.25); }
-        .live-dot { width:8px; height:8px; border-radius:50%; background:var(--success); animation:pulse 1.5s infinite; display:inline-block; }
-        .user-blocked { opacity:0.5; }
-
-        .profile-tab { padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.25s; background:transparent; color:var(--muted); border:1px solid transparent; font-family:'Outfit',sans-serif; }
-        .profile-tab.active { background:rgba(108,171,221,0.1); color:var(--accent); border-color:rgba(108,171,221,0.3); }
-
-        .email-chip { display:inline-flex; align-items:center; gap:6px; background:rgba(108,171,221,0.1); border:1px solid rgba(108,171,221,0.3); color:var(--accent); padding:4px 10px; border-radius:20px; font-size:12px; }
-
-        @media(max-width:768px) {
-            .chat-window { width:calc(100vw - 48px); right:-12px; }
-            .stat-value { font-size:32px; min-width:70px; }
-            .compare-bar { width:calc(100vw - 40px); flex-wrap:wrap; justify-content:center; }
-            .modal-content-wide { max-width:100%; }
-            .admin-sidebar { width:70px; }
-            .admin-sidebar span { display:none; }
-            .admin-sidebar-item { padding:14px; justify-content:center; border-left:none; border-bottom:3px solid transparent; }
-            .admin-sidebar-item.active { border-bottom-color:var(--accent); border-left-color:transparent; }
-        }
-        @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transformaciones de Funciones | Gráfica interactiva</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#F7F8FA;color:#18181B;min-height:100vh;display:flex;flex-direction:column}
+  header{position:sticky;top:0;z-index:10;border-bottom:1px solid #e4e4e7;background:rgba(255,255,255,.85);backdrop-filter:blur(8px)}
+  .header-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 16px}
+  .logo{width:40px;height:40px;border-radius:12px;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.1)}
+  header h1{font-size:18px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+  header p{font-size:12px;color:#71717a}
+  main{max-width:1280px;margin:0 auto;width:100%;flex:1;padding:20px 16px;display:grid;grid-template-columns:400px minmax(0,1fr);gap:20px;align-items:start}
+  @media(max-width:1023px){main{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid #e4e4e7;border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:16px;margin-bottom:16px}
+  .card h2{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700}
+  .chip{width:24px;height:24px;border-radius:7px;background:#d1fae5;color:#047857;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+  .card .desc{font-size:13px;color:#71717a;margin-top:2px}
+  .row{display:flex;align-items:center;gap:10px}
+  .fx-label{background:#f4f4f5;border-radius:8px;padding:9px 10px;font-family:Georgia,serif;font-style:italic;font-size:14px;color:#71717a;white-space:nowrap}
+  #expr{flex:1;min-width:0;border:1px solid #d4d4d8;border-radius:10px;padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;outline:none}
+  #expr:focus{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.15)}
+  .error{display:none;margin-top:10px;border:1px solid #fecaca;background:#fef2f2;color:#b91c1c;border-radius:10px;padding:9px 12px;font-size:12px;line-height:1.5}
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .presets button{border:1px solid #d4d4d8;background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-family:ui-monospace,monospace;cursor:pointer;color:#3f3f46}
+  .presets button:hover{background:#f4f4f5}
+  .hint{font-size:11px;color:#71717a;line-height:1.6;margin-top:10px}
+  .trow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .trow .lbl{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
+  .trow .lbl svg{color:#71717a;flex-shrink:0}
+  .trow small{display:block;font-size:12px;color:#71717a;font-weight:400}
+  .badge{font-family:ui-monospace,monospace;font-size:12px;border-radius:999px;padding:3px 10px;background:#f4f4f5;color:#71717a;white-space:nowrap}
+  .badge.on-k{background:#059669;color:#fff}
+  .badge.on-h{background:#d97706;color:#fff}
+  .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+  .switch input{opacity:0;width:0;height:0}
+  .slider-bg{position:absolute;inset:0;background:#d4d4d8;border-radius:999px;transition:.2s;cursor:pointer}
+  .slider-bg::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .switch input:checked + .slider-bg{background:#059669}
+  .switch input:checked + .slider-bg::before{transform:translateX(20px)}
+  .sep{border:none;border-top:1px solid #e4e4e7;margin:16px 0}
+  .sld-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  input[type=range]{width:100%;accent-color:#059669;cursor:pointer;height:22px}
+  #sl-h{accent-color:#d97706}
+  .range-ends{display:flex;justify-content:space-between;font-size:11px;color:#a1a1aa;margin-top:2px}
+  .btn-reset{display:inline-flex;align-items:center;gap:6px;border:1px solid #d4d4d8;background:#fff;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer;color:#3f3f46}
+  .btn-reset:hover{background:#f4f4f5}
+  .vec-lbl{display:flex;align-items:center;gap:6px;font-size:12px;color:#71717a;cursor:pointer;user-select:none}
+  .vec-lbl input{accent-color:#7c3aed;width:14px;height:14px;cursor:pointer}
+  .fx-box{border-left:4px solid #1565C0;background:#f8fafc;border-radius:10px;padding:10px 12px}
+  .fx-box.g{border-left-color:#D32F2F}
+  .fx-box .tag{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+  .fx-box .tag{color:#1565C0}.fx-box.g .tag{color:#D32F2F}
+  .fx-box .math{font-size:16px;min-height:24px}
+  .steps{margin-top:12px}
+  .steps p{font-size:12px;font-weight:600;margin-bottom:8px}
+  .steps ol{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .steps li{border:1px solid #e4e4e7;background:#fff;border-radius:9px;padding:8px 12px}
+  .steps li small{font-size:11px;color:#71717a;line-height:1.5;display:block}
+  .steps li .math{font-size:13px;margin-top:4px;min-height:20px}
+  .identity{font-size:12px;font-style:italic;color:#71717a;margin-top:10px}
+  .graph-card{background:#fff;border:1px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04);position:sticky;top:76px}
+  @media(max-width:1023px){.graph-card{position:static}}
+  .graph-body{position:relative;height:420px}
+  @media(min-width:768px){.graph-body{height:540px}}
+  @media(min-width:1024px){.graph-body{height:calc(100vh - 170px);min-height:540px}}
+  #graph{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+  .legend{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.95);border:1px solid #e4e4e7;border-radius:10px;padding:8px 12px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+  .legend div{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500}
+  .legend .bar{width:20px;height:3px;border-radius:99px}
+  .toolbar{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.95);border:1px solid #e4e4e7;border-radius:10px;padding:4px}
+  .toolbar button{width:32px;height:32px;border:none;background:transparent;border-radius:7px;cursor:pointer;color:#3f3f46;display:flex;align-items:center;justify-content:center}
+  .toolbar button:hover{background:#f4f4f5}
+  .canvas-hint{position:absolute;bottom:12px;left:12px;background:rgba(255,255,255,.9);border-radius:8px;padding:5px 10px;font-size:11px;color:#71717a;pointer-events:none}
+  #cdn-error{display:none;margin:12px auto;max-width:1280px;border:1px solid #fecaca;background:#fef2f2;color:#b91c1c;border-radius:10px;padding:10px 14px;font-size:13px}
+  footer{margin-top:auto;border-top:1px solid #e4e4e7;background:#fff}
+  footer div{max-width:1280px;margin:0 auto;padding:12px 16px;text-align:center;font-size:12px;color:#71717a}
+</style>
 </head>
 <body>
 
-<div class="toast-container" id="toastContainer"></div>
-
-<!-- ========== ADMIN DASHBOARD ========== -->
-<div class="admin-overlay" id="adminDashboard">
-    <div class="flex h-full">
-        <div class="admin-sidebar" id="adminSidebar">
-            <div class="px-6 mb-8"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));"><i class="fas fa-car-side" style="color:var(--navy-dark);"></i></div><span class="text-lg font-bold" style="font-family:'Space Grotesk',sans-serif;">Auto<span style="color:var(--accent)">Macky</span></span></div></div>
-            <div class="flex-1">
-                <div class="admin-sidebar-item active" onclick="switchAdminTab('overview',this)"><i class="fas fa-chart-pie"></i><span>Resumen</span></div>
-                <div class="admin-sidebar-item" onclick="switchAdminTab('ingresos',this)"><i class="fas fa-dollar-sign"></i><span>Ingresos</span></div>
-                <div class="admin-sidebar-item" onclick="switchAdminTab('usuarios',this)"><i class="fas fa-users"></i><span>Usuarios</span></div>
-                <div class="admin-sidebar-item" onclick="switchAdminTab('rentas',this)"><i class="fas fa-key"></i><span>Rentas</span></div>
-                <div class="admin-sidebar-item" onclick="switchAdminTab('flota',this)"><i class="fas fa-car"></i><span>Flota</span></div>
-                <div class="admin-sidebar-item" onclick="switchAdminTab('correos',this)"><i class="fas fa-envelope"></i><span>Enviar Correos</span></div>
-            </div>
-            <div class="mt-auto px-4"><button onclick="logoutAdmin()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all" style="background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2);" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'"><i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span></button></div>
-        </div>
-        <div class="flex-1 overflow-y-auto p-6 md:p-8" id="adminContent"></div>
+<header>
+  <div class="header-in">
+    <div class="logo">Σ</div>
+    <div>
+      <h1>Transformaciones de Funciones</h1>
+      <p>Reflexión sobre el eje X · Traslación vertical y horizontal · Gráfica interactiva estilo GeoGebra</p>
     </div>
-</div>
+  </div>
+</header>
 
-<!-- ========== PÁGINA PRINCIPAL ========== -->
-<div id="mainPage">
-    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-transparent">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));"><i class="fas fa-car-side text-lg" style="color:var(--navy-dark);"></i></div><span class="text-xl font-bold tracking-tight" style="font-family:'Space Grotesk',sans-serif;">Auto<span style="color:var(--accent)">Macky</span></span></a>
-            <div class="hidden md:flex items-center gap-8">
-                <a href="#vehiculos" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Vehículos</a>
-                <a href="#como-funciona" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Cómo Funciona</a>
-                <a href="#testimonios" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Opiniones</a>
-                <a href="#contacto" class="text-sm font-medium hover:text-sky-400 transition-colors" style="color:var(--muted)">Contacto</a>
-                <button onclick="openModal('rentalsModal');renderRentals()" class="text-sm font-medium hover:text-sky-400 transition-colors flex items-center gap-2" style="color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;"><i class="fas fa-key"></i> Mis Rentas <span id="rentalNavBadge" class="hidden w-5 h-5 rounded-full text-xs font-bold items-center justify-center" style="background:var(--accent);color:var(--navy-dark);">0</span></button>
-            </div>
-            <div class="flex items-center gap-3">
-                <button class="btn-secondary text-sm hidden sm:flex items-center gap-2" id="navLoginBtn" onclick="handleNavAuth()"><i class="fas fa-user"></i> <span id="navLoginText">Iniciar Sesión</span></button>
-                <button class="btn-primary text-sm" onclick="openModal('reserveModal')">Reservar Ahora</button>
-            </div>
-        </div>
-    </nav>
+<div id="cdn-error">⚠ No se pudieron cargar las librerías (math.js / KaTeX). Se necesita conexión a internet para que la página funcione.</div>
 
-    <header class="relative min-h-screen flex items-center overflow-hidden">
-        <div class="hero-bg"></div><div id="particles" class="absolute inset-0 pointer-events-none"></div>
-        <div class="relative z-10 max-w-7xl mx-auto px-6 py-32 w-full">
-            <div class="max-w-3xl">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background:rgba(108,171,221,0.08);border:1px solid rgba(108,171,221,0.2);"><span class="w-2 h-2 rounded-full animate-pulse" style="background:var(--accent);"></span><span class="text-sm font-medium" style="color:var(--accent);">Más de 500 vehículos disponibles en Guatemala</span></div>
-                <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6" style="font-family:'Space Grotesk',sans-serif;">Conduce tu<br><span style="background:linear-gradient(135deg,var(--accent),var(--accent-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">próxima aventura</span></h1>
-                <p class="text-lg md:text-xl mb-10 max-w-xl leading-relaxed" style="color:var(--muted);">Renta vehículos premium en Guatemala a los mejores precios. Desde Ciudad de Guatemala hasta Antigua, Petén y más.</p>
-                <div class="flex flex-wrap gap-4"><button class="btn-primary text-base" onclick="document.getElementById('vehiculos').scrollIntoView({behavior:'smooth'})"><i class="fas fa-search mr-2"></i>Explorar Vehículos</button><button class="btn-secondary text-base" onclick="openModal('reserveModal')"><i class="fas fa-calendar-alt mr-2"></i>Reserva Rápida</button></div>
-            </div>
-            <div class="mt-16 p-6 rounded-2xl max-w-4xl" style="background:var(--card);border:1px solid var(--border);"><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Lugar de Recogida</label><div class="relative"><i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2" style="color:var(--accent);"></i><input type="text" placeholder="Ciudad o aeropuerto" class="input-field pl-10" id="searchLocation"></div></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Fecha de Recogida</label><div class="relative"><i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2" style="color:var(--accent);"></i><input type="date" class="input-field pl-10" id="searchPickup"></div></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Fecha de Devolución</label><div class="relative"><i class="fas fa-calendar-check absolute left-3 top-1/2 -translate-y-1/2" style="color:var(--accent);"></i><input type="date" class="input-field pl-10" id="searchReturn"></div></div><div class="flex items-end"><button class="btn-primary w-full text-base" onclick="searchVehicles()"><i class="fas fa-search mr-2"></i>Buscar</button></div></div></div>
-        </div>
-    </header>
-
-    <section class="py-10 overflow-hidden" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);"><div class="max-w-7xl mx-auto px-6"><div class="overflow-hidden"><div class="brands-track" style="color:var(--muted);"><span class="text-2xl font-bold whitespace-nowrap opacity-40">Toyota</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Hyundai</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Kia</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Nissan</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mitsubishi</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Ford</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Chevrolet</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mazda</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Toyota</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Hyundai</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Kia</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Nissan</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mitsubishi</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Ford</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Chevrolet</span><span class="text-2xl font-bold whitespace-nowrap opacity-40">Mazda</span></div></div></div></section>
-
-    <section class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="grid grid-cols-2 lg:grid-cols-4 gap-8 reveal"><div class="text-center"><div class="stat-value" data-target="500" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Vehículos Disponibles</div></div><div class="text-center"><div class="stat-value" data-target="22" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Departamentos</div></div><div class="text-center"><div class="stat-value" data-target="12000" data-suffix="+">0</div><div class="text-sm mt-2" style="color:var(--muted);">Clientes Satisfechos</div></div><div class="text-center"><div class="stat-value" data-target="98" data-suffix="%">0</div><div class="text-sm mt-2" style="color:var(--muted);">Satisfacción</div></div></div></div></section>
-
-    <section id="vehiculos" class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-12 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Nuestra <span style="color:var(--accent);">Flota</span></h2></div><div class="flex flex-wrap justify-center gap-3 mb-10 reveal"><button class="filter-chip active" onclick="filterVehicles('todos',this)">Todos</button><button class="filter-chip" onclick="filterVehicles('compacto',this)">Compacto</button><button class="filter-chip" onclick="filterVehicles('sedan',this)">Sedán</button><button class="filter-chip" onclick="filterVehicles('suv',this)">SUV</button><button class="filter-chip" onclick="filterVehicles('pickup',this)">Pick-up</button><button class="filter-chip" onclick="filterVehicles('van',this)">Van</button></div><div class="flex items-center justify-center gap-4 mb-10 reveal"><span class="text-sm" style="color:var(--muted);">Precio máx:</span><input type="range" min="200" max="3000" value="3000" id="priceRange" oninput="updatePriceFilter(this.value)" class="w-48" style="accent-color:var(--accent);"><span class="text-sm font-bold" style="color:var(--accent);" id="priceLabel">Q3,000/día</span></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="vehicleGrid"></div></div></section>
-
-    <section id="como-funciona" class="py-20" style="background:var(--bg-elevated);"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-14 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Cómo <span style="color:var(--accent);">Funciona</span></h2></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8 reveal"><div class="step-card"><div class="step-number">1</div><h3 class="text-xl font-bold mb-3">Elige tu Vehículo</h3><p style="color:var(--muted);">Explora el catálogo y selecciona el vehículo ideal para tu aventura guatemalteca.</p></div><div class="step-card"><div class="step-number">2</div><h3 class="text-xl font-bold mb-3">Reserva en Línea</h3><p style="color:var(--muted);">Completa el formulario en segundos. Proceso 100% seguro.</p></div><div class="step-card"><div class="step-number">3</div><h3 class="text-xl font-bold mb-3">Recoge y Conduce</h3><p style="color:var(--muted);">Presenta tu DPI o pasaporte y disfruta Guatemala al volante.</p></div></div></div></section>
-
-    <section class="py-20"><div class="max-w-7xl mx-auto px-6"><div class="text-center mb-14 reveal"><h2 class="text-4xl md:text-5xl font-black mb-4">Por qué <span style="color:var(--accent);">Elegirnos</span></h2></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal"><div class="service-card"><div class="feature-icon-box"><i class="fas fa-shield-alt"></i></div><h4 class="font-bold mb-2">Seguro Total</h4><p class="text-sm" style="color:var(--muted);">Cobertura completa incluida en toda Guatemala.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-headset"></i></div><h4 class="font-bold mb-2">Soporte 24/7</h4><p class="text-sm" style="color:var(--muted);">Asistencia en carretera siempre disponible.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-hand-holding-usd"></i></div><h4 class="font-bold mb-2">Sin Cargos Ocultos</h4><p class="text-sm" style="color:var(--muted);">Precios transparentes en Quetzales.</p></div><div class="service-card"><div class="feature-icon-box"><i class="fas fa-gas-pump"></i></div><h4 class="font-bold mb-2">Tanque Lleno</h4><p class="text-sm" style="color:var(--muted);">Recibe y devuelve con tanque lleno.</p></div></div></div></section>
-
-    <!-- TESTIMONIOS -->
-    <section id="testimonios" class="py-20" style="background:var(--bg-elevated);">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-8 reveal">
-                <h2 class="text-4xl md:text-5xl font-black mb-4">Opiniones de <span style="color:var(--accent);">Nuestros Clientes</span></h2>
-                <div class="flex items-center justify-center gap-2 text-sm" style="color:var(--muted);"><span class="live-dot"></span><span>Opiniones reales de clientes verificados</span></div>
-            </div>
-            <div class="max-w-2xl mx-auto mb-10 reveal">
-                <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-                    <h3 class="font-bold mb-4 text-lg">Deja tu opinión</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                        <input type="text" id="commentName" class="input-field" placeholder="Tu nombre">
-                        <input type="text" id="commentLocation" class="input-field" placeholder="Tu ciudad (ej: Guatemala, Antigua...)">
-                    </div>
-                    <div class="flex gap-1 mb-3" id="starSelector">
-                        <button onclick="setCommentRating(1)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
-                        <button onclick="setCommentRating(2)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
-                        <button onclick="setCommentRating(3)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
-                        <button onclick="setCommentRating(4)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
-                        <button onclick="setCommentRating(5)" class="star-btn text-2xl transition-colors" style="color:var(--border);background:none;border:none;cursor:pointer;">★</button>
-                    </div>
-                    <textarea id="commentText" class="input-field mb-3" rows="3" placeholder="Cuéntanos tu experiencia con AutoMacky..."></textarea>
-                    <button onclick="submitComment()" class="btn-primary w-full"><i class="fas fa-paper-plane mr-2"></i>Publicar Comentario</button>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="testimonialGrid"></div>
-        </div>
+<main>
+  <div>
+    <!-- 1 · FUNCIÓN ORIGINAL -->
+    <section class="card">
+      <h2><span class="chip">1</span> Función original f(x)</h2>
+      <p class="desc">Escribe la función que quieres transformar</p>
+      <div class="row" style="margin-top:12px">
+        <span class="fx-label">f(x) =</span>
+        <input id="expr" value="x^2" spellcheck="false" aria-label="Expresión de la función f(x)" placeholder="x^2, sin(x), sqrt(x)...">
+      </div>
+      <div id="err" class="error" role="alert"></div>
+      <div class="presets" id="presets"></div>
+      <p class="hint">Funciones soportadas: sin, cos, tan, sqrt, abs, log, ln, exp, ... · Constantes: pi, e</p>
     </section>
 
-    <!-- CONTACTO -->
-    <section id="contacto" class="py-20">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 reveal">
-                <div>
-                    <h2 class="text-4xl font-black mb-6">Contáctanos <span style="color:var(--accent);">Hoy</span></h2>
-                    <p class="text-lg mb-8" style="color:var(--muted);">¿Tienes preguntas? Estamos para ayudarte.</p>
-                    <div class="space-y-6">
-                        <a href="https://wa.me/50238124414" target="_blank" class="flex items-center gap-4 cursor-pointer group" style="text-decoration:none;color:inherit;">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110" style="background:rgba(37,211,102,0.1);">
-                                <i class="fab fa-whatsapp text-xl" style="color:#25d366;"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs mb-0.5" style="color:var(--muted);">WhatsApp / Teléfono</div>
-                                <div class="font-semibold group-hover:text-green-400 transition-colors">+502 3812-4414</div>
-                                <div class="text-xs" style="color:var(--muted);">Toca para abrir WhatsApp</div>
-                            </div>
-                        </a>
-                        <a href="mailto:infoautomaky@gmail.com?subject=Consulta AutoMacky" target="_blank" class="flex items-center gap-4 cursor-pointer group" style="text-decoration:none;color:inherit;">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110" style="background:rgba(234,67,53,0.1);">
-                                <i class="fas fa-envelope text-xl" style="color:#ea4335;"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs mb-0.5" style="color:var(--muted);">Correo Electrónico</div>
-                                <div class="font-semibold group-hover:text-red-400 transition-colors">infoautomaky@gmail.com</div>
-                                <div class="text-xs" style="color:var(--muted);">Toca para enviarnos un correo</div>
-                            </div>
-                        </a>
-                        <a href="https://www.google.com/maps/search/?api=1&query=Aeropuerto+Internacional+La+Aurora+Guatemala" target="_blank" class="flex items-center gap-4 cursor-pointer group" style="text-decoration:none;color:inherit;">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110" style="background:rgba(108,171,221,0.1);">
-                                <i class="fas fa-map-marker-alt text-xl" style="color:var(--accent);"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs mb-0.5" style="color:var(--muted);">Ubicación Principal</div>
-                                <div class="font-semibold group-hover:text-sky-400 transition-colors">Aeropuerto Internacional La Aurora</div>
-                                <div class="text-xs" style="color:var(--muted);">Toca para abrir en Google Maps</div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-                    <form onsubmit="submitContactForm(event)">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre</label><input type="text" class="input-field" placeholder="Tu nombre" required id="contactName"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="tu@email.com" required id="contactEmail"></div></div>
-                        <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Asunto</label><input type="text" class="input-field" placeholder="¿En qué podemos ayudarte?" id="contactSubject"></div>
-                        <div class="mb-6"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Mensaje</label><textarea class="input-field" rows="4" placeholder="Escribe tu mensaje..." required id="contactMsg"></textarea></div>
-                        <button type="submit" class="btn-primary w-full text-base"><i class="fas fa-paper-plane mr-2"></i>Enviar Mensaje</button>
-                    </form>
-                </div>
-            </div>
+    <!-- 2 · TRANSFORMACIONES -->
+    <section class="card">
+      <h2><span class="chip">2</span> Transformaciones</h2>
+      <p class="desc">Se aplican sobre la gráfica de f en tiempo real</p>
+
+      <div class="trow" style="margin-top:14px">
+        <div>
+          <span class="lbl">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m8 7 4-4 4 4"/><path d="m8 17 4 4 4-4"/></svg>
+            Reflexión sobre el eje X
+            <small>Invierte la gráfica verticalmente: <span style="font-family:ui-monospace">g(x) = −f(x)</span></small>
+          </span>
         </div>
+        <label class="switch"><input type="checkbox" id="reflect" checked><span class="slider-bg"></span></label>
+      </div>
+
+      <hr class="sep">
+
+      <div class="sld-head">
+        <span class="lbl" style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m8 8 4-4 4 4"/><path d="m8 16 4 4 4-4"/></svg>
+          Traslación vertical (k)
+        </span>
+        <span class="badge" id="badge-k">· 0</span>
+      </div>
+      <input type="range" id="sl-k" min="-10" max="10" step="0.5" value="0" aria-label="Traslación vertical">
+      <div class="range-ends"><span>k &lt; 0 baja</span><span>k &gt; 0 sube</span></div>
+
+      <div class="sld-head" style="margin-top:18px">
+        <span class="lbl" style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg>
+          Traslación horizontal (h)
+        </span>
+        <span class="badge" id="badge-h">· 0</span>
+      </div>
+      <input type="range" id="sl-h" min="-10" max="10" step="0.5" value="2" aria-label="Traslación horizontal">
+      <div class="range-ends"><span>h &lt; 0 izquierda</span><span>h &gt; 0 derecha</span></div>
+
+      <hr class="sep">
+
+      <div class="trow">
+        <button class="btn-reset" id="btn-reset">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Restablecer transformaciones
+        </button>
+        <label class="vec-lbl"><input type="checkbox" id="show-vec" checked> Vector T(h, k)</label>
+      </div>
     </section>
 
-    <footer class="py-12" style="background:var(--bg-elevated);border-top:1px solid var(--border);">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
-                <div><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));"><i class="fas fa-car-side text-lg" style="color:var(--navy-dark);"></i></div><span class="text-xl font-bold">Auto<span style="color:var(--accent)">Macky</span></span></div><p class="text-sm" style="color:var(--muted);">Tu plataforma de renta premium en Guatemala.</p></div>
-                <div><h4 class="font-bold mb-4">Servicios</h4><ul class="space-y-2 text-sm" style="color:var(--muted);"><li><a href="#" class="hover:text-sky-400 transition-colors">Renta por Día</a></li><li><a href="#" class="hover:text-sky-400 transition-colors">Corporativo</a></li><li><a href="#" class="hover:text-sky-400 transition-colors">Turismo</a></li></ul></div>
-                <div><h4 class="font-bold mb-4">Contacto</h4><div class="flex flex-col gap-3">
-                    <a href="https://wa.me/50238124414" target="_blank" class="flex items-center gap-2 transition-colors hover:text-green-400" style="color:var(--muted);text-decoration:none;"><i class="fab fa-whatsapp" style="color:#25d366;width:16px;"></i><span class="text-sm">+502 3812-4414</span></a>
-                    <a href="mailto:infoautomaky@gmail.com" target="_blank" class="flex items-center gap-2 transition-colors hover:text-red-400" style="color:var(--muted);text-decoration:none;"><i class="fas fa-envelope" style="color:#ea4335;width:16px;"></i><span class="text-sm">infoautomaky@gmail.com</span></a>
-                </div></div>
-            </div>
-            <div class="accent-line mb-6"></div>
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm" style="color:var(--muted);"><span>© 2025 AutoMacky Guatemala. Todos los derechos reservados.</span><div class="flex gap-6"><a href="#" class="hover:text-sky-400 transition-colors">Privacidad</a><a href="#" class="hover:text-sky-400 transition-colors">Términos</a></div></div>
-        </div>
-    </footer>
-</div>
+    <!-- 3 · FUNCIÓN TRANSFORMADA -->
+    <section class="card" id="card-formulas">
+      <h2><span class="chip">3</span> Función transformada</h2>
+      <p class="desc">Regla general: <span style="font-family:ui-monospace">g(x) = a·f(x − h) + k</span></p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+        <div class="fx-box"><p class="tag">Original</p><div class="math" id="tex-f"></div></div>
+        <div class="fx-box g"><p class="tag">Transformada</p><div class="math" id="tex-g"></div></div>
+      </div>
+      <div class="steps" id="steps"></div>
+      <p class="identity" id="identity" style="display:none">No se ha aplicado ninguna transformación: g coincide con f.</p>
+    </section>
+  </div>
 
-<div class="compare-bar" id="compareBar"><i class="fas fa-exchange-alt" style="color:var(--accent);"></i><span class="text-sm font-semibold whitespace-nowrap">Comparar: </span><div id="compareItems" class="flex gap-2 flex-wrap"></div><button class="btn-primary text-sm py-2 px-4" onclick="openCompareModal()">Comparar</button><button class="text-sm px-3 py-2 rounded-lg whitespace-nowrap" style="background:var(--card);border:1px solid var(--border);color:var(--muted);" onclick="clearCompare()">Limpiar</button></div>
-
-<!-- CHAT -->
-<div class="chat-container">
-    <div class="chat-window" id="chatWindow">
-        <div class="p-4 flex items-center justify-between" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));">
-            <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.15);"><i class="fas fa-robot" style="color:var(--navy-dark);"></i></div><div><div class="font-bold text-sm" style="color:var(--navy-dark);">AutoMacky Asistente</div><div class="text-xs" style="color:rgba(13,27,62,0.6);">En línea • Guatemala</div></div></div>
-            <button onclick="toggleChat()" style="color:var(--navy-dark);"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-quick-actions" id="quickActions"></div>
-        <div class="p-3" style="border-top:1px solid var(--border);"><div class="flex gap-2"><input type="text" id="chatInput" class="input-field text-sm" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter')sendChatMessage()"><button onclick="sendChatMessage()" class="btn-primary py-2 px-4 text-sm flex-shrink-0"><i class="fas fa-paper-plane"></i></button></div></div>
+  <!-- GRÁFICA -->
+  <div class="graph-card">
+    <div class="graph-body" id="graph-body">
+      <canvas id="graph" aria-label="Gráfica de la función original y la función transformada"></canvas>
+      <div class="legend">
+        <div><span class="bar" style="background:#1565C0"></span><span style="color:#1565C0">f(x) — original</span></div>
+        <div><span class="bar" style="background:#D32F2F"></span><span style="color:#D32F2F">g(x) — transformada</span></div>
+      </div>
+      <div class="toolbar">
+        <button id="z-in" title="Acercar" aria-label="Acercar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></button>
+        <button id="z-out" title="Alejar" aria-label="Alejar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg></button>
+        <button id="z-reset" title="Restablecer vista" aria-label="Restablecer vista"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+        <button id="dl" title="Descargar imagen PNG" aria-label="Descargar imagen PNG"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg></button>
+      </div>
+      <div class="canvas-hint">Arrastra para mover · Rueda o pinza para zoom</div>
     </div>
-    <button class="chat-toggle" onclick="toggleChat()" aria-label="Chat"><i class="fas fa-comments text-xl" id="chatIcon" style="color:var(--navy-dark);"></i><div class="badge" id="chatBadge">1</div></button>
-</div>
+  </div>
+</main>
 
-<!-- Modal Login -->
-<div class="modal-overlay" id="loginModal"><div class="modal-content p-8 max-w-md">
-    <div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Iniciar Sesión</h3><button onclick="closeModal('loginModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
-    <div id="loginError" class="hidden mb-4 p-3 rounded-xl text-sm font-medium" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--danger);"><i class="fas fa-exclamation-circle mr-2"></i><span id="loginErrorText"></span></div>
-    <form onsubmit="submitLogin(event)">
-        <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="tu@email.com" required id="loginEmail"></div>
-        <div class="mb-6"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Contraseña</label><input type="password" class="input-field" placeholder="Tu contraseña" required id="loginPassword"></div>
-        <button type="submit" class="btn-primary w-full text-base mb-4"><i class="fas fa-sign-in-alt mr-2"></i>Ingresar</button>
-        <p class="text-center text-sm" style="color:var(--muted);">¿No tienes cuenta? <a href="#" style="color:var(--accent);" onclick="event.preventDefault();closeModal('loginModal');openModal('registerModal')">Regístrate</a></p>
-    </form>
-</div></div>
+<footer><div>Transformaciones geométricas de funciones · Reflexión sobre el eje X · Traslación vertical k · Traslación horizontal h · g(x) = a·f(x − h) + k</div></footer>
 
-<!-- Modal Registro -->
-<div class="modal-overlay" id="registerModal"><div class="modal-content p-8 max-w-md">
-    <div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Crear Cuenta</h3><button onclick="closeModal('registerModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
-    <form onsubmit="submitRegister(event)">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre Completo</label><input type="text" class="input-field" placeholder="Tu nombre" required id="regName"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Teléfono</label><input type="tel" class="input-field" placeholder="+502 XXXX XXXX" required id="regPhone"></div></div>
-        <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="tu@email.com" required id="regEmail"></div>
-        <div class="mb-6"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Contraseña</label><input type="password" class="input-field" placeholder="Mínimo 6 caracteres" required id="regPassword" minlength="6"></div>
-        <button type="submit" class="btn-primary w-full text-base mb-4"><i class="fas fa-user-plus mr-2"></i>Crear Cuenta</button>
-        <p class="text-center text-sm" style="color:var(--muted);">¿Ya tienes cuenta? <a href="#" style="color:var(--accent);" onclick="event.preventDefault();closeModal('registerModal');openModal('loginModal')">Inicia Sesión</a></p>
-    </form>
-</div></div>
-
-<!-- Modal Perfil de Usuario -->
-<div class="modal-overlay" id="profileModal"><div class="modal-content modal-content-wide p-0">
-    <div class="p-6 flex items-center justify-between" style="border-bottom:1px solid var(--border);">
-        <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:var(--navy-dark);" id="profileAvatar">U</div>
-            <div><h3 class="text-xl font-black" id="profileName">Mi Perfil</h3><p class="text-sm" style="color:var(--muted);" id="profileEmail">usuario@email.com</p></div>
-        </div>
-        <button onclick="closeModal('profileModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button>
-    </div>
-    <div class="flex gap-2 p-4 flex-wrap" style="border-bottom:1px solid var(--border);">
-        <button class="profile-tab active" onclick="switchProfileTab('info',this)"><i class="fas fa-user mr-2"></i>Mi Información</button>
-        <button class="profile-tab" onclick="switchProfileTab('rentas',this)"><i class="fas fa-key mr-2"></i>Mis Rentas</button>
-        <button class="profile-tab" onclick="switchProfileTab('seguridad',this)"><i class="fas fa-lock mr-2"></i>Seguridad</button>
-    </div>
-    <div class="p-6" id="profileTabContent"></div>
-</div></div>
-
-<!-- Modal Mis Rentas -->
-<div class="modal-overlay" id="rentalsModal"><div class="modal-content modal-content-wide p-0">
-    <div class="p-6 flex items-center justify-between" style="border-bottom:1px solid var(--border);"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(108,171,221,0.1);"><i class="fas fa-key" style="color:var(--accent);"></i></div><div><h3 class="text-xl font-black">Mis Rentas</h3></div></div><button onclick="closeModal('rentalsModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
-    <div class="flex gap-2 p-4" style="border-bottom:1px solid var(--border);" id="rentalTabs"><button class="rental-tab active" onclick="switchRentalTab('todas',this)">Todas</button><button class="rental-tab" onclick="switchRentalTab('activa',this)">Activas</button><button class="rental-tab" onclick="switchRentalTab('pendiente',this)">Pendientes</button><button class="rental-tab" onclick="switchRentalTab('completada',this)">Completadas</button></div>
-    <div class="grid grid-cols-3 gap-4 p-4" id="rentalSummary"></div>
-    <div class="p-4 space-y-4 max-h-96 overflow-y-auto" id="rentalList"></div>
-</div></div>
-
-<div class="modal-overlay" id="rentalDetailModal"><div class="modal-content modal-content-wide p-0" id="rentalDetailContent"></div></div>
-<div class="modal-overlay" id="vehicleModal"><div class="modal-content" id="vehicleModalContent"></div></div>
-
-<!-- Modal Reserva -->
-<div class="modal-overlay" id="reserveModal"><div class="modal-content p-8">
-    <div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Reserva tu Vehículo</h3><button onclick="closeModal('reserveModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
-    <form onsubmit="submitReservation(event)">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre Completo</label><input type="text" class="input-field" placeholder="Juan García" required id="resName"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label><input type="email" class="input-field" placeholder="juan@email.com" required id="resEmail"></div></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Teléfono</label><input type="tel" class="input-field" placeholder="+502 XXXX XXXX" required id="resPhone"></div><div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Vehículo</label><select class="input-field" id="reserveVehicle" required onchange="validateDates()"><option value="">Seleccionar</option></select></div></div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Fecha de Recogida</label><input type="date" class="input-field" required id="resStart" onchange="validateDates()"></div>
-            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Fecha de Devolución</label><input type="date" class="input-field" required id="resEnd" onchange="validateDates()"></div>
-        </div>
-        <div id="dateError" class="hidden mb-3 p-3 rounded-xl text-sm" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--danger);"><i class="fas fa-exclamation-circle mr-2"></i>La fecha de devolución debe ser posterior a la recogida.</div>
-        <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Lugar de Recogida</label><select class="input-field" required id="resLocation"><option value="">Seleccionar</option><option>Aeropuerto Internacional La Aurora</option><option>Sucursal Zona Viva, Guatemala City</option><option>Sucursal Antigua Guatemala</option><option>Sucursal Quetzaltenango</option><option>Sucursal Cobán</option><option>Sucursal Petén / Flores</option><option>Sucursal Puerto Barrios</option><option>Sucursal Escuintla</option></select></div>
-        <div class="mb-4 p-4 rounded-xl" id="pricePreview" style="background:var(--card);border:1px solid var(--border);display:none;"><div class="flex justify-between items-center"><span style="color:var(--muted);">Total estimado:</span><span class="text-xl font-black" style="color:var(--accent);" id="pricePreviewVal"></span></div></div>
-        <div class="mb-6"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="w-5 h-5" style="accent-color:var(--accent);" checked id="resInsurance" onchange="validateDates()"><span class="text-sm" style="color:var(--muted);">Seguro total (+Q150/día)</span></label></div>
-        <button type="submit" class="btn-primary w-full text-base" id="reserveBtn"><i class="fas fa-check-circle mr-2"></i>Confirmar Reserva</button>
-    </form>
-</div></div>
-
-<div class="modal-overlay" id="compareModal"><div class="modal-content p-8 max-w-3xl" id="compareModalContent"></div></div>
-
-<!-- Modal Admin Email -->
-<div class="modal-overlay" id="adminEmailModal"><div class="modal-content p-8 max-w-lg">
-    <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-black">Enviar Correo</h3>
-        <button onclick="closeModal('adminEmailModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button>
-    </div>
-    <div id="adminEmailForm">
-        <div class="mb-4 p-3 rounded-xl text-sm" style="background:rgba(108,171,221,0.08);border:1px solid rgba(108,171,221,0.2);">
-            <span style="color:var(--muted);">De: </span><span style="color:var(--accent);">infoautomaky@gmail.com</span>
-        </div>
-        <div class="mb-4">
-            <label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Para</label>
-            <div id="emailToDisplay" class="mb-2"></div>
-        </div>
-        <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Asunto</label><input type="text" class="input-field" id="adminEmailSubject" placeholder="Asunto del correo"></div>
-        <div class="mb-6"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Mensaje</label><textarea class="input-field" id="adminEmailBody" rows="5" placeholder="Escribe tu mensaje..."></textarea></div>
-        <div class="flex gap-3">
-            <button onclick="sendAdminEmail()" class="btn-primary flex-1"><i class="fas fa-paper-plane mr-2"></i>Enviar Correo</button>
-            <button onclick="closeModal('adminEmailModal')" class="btn-secondary">Cancelar</button>
-        </div>
-    </div>
-</div></div>
-
+<script src="https://cdn.jsdelivr.net/npm/mathjs@13/lib/browser/math.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script>
-// ==================== CONSTANTES ====================
-const CONTACT_EMAIL = 'infoautomaky@gmail.com';
-const ADMIN_EMAIL_CRED = "admin@automacky.com";
-const ADMIN_PASS = "Admin123!";
-const LS_USERS = 'automacky_users';
-const LS_RENTALS = 'automacky_rentals';
-const LS_TESTIMONIALS = 'automacky_testimonials';
-const LS_REVENUE = 'automacky_revenue';
-const LS_RENTAL_COUNTER = 'automacky_rental_counter';
+'use strict';
+/* ============================= ESTADO ============================= */
+const COLOR_F = '#1565C0', COLOR_G = '#D32F2F', COLOR_VEC = '#7C3AED';
+const state = { reflect: true, h: 2, k: 0, showVec: true };
+let currentF = null, currentG = null, currentNode = null;
 
-// ==================== ESTADO GLOBAL ====================
-let currentSessionUser = null;
-let currentRentalTab = 'todas';
-let currentAdminTab = 'overview';
-let isAdminLoggedIn = false;
-let currentFilter = 'todos';
-let maxPrice = 3000;
-let compareList = [];
-let chatOpen = false;
-let chatInitialized = false;
-let commentRating = 0;
-let currentProfileTab = 'info';
-let adminEmailTarget = null;
-
-// ==================== PERSISTENCIA ====================
-function loadUsers() { try { return JSON.parse(localStorage.getItem(LS_USERS)) || []; } catch(e) { return []; } }
-function saveUsers(u) { localStorage.setItem(LS_USERS, JSON.stringify(u)); }
-function loadRentals() { try { return JSON.parse(localStorage.getItem(LS_RENTALS)) || []; } catch(e) { return []; } }
-function saveRentals(r) { localStorage.setItem(LS_RENTALS, JSON.stringify(r)); }
-function loadTestimonials() {
-    try {
-        const saved = JSON.parse(localStorage.getItem(LS_TESTIMONIALS));
-        if (saved && saved.length > 0) return saved;
-    } catch(e) {}
-    return getDefaultTestimonials();
+/* ======================= UTILIDADES MATEMÁTICAS ======================= */
+function fmtNum(n){
+  if (Object.is(n, -0)) return '0';
+  if (Math.abs(n) >= 1e6 || (Math.abs(n) < 1e-4 && n !== 0)) return n.toExponential(2);
+  return String(parseFloat(n.toFixed(4)));
 }
-function saveTestimonials(t) { localStorage.setItem(LS_TESTIMONIALS, JSON.stringify(t)); }
-function loadRevenue() {
-    try {
-        const r = JSON.parse(localStorage.getItem(LS_REVENUE));
-        if (r) return r;
-    } catch(e) {}
-    return [{month:"Ene",amount:0},{month:"Feb",amount:0},{month:"Mar",amount:0},{month:"Abr",amount:0},{month:"May",amount:0},{month:"Jun",amount:0},{month:"Jul",amount:0},{month:"Ago",amount:0},{month:"Sep",amount:0},{month:"Oct",amount:0},{month:"Nov",amount:0},{month:"Dic",amount:0}];
+function fmtKTerm(k){
+  if (k > 0) return ' + ' + fmtNum(k);
+  if (k < 0) return ' - ' + fmtNum(Math.abs(k));
+  return '';
 }
-function saveRevenue(r) { localStorage.setItem(LS_REVENUE, JSON.stringify(r)); }
-function loadRentalCounter() { return parseInt(localStorage.getItem(LS_RENTAL_COUNTER)) || 1; }
-function saveRentalCounter(n) { localStorage.setItem(LS_RENTAL_COUNTER, n); }
+function compileExpression(input){
+  const raw = input.trim();
+  if (!raw) return { ok: false, error: 'Ingresa una función, por ejemplo: x^2' };
+  let expr = raw.replace(/^\s*[a-zA-Z]\s*(\(\s*x\s*\))?\s*=\s*/, '').replace(/X/g, 'x').replace(/π/g, 'pi');
+  if (!expr) return { ok: false, error: 'Ingresa una función, por ejemplo: x^2' };
+  try {
+    const node = math.parse(expr);
+    const c = node.compile();
+    const fn = x => {
+      try {
+        const r = c.evaluate({ x });
+        return (typeof r === 'number' && isFinite(r)) ? r : null;
+      } catch (e) { return null; }
+    };
+    return { ok: true, node, fn };
+  } catch (err) {
+    return { ok: false, error: 'No se pudo interpretar la función. Revisa la sintaxis. (' + err.message + ')' };
+  }
+}
+function makeTransformedFn(base, reflect, h, k){
+  return x => {
+    const y = base(x - h);
+    if (y === null) return null;
+    const out = (reflect ? -y : y) + k;
+    return isFinite(out) ? out : null;
+  };
+}
+/* Sustituye x por (x - h) en el árbol de la expresión */
+function substituteX(node, h){
+  if (h === 0) return node;
+  const str = h > 0 ? 'x - ' + fmtNum(h) : 'x + ' + fmtNum(Math.abs(h));
+  const repl = new math.ParenthesisNode(math.parse(str));
+  const bare = math.parse(str);
+  return node.transform((n, path, parent) => {
+    if (n.isSymbolNode && n.name === 'x') {
+      if (parent && parent.isFunctionNode) return bare.clone();
+      return repl.clone();
+    }
+    return n;
+  });
+}
+function buildFormulas(node, reflect, h, k){
+  const fTex = 'f\\left(x\\right) = ' + node.toTex({ implicit: 'hide' });
+  const substituted = substituteX(node, h);
+  const subTex = substituted.toTex({ implicit: 'hide' });
+  const needsParens = !!substituted.isOperatorNode && (substituted.op === '+' || substituted.op === '-');
+  const wrapped = needsParens ? '\\left(' + subTex + '\\right)' : subTex;
+  const gTex = 'g\\left(x\\right) = ' + (reflect ? '-' + wrapped : wrapped) + fmtKTerm(k);
 
-let registeredUsers = loadUsers();
-let rentals = loadRentals();
-let testimonials = loadTestimonials();
-let monthlyRevenue = loadRevenue();
-let rentalIdCounter = loadRentalCounter();
-let activityLog = [];
+  const steps = [];
+  let current = subTex;
+  if (h !== 0) {
+    steps.push({
+      label: h > 0
+        ? 'Traslación horizontal: ' + fmtNum(h) + ' unidades a la derecha → y = f(x - ' + fmtNum(h) + ')'
+        : 'Traslación horizontal: ' + fmtNum(Math.abs(h)) + ' unidades a la izquierda → y = f(x + ' + fmtNum(Math.abs(h)) + ')',
+      tex: 'y_1 = ' + current
+    });
+  }
+  if (reflect) {
+    current = needsParens ? '-\\left(' + current + '\\right)' : '-' + current;
+    steps.push({ label: 'Reflexión sobre el eje X: se invierte verticalmente → y = -y', tex: 'y_2 = ' + current });
+  }
+  if (k !== 0) {
+    current += k > 0 ? ' + ' + fmtNum(k) : ' - ' + fmtNum(Math.abs(k));
+    steps.push({
+      label: k > 0
+        ? 'Traslación vertical: ' + fmtNum(k) + ' unidades hacia arriba → y = y + ' + fmtNum(k)
+        : 'Traslación vertical: ' + fmtNum(Math.abs(k)) + ' unidades hacia abajo → y = y - ' + fmtNum(Math.abs(k)),
+      tex: 'y_3 = ' + current
+    });
+  }
+  return { fTex, gTex, steps, isIdentity: !reflect && h === 0 && k === 0 };
+}
 
-function getDefaultTestimonials() {
-    return [
-        {id:1,name:"Carlos Ajú",location:"Guatemala City",text:"Excelente servicio. Renté una SUV para ir a Petén y el proceso fue muy sencillo. El vehículo en perfectas condiciones.",rating:5,date:"15 Jun 2025",isNew:false},
-        {id:2,name:"María Sincal",location:"Antigua Guatemala",text:"AutoMacky es sin duda la mejor opción en Guatemala. Precios justos en Quetzales y atención increíble. ¡Ya renté tres veces!",rating:5,date:"20 Jun 2025",isNew:false},
-        {id:3,name:"Roberto Oxlaj",location:"Quetzaltenango",text:"Rentamos una pick-up para un viaje familiar. El proceso fue rápido y el precio muy accesible. Recomendado 100%.",rating:4,date:"22 Jun 2025",isNew:false},
-        {id:4,name:"Ana López",location:"Cobán",text:"Muy buena atención al cliente. El Toyota RAV4 que renté estaba impecable. Llegué a Semuc Champey sin ningún problema.",rating:5,date:"28 Jun 2025",isNew:false},
-        {id:5,name:"Jorge Cac",location:"Flores, Petén",text:"Renté para llegar a Tikal. La camioneta 4x4 fue perfecta para los caminos de terracería. Altamente recomendado.",rating:5,date:"1 Jul 2025",isNew:false},
-        {id:6,name:"Lucía Morales",location:"Escuintla",text:"Buen precio, vehículo limpio y proceso muy fácil en línea. La entrega en el aeropuerto fue rapidísima.",rating:4,date:"5 Jul 2025",isNew:false},
+/* ============================== GRÁFICO ============================== */
+const wrap = document.getElementById('graph-body');
+const canvas = document.getElementById('graph');
+const ctx = canvas.getContext('2d');
+const view = { cx: 0, cy: 0, ppu: 45 };
+let hover = null, dragging = false;
+
+function niceStep(ppu, targetPx){
+  const target = targetPx / ppu;
+  const pow = Math.pow(10, Math.floor(Math.log10(target)));
+  const m = target / pow;
+  const mant = m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10;
+  return mant * pow;
+}
+function fmtTick(v, step){
+  const dec = Math.max(0, -Math.floor(Math.log10(step)));
+  const s = String(parseFloat(v.toFixed(Math.min(10, dec + 1))));
+  return s === '0' ? '0' : s;
+}
+function draw(){
+  const dpr = window.devicePixelRatio || 1;
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  if (!W || !H) return;
+  if (canvas.width !== W * dpr || canvas.height !== H * dpr) {
+    canvas.width = W * dpr; canvas.height = H * dpr;
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const { cx, cy, ppu } = view;
+  const xmin = cx - W / 2 / ppu, xmax = cx + W / 2 / ppu;
+  const ymin = cy - H / 2 / ppu, ymax = cy + H / 2 / ppu;
+  const toSX = x => W / 2 + (x - cx) * ppu;
+  const toSY = y => H / 2 - (y - cy) * ppu;
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, W, H);
+
+  /* cuadrícula */
+  const major = niceStep(ppu, 90), minor = major / 5;
+  if (minor * ppu >= 7) {
+    ctx.strokeStyle = '#EDEDF2'; ctx.lineWidth = 1; ctx.beginPath();
+    for (let i = Math.ceil(xmin / minor); i * minor <= xmax; i++) {
+      const sx = Math.round(toSX(i * minor)) + .5; ctx.moveTo(sx, 0); ctx.lineTo(sx, H);
+    }
+    for (let j = Math.ceil(ymin / minor); j * minor <= ymax; j++) {
+      const sy = Math.round(toSY(j * minor)) + .5; ctx.moveTo(0, sy); ctx.lineTo(W, sy);
+    }
+    ctx.stroke();
+  }
+  ctx.strokeStyle = '#D9D9E3'; ctx.lineWidth = 1; ctx.beginPath();
+  for (let i = Math.ceil(xmin / major); i * major <= xmax; i++) {
+    const sx = Math.round(toSX(i * major)) + .5; ctx.moveTo(sx, 0); ctx.lineTo(sx, H);
+  }
+  for (let j = Math.ceil(ymin / major); j * major <= ymax; j++) {
+    const sy = Math.round(toSY(j * major)) + .5; ctx.moveTo(0, sy); ctx.lineTo(W, sy);
+  }
+  ctx.stroke();
+
+  /* ejes con flechas */
+  const ax = toSX(0), ay = toSY(0);
+  ctx.strokeStyle = '#3F3F46'; ctx.lineWidth = 1.5; ctx.beginPath();
+  ctx.moveTo(0, ay); ctx.lineTo(W - 2, ay);
+  ctx.moveTo(ax, H); ctx.lineTo(ax, 2);
+  ctx.stroke();
+  ctx.fillStyle = '#3F3F46';
+  ctx.beginPath(); ctx.moveTo(W - 2, ay); ctx.lineTo(W - 10, ay - 4); ctx.lineTo(W - 10, ay + 4); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(ax, 2); ctx.lineTo(ax - 4, 10); ctx.lineTo(ax + 4, 10); ctx.closePath(); ctx.fill();
+  ctx.font = 'italic 13px Georgia, serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillText('x', W - 14, ay - 8);
+  ctx.fillText('y', ax + 10, 14);
+
+  /* números de los ejes */
+  ctx.font = '11px ui-sans-serif, system-ui, sans-serif';
+  ctx.fillStyle = '#52525B';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const labelY = Math.min(Math.max(ay + 5, 4), H - 18);
+  for (let i = Math.ceil(xmin / major); i * major <= xmax; i++) {
+    const v = i * major;
+    if (Math.abs(v) < major / 100) continue;
+    ctx.fillText(fmtTick(v, major), toSX(v), labelY);
+  }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  const labelX = Math.min(Math.max(ax - 6, 30), W - 4);
+  for (let j = Math.ceil(ymin / major); j * major <= ymax; j++) {
+    const v = j * major;
+    if (Math.abs(v) < major / 100) continue;
+    ctx.fillText(fmtTick(v, major), labelX, toSY(v));
+  }
+
+  /* curvas (con detección de asíntotas) */
+  function drawCurve(fn, color){
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath();
+    let penDown = false, prevY = null;
+    for (let px = 0; px <= W; px++) {
+      const x = cx + (px - W / 2) / ppu;
+      const y = fn(x);
+      if (y === null || !isFinite(y)) { penDown = false; prevY = null; continue; }
+      const syRaw = toSY(y);
+      if (syRaw > 1e6 || syRaw < -1e6) { penDown = false; prevY = null; continue; }
+      const sy = Math.max(-1000, Math.min(H + 1000, syRaw));
+      const asymptote = prevY !== null && ((prevY > ymax && y < ymin) || (prevY < ymin && y > ymax));
+      if (!penDown || asymptote) { ctx.moveTo(px, sy); penDown = true; }
+      else ctx.lineTo(px, sy);
+      prevY = y;
+    }
+    ctx.stroke();
+  }
+  if (currentF) drawCurve(currentF, COLOR_F);
+  if (currentG) drawCurve(currentG, COLOR_G);
+
+  /* etiquetas f y g al borde derecho */
+  if (currentF || currentG) {
+    ctx.font = 'bold italic 14px Georgia, serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const xEdge = cx + (W / 2 - 14) / ppu;
+    function drawLabel(fn, name, color){
+      const y = fn(xEdge);
+      if (y === null) return;
+      const sy = toSY(y);
+      if (sy < 12 || sy > H - 12) return;
+      ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.9)';
+      ctx.strokeText(name, W - 26, sy - 10);
+      ctx.fillStyle = color;
+      ctx.fillText(name, W - 26, sy - 10);
+    }
+    if (currentF) drawLabel(currentF, 'f', COLOR_F);
+    if (currentG) drawLabel(currentG, 'g', COLOR_G);
+  }
+
+  /* vector de traslación T(h, k) */
+  if (state.showVec && (state.h !== 0 || state.k !== 0)) {
+    const x1 = toSX(0), y1 = toSY(0), x2 = toSX(state.h), y2 = toSY(state.k);
+    ctx.save();
+    ctx.strokeStyle = COLOR_VEC; ctx.fillStyle = COLOR_VEC; ctx.lineWidth = 2;
+    ctx.setLineDash([7, 5]);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    ctx.setLineDash([]);
+    const ang = Math.atan2(y2 - y1, x2 - x1), head = 10;
+    ctx.beginPath(); ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - head * Math.cos(ang - .45), y2 - head * Math.sin(ang - .45));
+    ctx.lineTo(x2 - head * Math.cos(ang + .45), y2 - head * Math.sin(ang + .45));
+    ctx.closePath(); ctx.fill();
+    [[x1, y1], [x2, y2]].forEach(p => { ctx.beginPath(); ctx.arc(p[0], p[1], 3.5, 0, Math.PI * 2); ctx.fill(); });
+    const text = 'T(' + fmtNum(state.h) + ', ' + fmtNum(state.k) + ')';
+    ctx.font = 'bold 12px ui-sans-serif, system-ui, sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.9)';
+    ctx.strokeText(text, (x1 + x2) / 2 + 8, (y1 + y2) / 2 - 6);
+    ctx.fillText(text, (x1 + x2) / 2 + 8, (y1 + y2) / 2 - 6);
+    ctx.restore();
+  }
+
+  /* tooltip al pasar el mouse */
+  if (hover && !dragging) {
+    const xm = cx + (hover.x - W / 2) / ppu;
+    const yf = currentF ? currentF(xm) : null;
+    const yg = currentG ? currentG(xm) : null;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(113,113,122,.45)'; ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(hover.x, 0); ctx.lineTo(hover.x, H); ctx.stroke();
+    ctx.setLineDash([]);
+    function dot(y, color){
+      if (y === null) return;
+      const sy = toSY(y);
+      if (sy < 0 || sy > H) return;
+      ctx.fillStyle = color; ctx.strokeStyle = '#FFF'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(hover.x, sy, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    }
+    dot(yf, COLOR_F); dot(yg, COLOR_G);
+
+    const rows = [
+      { text: 'x = ' + fmtNum(xm), color: null },
+      { text: 'f(x) = ' + (yf === null ? '—' : fmtNum(yf)), color: COLOR_F },
+      { text: 'g(x) = ' + (yg === null ? '—' : fmtNum(yg)), color: COLOR_G }
     ];
+    ctx.font = '12px ui-sans-serif, system-ui, sans-serif';
+    let boxW = 0;
+    rows.forEach(r => boxW = Math.max(boxW, ctx.measureText(r.text).width));
+    const padX = 10, padY = 8, rowH = 17;
+    const boxWf = boxW + padX * 2 + 10, boxH = rows.length * rowH + padY * 2;
+    let bx = hover.x + 14, by = hover.y + 14;
+    if (bx + boxWf > W - 6) bx = hover.x - boxWf - 14;
+    if (by + boxH > H - 6) by = hover.y - boxH - 14;
+    if (bx < 6) bx = 6;
+    if (by < 6) by = 6;
+    ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.strokeStyle = '#D4D4D8'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, boxWf, boxH, 8); else ctx.rect(bx, by, boxWf, boxH);
+    ctx.fill(); ctx.stroke();
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    rows.forEach((r, i) => {
+      const ry = by + padY + rowH * i + rowH / 2;
+      if (r.color) { ctx.fillStyle = r.color; ctx.fillRect(bx + padX - 3, ry - 1.5, 7, 3); }
+      ctx.fillStyle = r.color || '#18181B';
+      ctx.fillText(r.text, bx + padX + 8, ry);
+    });
+    ctx.restore();
+  }
 }
 
-// ==================== VEHÍCULOS CON IMÁGENES CORREGIDAS ====================
-// Cada imagen corresponde exactamente al vehículo indicado
-const vehicles = [
-    {
-        id:1, name:"Toyota Corolla", brand:"Toyota", category:"sedan", price:350,
-        seats:5, transmission:"Automático", fuel:"Gasolina", year:2024, hp:139,
-        // Toyota Corolla 2024 — imagen oficial del modelo exacto
-        img:"https://hips.hearstapps.com/hmg-prod/images/corolla-2023-03-1676989928.jpg?crop=1xw:1xh;center,top",
-        features:["Bluetooth","Aire acondicionado","USB","Cámara trasera"], rating:4.5
-    },
-    {
-        id:2, name:"Toyota RAV4", brand:"Toyota", category:"suv", price:750,
-        seats:5, transmission:"Automático", fuel:"Gasolina", year:2024, hp:203,
-        // Toyota RAV4 2024 — SUV mediana de Toyota
-        img:"https://www.topgear.com/sites/default/files/2026/04/2026_RAV4%20PHEV_%20Avantgarde%20Bronze_dynamic_001.jpg?w=892&h=502",
-        features:["AWD","Apple CarPlay","Cámara 360°","Pantalla táctil"], rating:4.7
-    },
-    {
-        id:3, name:"Hyundai Tucson", brand:"Hyundai", category:"suv", price:680,
-        seats:5, transmission:"Automático", fuel:"Gasolina", year:2024, hp:187,
-        // Hyundai Tucson 2024 — diseño angular moderno
-        img:"https://www.topgear.com/sites/default/files/2024/12/hyundai-tucson-ultimate-7.jpg?w=892&h=502",
-        features:["Navegador GPS","Sensores parqueo","Cruise control","LED"], rating:4.6
-    },
-    {
-        id:4, name:"Ford Ranger", brand:"Ford", category:"pickup", price:900,
-        seats:5, transmission:"Automático", fuel:"Diésel", year:2024, hp:213,
-        // Ford Ranger 2024 — pickup doble cabina
-        img:"https://image1.mobiauto.com.br/images/api/images/v1.0/406088431/transform/fl_progressive,f_webp,q_100,w_1200",
-        features:["4x4","Doble cabina","Remolque","Doble tracción"], rating:4.8
-    },
-    {
-        id:5, name:"Kia Sportage", brand:"Kia", category:"suv", price:620,
-        seats:5, transmission:"Automático", fuel:"Gasolina", year:2024, hp:180,
-        // Kia Sportage 2024 — SUV compacta
-        img:"https://www.kia.com/content/dam/kia/us/en/vehicles/sportage/2026/mep/in-page-gallery/my26-sportage-ice-mep-gallery-1.jpg",
-        features:["CarPlay","Android Auto","Asientos calefactados","LED"], rating:4.4
-    },
-    {
-        id:6, name:"Nissan Frontier", brand:"Nissan", category:"pickup", price:850,
-        seats:5, transmission:"Manual", fuel:"Diésel", year:2023, hp:190,
-        // Nissan Frontier 2023 — pickup robusta
-        img:"https://media.ed.edmunds-media.com/nissan/frontier/2026/oem/2026_nissan_frontier_crew-cab-pickup_pro-4x_fq_oem_1_815.jpg",
-        features:["4x4","Alta suspensión","Caja larga","Barra de carga"], rating:4.3
-    },
-    {
-        id:7, name:"Toyota Yaris", brand:"Toyota", category:"compacto", price:280,
-        seats:5, transmission:"Automático", fuel:"Gasolina", year:2024, hp:106,
-        // Toyota Yaris 2024 — hatchback compacto
-        img:"https://www.toyocosta.com/wp-content/uploads/2024/12/yaris-cross-1-798x466.jpg",
-        features:["Económico","Bluetooth","Aire acondicionado","USB"], rating:4.2
-    },
-    {
-        id:8, name:"Mitsubishi Outlander", brand:"Mitsubishi", category:"suv", price:720,
-        seats:7, transmission:"Automático", fuel:"Gasolina", year:2024, hp:181,
-        // Mitsubishi Outlander 2024 — SUV 7 plazas
-        img:"https://cdn.motor1.com/images/mgl/Oo11eY/s3/2023-mitsubishi-outlander-phev.webp",
-        features:["7 asientos","4x4","Pantalla táctil","Cámara trasera"], rating:4.5
-    },
-    {
-        id:9, name:"Chevrolet Silverado", brand:"Chevrolet", category:"pickup", price:1100,
-        seats:5, transmission:"Automático", fuel:"Gasolina", year:2024, hp:285,
-        // Chevrolet Silverado 2024 — pickup grande V8
-        img:"https://flasharkracing.com/cdn/shop/articles/The-Ultimate-Guide-to-the-Chevy-Silverado-1500-2500-3500-Flashark-101689920.jpg?v=1766454926&width=900",
-        features:["V8","4x4","Doble cabina","WiFi incorporado"], rating:4.6
-    },
-    {
-        id:10, name:"Toyota HiAce", brand:"Toyota", category:"van", price:1200,
-        seats:12, transmission:"Automático", fuel:"Diésel", year:2023, hp:150,
-        // Toyota HiAce — van de pasajeros 12 asientos
-        img:"https://image.made-in-china.com/155f0j00WJZkIKMfPmbj/Toyota-Hiace-Left-Hand-Drive-Luxury-Interior-3-5L-Engine-7-Seats-Large-MPV-Car.webp",
-        features:["12 pasajeros","Aire acondicionado","Equipaje extra","Para grupos"], rating:4.4
-    },
-    {
-        id:11, name:"Mazda CX-5", brand:"Mazda", category:"suv", price:700,
-        seats:5, transmission:"Automático", fuel:"Gasolina", year:2024, hp:187,
-        // Mazda CX-5 2024 — SUV premium japonesa
-        img:"https://es.mazda-press.com/globalassets/generic-cms-images/02-heroes/2026/all-new-mazda-cx-5/hero-2026-cx-5-spain-01.jpg?token=9lKA7wy4qMFmTjdiL4ADClQG4fbXAJX-ALamXmHOWbE1",
-        features:["i-Activsense","CarPlay","Techo solar","Cuero"], rating:4.7
-    },
-    {
-        id:12, name:"Volkswagen Jetta", brand:"Volkswagen", category:"sedan", price:400,
-        seats:5, transmission:"Automático", fuel:"Gasolina", year:2024, hp:158,
-        // Volkswagen Jetta 2024 — sedán alemán
-        img:"https://media.ed.edmunds-media.com/volkswagen/jetta/2026/oem/2026_volkswagen_jetta_sedan_sel_fq_oem_1_815.jpg",
-        features:["Ventanas eléctricas","Bluetooth","Cruise control","USB"], rating:4.3
-    },
+/* --- interacción: pan, zoom, pinza --- */
+const pointers = new Map();
+let lastDist = 0;
+canvas.addEventListener('pointerdown', e => {
+  canvas.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 1) { dragging = true; canvas.style.cursor = 'grabbing'; }
+  else if (pointers.size === 2) {
+    const p = [...pointers.values()];
+    lastDist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+  }
+});
+canvas.addEventListener('pointermove', e => {
+  const rect = canvas.getBoundingClientRect();
+  if (!pointers.has(e.pointerId)) {
+    hover = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    draw(); return;
+  }
+  const prev = pointers.get(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 1) {
+    view.cx -= (e.clientX - prev.x) / view.ppu;
+    view.cy += (e.clientY - prev.y) / view.ppu;
+    hover = null;
+    draw();
+  } else if (pointers.size === 2) {
+    const p = [...pointers.values()];
+    const dist = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+    if (lastDist > 0) view.ppu = Math.max(4, Math.min(6000, view.ppu * dist / lastDist));
+    lastDist = dist;
+    draw();
+  }
+});
+function pointerUp(e){
+  pointers.delete(e.pointerId);
+  if (pointers.size === 0) { dragging = false; canvas.style.cursor = 'grab'; lastDist = 0; }
+}
+canvas.addEventListener('pointerup', pointerUp);
+canvas.addEventListener('pointercancel', pointerUp);
+canvas.addEventListener('pointerleave', () => { hover = null; draw(); });
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const factor = Math.exp(-e.deltaY * 0.0016);
+  const newPpu = Math.max(4, Math.min(6000, view.ppu * factor));
+  const xm = view.cx + (mx - rect.width / 2) / view.ppu;
+  const ym = view.cy - (my - rect.height / 2) / view.ppu;
+  view.cx = xm - (mx - rect.width / 2) / newPpu;
+  view.cy = ym + (my - rect.height / 2) / newPpu;
+  view.ppu = newPpu;
+  draw();
+}, { passive: false });
+
+new ResizeObserver(() => draw()).observe(wrap);
+document.getElementById('z-in').addEventListener('click', () => { view.ppu = Math.min(6000, view.ppu * 1.3); draw(); });
+document.getElementById('z-out').addEventListener('click', () => { view.ppu = Math.max(4, view.ppu / 1.3); draw(); });
+document.getElementById('z-reset').addEventListener('click', () => { view.cx = 0; view.cy = 0; view.ppu = 45; draw(); });
+document.getElementById('dl').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'transformaciones-funcion.png';
+  a.click();
+});
+
+/* ============================== INTERFAZ ============================== */
+function tex(el, s){
+  try { katex.render(s, el, { throwOnError: false }); }
+  catch (e) { el.textContent = s; }
+}
+const errBox = document.getElementById('err');
+const exprInput = document.getElementById('expr');
+
+function updateBadges(){
+  const bk = document.getElementById('badge-k'), bh = document.getElementById('badge-h');
+  bk.textContent = (state.k > 0 ? '↑ ' : state.k < 0 ? '↓ ' : '· ') + fmtNum(state.k);
+  bh.textContent = (state.h > 0 ? '→ ' : state.h < 0 ? '← ' : '· ') + fmtNum(state.h);
+  bk.className = 'badge' + (state.k !== 0 ? ' on-k' : '');
+  bh.className = 'badge' + (state.h !== 0 ? ' on-h' : '');
+}
+function renderFormulas(){
+  if (!currentNode) return;
+  const f = buildFormulas(currentNode, state.reflect, state.h, state.k);
+  tex(document.getElementById('tex-f'), f.fTex);
+  tex(document.getElementById('tex-g'), f.gTex);
+  const stepsEl = document.getElementById('steps');
+  const idEl = document.getElementById('identity');
+  document.getElementById('card-formulas').style.display = 'block';
+  if (f.isIdentity) {
+    stepsEl.innerHTML = '';
+    idEl.style.display = 'block';
+  } else {
+    idEl.style.display = 'none';
+    stepsEl.innerHTML = '<p>Desglose de pasos</p><ol>' +
+      f.steps.map((s, i) =>
+        '<li><small>' + (i + 1) + '. ' + s.label + '</small><div class="math" id="step-' + i + '"></div></li>'
+      ).join('') + '</ol>';
+    f.steps.forEach((s, i) => tex(document.getElementById('step-' + i), s.tex));
+  }
+}
+function recompute(){
+  const res = compileExpression(exprInput.value);
+  if (!res.ok) {
+    errBox.textContent = res.error;
+    errBox.style.display = 'block';
+    currentF = currentG = currentNode = null;
+  } else {
+    errBox.style.display = 'none';
+    currentNode = res.node;
+    currentF = res.fn;
+    currentG = makeTransformedFn(res.fn, state.reflect, state.h, state.k);
+    renderFormulas();
+  }
+  draw();
+}
+
+/* eventos de controles */
+exprInput.addEventListener('input', recompute);
+document.getElementById('reflect').addEventListener('change', e => { state.reflect = e.target.checked; recompute(); });
+document.getElementById('sl-k').addEventListener('input', e => { state.k = parseFloat(e.target.value); updateBadges(); recompute(); });
+document.getElementById('sl-h').addEventListener('input', e => { state.h = parseFloat(e.target.value); updateBadges(); recompute(); });
+document.getElementById('show-vec').addEventListener('change', e => { state.showVec = e.target.checked; draw(); });
+document.getElementById('btn-reset').addEventListener('click', () => {
+  state.reflect = false; state.h = 0; state.k = 0;
+  document.getElementById('reflect').checked = false;
+  document.getElementById('sl-h').value = 0;
+  document.getElementById('sl-k').value = 0;
+  updateBadges(); recompute();
+});
+
+/* ejemplos rápidos */
+const PRESETS = [
+  { label: 'x²', expr: 'x^2' },
+  { label: 'x³ − 3x', expr: 'x^3 - 3x' },
+  { label: 'sin(x)', expr: 'sin(x)' },
+  { label: '√x', expr: 'sqrt(x)' },
+  { label: '|x|', expr: 'abs(x)' },
+  { label: '1/x', expr: '1/x' }
 ];
-
-// ==================== INIT ====================
-document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date().toISOString().split('T')[0];
-    const resStart = document.getElementById('resStart');
-    const resEnd = document.getElementById('resEnd');
-    if (resStart) resStart.min = today;
-    if (resEnd) resEnd.min = today;
-
-    renderVehicles();
-    renderTestimonials();
-    populateReserveSelect();
-    createParticles();
-    setupScrollAnimations();
-    setupNavScroll();
-    updateRentalBadge();
-    updateNavAuthBtn();
+const presetsEl = document.getElementById('presets');
+PRESETS.forEach(p => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = p.label;
+  b.addEventListener('click', () => { exprInput.value = p.expr; recompute(); });
+  presetsEl.appendChild(b);
 });
 
-// ==================== VALIDACIÓN DE FECHAS ====================
-function validateDates() {
-    const s = document.getElementById('resStart').value;
-    const e = document.getElementById('resEnd').value;
-    const errDiv = document.getElementById('dateError');
-    const btn = document.getElementById('reserveBtn');
-    const preview = document.getElementById('pricePreview');
-    if (s) document.getElementById('resEnd').min = s;
-    if (s && e) {
-        if (new Date(e) <= new Date(s)) {
-            errDiv.classList.remove('hidden');
-            btn.disabled = true; btn.style.opacity = '0.5';
-            preview.style.display = 'none';
-            return false;
-        } else {
-            errDiv.classList.add('hidden');
-            btn.disabled = false; btn.style.opacity = '1';
-            const vN = document.getElementById('reserveVehicle').value;
-            const v = vehicles.find(x => x.name === vN);
-            if (v) {
-                const d = Math.max(1, Math.ceil((new Date(e) - new Date(s)) / (1000*60*60*24)));
-                const ins = document.getElementById('resInsurance')?.checked ? 150 : 0;
-                const tp = v.price * d + ins * d;
-                document.getElementById('pricePreviewVal').textContent = `Q${tp.toLocaleString()} (${d} día${d>1?'s':''})`;
-                preview.style.display = 'block';
-            }
-            return true;
-        }
-    }
-    return true;
-}
-
-// ==================== AUTH ====================
-function handleNavAuth() {
-    if (currentSessionUser) { openProfileModal(); }
-    else { openModal('loginModal'); }
-}
-
-function updateNavAuthBtn() {
-    const btn = document.getElementById('navLoginBtn');
-    const txt = document.getElementById('navLoginText');
-    if (!btn || !txt) return;
-    if (currentSessionUser) {
-        txt.textContent = currentSessionUser.name.split(' ')[0];
-        btn.querySelector('i').className = 'fas fa-user-circle';
-    } else {
-        txt.textContent = 'Iniciar Sesión';
-        btn.querySelector('i').className = 'fas fa-user';
-    }
-}
-
-function submitLogin(e) {
-    e.preventDefault();
-    const em = document.getElementById('loginEmail').value.trim();
-    const pw = document.getElementById('loginPassword').value;
-    const errBox = document.getElementById('loginError');
-    const errText = document.getElementById('loginErrorText');
-
-    if (em === ADMIN_EMAIL_CRED && pw === ADMIN_PASS) {
-        errBox.classList.add('hidden');
-        closeModal('loginModal');
-        isAdminLoggedIn = true;
-        openAdminDashboard();
-        showToast('Bienvenido al Panel de Administración', 'success');
-        return;
-    }
-
-    const users = loadUsers();
-    const found = users.find(u => u.email === em && u.password === pw);
-    if (found) {
-        if (found.blocked) {
-            errBox.classList.remove('hidden');
-            errText.textContent = 'Tu cuenta ha sido bloqueada. Contacta al administrador.';
-            return;
-        }
-        currentSessionUser = found;
-        errBox.classList.add('hidden');
-        closeModal('loginModal');
-        updateNavAuthBtn();
-        showToast(`¡Bienvenido de nuevo, ${found.name.split(' ')[0]}!`, 'success');
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginPassword').value = '';
-        return;
-    }
-
-    const users2 = loadUsers();
-    const emailExists = users2.find(u => u.email === em);
-    errBox.classList.remove('hidden');
-    errText.textContent = emailExists ? 'Contraseña incorrecta.' : 'No existe una cuenta con ese email. ¡Regístrate!';
-}
-
-function submitRegister(e) {
-    e.preventDefault();
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const phone = document.getElementById('regPhone').value.trim();
-    const pass = document.getElementById('regPassword').value;
-
-    if (!name || !email || !phone || pass.length < 6) {
-        showToast('Completa todos los campos correctamente', 'warning'); return;
-    }
-
-    const users = loadUsers();
-    if (users.find(u => u.email === email)) {
-        showToast('Ya existe una cuenta con ese email.', 'warning'); return;
-    }
-
-    const newUser = {
-        id: Date.now(), name, email, phone, password: pass,
-        joindate: new Date().toLocaleDateString('es-GT', {day:'2-digit',month:'short',year:'numeric'}),
-        rentals: 0, totalSpent: 0, status: 'activo', blocked: false
-    };
-    users.push(newUser);
-    saveUsers(users);
-    registeredUsers = users;
-    currentSessionUser = newUser;
-    activityLog.unshift({time:"Ahora",icon:"fa-user-plus",text:`Nuevo usuario: ${name} (${email})`,type:"usuario"});
-    closeModal('registerModal');
-    updateNavAuthBtn();
-    showToast(`¡Bienvenido a AutoMacky, ${name.split(' ')[0]}!`, 'success');
-    document.getElementById('regName').value = '';
-    document.getElementById('regEmail').value = '';
-    document.getElementById('regPhone').value = '';
-    document.getElementById('regPassword').value = '';
-}
-
-function logoutUser() {
-    currentSessionUser = null;
-    updateNavAuthBtn();
-    closeModal('profileModal');
-    showToast('Sesión cerrada correctamente.', 'info');
-}
-
-// ==================== PERFIL DE USUARIO ====================
-function openProfileModal() {
-    if (!currentSessionUser) { openModal('loginModal'); return; }
-    document.getElementById('profileAvatar').textContent = currentSessionUser.name.charAt(0).toUpperCase();
-    document.getElementById('profileName').textContent = currentSessionUser.name;
-    document.getElementById('profileEmail').textContent = currentSessionUser.email;
-    switchProfileTab('info', null);
-    openModal('profileModal');
-}
-
-function switchProfileTab(tab, btn) {
-    currentProfileTab = tab;
-    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    else {
-        const tabs = document.querySelectorAll('.profile-tab');
-        if(tab==='info') tabs[0]?.classList.add('active');
-        else if(tab==='rentas') tabs[1]?.classList.add('active');
-        else if(tab==='seguridad') tabs[2]?.classList.add('active');
-    }
-    renderProfileTab(tab);
-}
-
-function renderProfileTab(tab) {
-    const c = document.getElementById('profileTabContent');
-    if (!c) return;
-    if (tab === 'info') {
-        c.innerHTML = `
-        <div class="space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nombre Completo</label>
-                <input type="text" id="profileEditName" class="input-field" value="${currentSessionUser.name}"></div>
-                <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Teléfono</label>
-                <input type="tel" id="profileEditPhone" class="input-field" value="${currentSessionUser.phone}"></div>
-            </div>
-            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Email</label>
-            <input type="email" class="input-field" value="${currentSessionUser.email}" disabled style="opacity:0.6;cursor:not-allowed;"></div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="p-4 rounded-xl text-center" style="background:var(--card);border:1px solid var(--border);">
-                    <div class="text-2xl font-black" style="color:var(--accent);">${currentSessionUser.rentals}</div>
-                    <div class="text-xs mt-1" style="color:var(--muted);">Rentas realizadas</div>
-                </div>
-                <div class="p-4 rounded-xl text-center" style="background:var(--card);border:1px solid var(--border);">
-                    <div class="text-2xl font-black" style="color:var(--success);">Q${(currentSessionUser.totalSpent||0).toLocaleString()}</div>
-                    <div class="text-xs mt-1" style="color:var(--muted);">Total gastado</div>
-                </div>
-                <div class="p-4 rounded-xl text-center" style="background:var(--card);border:1px solid var(--border);">
-                    <div class="text-2xl font-black" style="color:var(--warning);">${currentSessionUser.joindate}</div>
-                    <div class="text-xs mt-1" style="color:var(--muted);">Miembro desde</div>
-                </div>
-            </div>
-            <div class="flex gap-3 pt-2">
-                <button onclick="saveProfileInfo()" class="btn-primary"><i class="fas fa-save mr-2"></i>Guardar Cambios</button>
-                <button onclick="logoutUser()" class="btn-danger"><i class="fas fa-sign-out-alt mr-1"></i>Cerrar Sesión</button>
-            </div>
-        </div>`;
-    } else if (tab === 'rentas') {
-        const myRentals = loadRentals().filter(r => r.customerEmail === currentSessionUser.email);
-        c.innerHTML = `
-        <div class="space-y-4 max-h-96 overflow-y-auto">
-            ${myRentals.length === 0
-                ? '<div class="text-center py-12"><i class="fas fa-key text-5xl mb-4" style="color:var(--border);"></i><p class="font-bold mb-2" style="color:var(--muted);">Aún no tienes rentas</p><button onclick="closeModal(\'profileModal\');openModal(\'reserveModal\')" class="btn-primary mt-4">Hacer mi primera reserva</button></div>'
-                : myRentals.map(r => `
-                <div class="rental-card">
-                    <div class="flex flex-col sm:flex-row">
-                        <div class="sm:w-36 h-24 flex-shrink-0"><img src="${r.vehicleImg}" class="w-full h-full object-cover" style="border-radius:16px 0 0 16px;" onerror="this.onerror=null;this.style.background='var(--card)'"></div>
-                        <div class="flex-1 p-4">
-                            <div class="flex items-start justify-between mb-2">
-                                <div><h4 class="font-bold">${r.vehicleName}</h4><p class="text-xs" style="color:var(--muted);">#${String(r.id).padStart(4,'0')}</p></div>
-                                <span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs mb-3">
-                                <div><span style="color:var(--muted);">Recogida: </span><span class="font-semibold">${r.pickupDate}</span></div>
-                                <div><span style="color:var(--muted);">Devolución: </span><span class="font-semibold">${r.returnDate}</span></div>
-                                <div><span style="color:var(--muted);">Lugar: </span><span class="font-semibold">${r.location}</span></div>
-                                <div><span style="color:var(--muted);">Total: </span><span class="font-semibold" style="color:var(--accent);">Q${r.totalPrice.toLocaleString()}</span></div>
-                            </div>
-                            ${r.status==='pendiente'?`<button onclick="cancelRentalFromProfile(${r.id})" class="btn-danger text-xs"><i class="fas fa-times mr-1"></i>Cancelar</button>`:''}
-                        </div>
-                    </div>
-                </div>`).join('')
-            }
-        </div>`;
-    } else if (tab === 'seguridad') {
-        c.innerHTML = `
-        <div class="space-y-4 max-w-md">
-            <h4 class="font-bold text-lg">Cambiar Contraseña</h4>
-            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Contraseña actual</label>
-            <input type="password" id="pwCurrent" class="input-field" placeholder="Contraseña actual"></div>
-            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Nueva contraseña</label>
-            <input type="password" id="pwNew" class="input-field" placeholder="Mínimo 6 caracteres" minlength="6"></div>
-            <div><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Confirmar nueva contraseña</label>
-            <input type="password" id="pwConfirm" class="input-field" placeholder="Repite la contraseña"></div>
-            <button onclick="changePassword()" class="btn-primary"><i class="fas fa-lock mr-2"></i>Cambiar Contraseña</button>
-        </div>`;
-    }
-}
-
-function saveProfileInfo() {
-    const newName = document.getElementById('profileEditName')?.value.trim();
-    const newPhone = document.getElementById('profileEditPhone')?.value.trim();
-    if (!newName) { showToast('El nombre no puede estar vacío', 'warning'); return; }
-    const users = loadUsers();
-    const idx = users.findIndex(u => u.id === currentSessionUser.id);
-    if (idx > -1) {
-        users[idx].name = newName;
-        users[idx].phone = newPhone;
-        saveUsers(users);
-        currentSessionUser.name = newName;
-        currentSessionUser.phone = newPhone;
-    }
-    document.getElementById('profileAvatar').textContent = newName.charAt(0).toUpperCase();
-    document.getElementById('profileName').textContent = newName;
-    updateNavAuthBtn();
-    showToast('Perfil actualizado correctamente', 'success');
-}
-
-function changePassword() {
-    const cur = document.getElementById('pwCurrent')?.value;
-    const nw = document.getElementById('pwNew')?.value;
-    const conf = document.getElementById('pwConfirm')?.value;
-    if (cur !== currentSessionUser.password) { showToast('Contraseña actual incorrecta', 'warning'); return; }
-    if (!nw || nw.length < 6) { showToast('La nueva contraseña debe tener al menos 6 caracteres', 'warning'); return; }
-    if (nw !== conf) { showToast('Las contraseñas no coinciden', 'warning'); return; }
-    const users = loadUsers();
-    const idx = users.findIndex(u => u.id === currentSessionUser.id);
-    if (idx > -1) { users[idx].password = nw; saveUsers(users); currentSessionUser.password = nw; }
-    showToast('Contraseña cambiada correctamente', 'success');
-    document.getElementById('pwCurrent').value = '';
-    document.getElementById('pwNew').value = '';
-    document.getElementById('pwConfirm').value = '';
-}
-
-function cancelRentalFromProfile(id) {
-    const allRentals = loadRentals();
-    const r = allRentals.find(x => x.id === id);
-    if (!r) return;
-    r.status = 'cancelada';
-    saveRentals(allRentals);
-    rentals = allRentals;
-    updateRentalBadge();
-    renderProfileTab('rentas');
-    showToast('Renta cancelada', 'info');
-}
-
-// ==================== RESERVA ====================
-function submitReservation(e) {
-    e.preventDefault();
-    if (!validateDates()) return;
-    const vN = document.getElementById('reserveVehicle').value;
-    const v = vehicles.find(x => x.name === vN);
-    const sV = document.getElementById('resStart').value;
-    const eV = document.getElementById('resEnd').value;
-    const loc = document.getElementById('resLocation').value;
-    const name = document.getElementById('resName').value || 'Cliente';
-    const email = document.getElementById('resEmail').value || 'cliente@email.com';
-    const phone = document.getElementById('resPhone').value || '+502 XXXX XXXX';
-    const insurance = document.getElementById('resInsurance').checked;
-
-    if (!v || !sV || !eV || !loc) { showToast('Completa todos los campos', 'warning'); return; }
-    if (new Date(eV) <= new Date(sV)) { showToast('La fecha de devolución debe ser posterior a la recogida', 'warning'); return; }
-
-    const d = Math.max(1, Math.ceil((new Date(eV) - new Date(sV)) / (1000*60*60*24)));
-    const ins = insurance ? 150 : 0;
-    const tp = v.price * d + ins * d;
-    const month = new Date(sV).getMonth();
-
-    const rev = loadRevenue();
-    rev[month].amount += tp;
-    saveRevenue(rev);
-    monthlyRevenue = rev;
-
-    const newRental = {
-        id: rentalIdCounter++,
-        vehicleId: v.id, vehicleName: v.name, vehicleImg: v.img,
-        status: 'pendiente',
-        pickupDate: sV, returnDate: eV, location: loc,
-        totalPrice: tp, days: d,
-        customerName: name, customerEmail: email, customerPhone: phone,
-        insurance, createdAt: new Date().toLocaleDateString('es-GT',{day:'2-digit',month:'short',year:'numeric'}),
-        timeline:[
-            {step:"Reserva confirmada",date:"Ahora",done:true},
-            {step:"Pago procesado",date:"Ahora",done:true},
-            {step:"Esperando recogida",date:sV,current:true},
-            {step:"En uso",date:"",done:false},
-            {step:"Devolución",date:eV,done:false}
-        ]
-    };
-    saveRentalCounter(rentalIdCounter);
-    const allRentals = loadRentals();
-    allRentals.unshift(newRental);
-    saveRentals(allRentals);
-    rentals = allRentals;
-
-    if (currentSessionUser) {
-        const users = loadUsers();
-        const u = users.find(x => x.id === currentSessionUser.id);
-        if (u) { u.rentals++; u.totalSpent = (u.totalSpent||0) + tp; saveUsers(users); currentSessionUser = {...currentSessionUser, rentals: u.rentals, totalSpent: u.totalSpent}; }
-    }
-    activityLog.unshift({time:"Ahora",icon:"fa-key",text:`Nueva renta: ${v.name} — Q${tp.toLocaleString()} (${d} días)`,type:"renta"});
-    closeModal('reserveModal');
-    updateRentalBadge();
-    showToast('¡Reserva confirmada exitosamente!', 'success');
-
-    setTimeout(() => {
-        const subject = encodeURIComponent(`Confirmación de reserva - ${v.name} - AutoMacky #${String(newRental.id).padStart(4,'0')}`);
-        const body = encodeURIComponent(
-`Estimado/a ${name},
-
-Su reserva ha sido confirmada:
-
-Vehículo: ${v.name}
-Fecha de recogida: ${sV}
-Fecha de devolución: ${eV}
-Lugar de recogida: ${loc}
-Total: Q${tp.toLocaleString()}
-Seguro total: ${insurance ? 'Incluido' : 'No incluido'}
-
-Para cualquier consulta, contáctenos:
-WhatsApp: +502 3812-4414
-Email: ${CONTACT_EMAIL}
-
-¡Gracias por elegir AutoMacky!`
-        );
-        window.location.href = `mailto:${email}?subject=${subject}&body=${body}&from=${CONTACT_EMAIL}`;
-    }, 800);
-
-    document.getElementById('resStart').value = '';
-    document.getElementById('resEnd').value = '';
-    document.getElementById('pricePreview').style.display = 'none';
-}
-
-// ==================== ADMIN ====================
-function openAdminDashboard() {
-    document.getElementById('adminDashboard').classList.add('open');
-    document.getElementById('mainPage').style.display = 'none';
-    document.querySelector('.chat-container').style.display = 'none';
-    document.querySelector('.compare-bar').style.display = 'none';
-    renderAdminTab('overview');
-}
-
-function logoutAdmin() {
-    isAdminLoggedIn = false;
-    document.getElementById('adminDashboard').classList.remove('open');
-    document.getElementById('mainPage').style.display = '';
-    document.querySelector('.chat-container').style.display = '';
-    document.querySelector('.compare-bar').style.display = '';
-    showToast('Sesión de administrador cerrada', 'info');
-}
-
-function switchAdminTab(tab, btn) {
-    currentAdminTab = tab;
-    document.querySelectorAll('.admin-sidebar-item').forEach(i => i.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    renderAdminTab(tab);
-}
-
-function renderAdminTab(tab) {
-    rentals = loadRentals();
-    registeredUsers = loadUsers();
-    monthlyRevenue = loadRevenue();
-    const c = document.getElementById('adminContent');
-    switch(tab) {
-        case 'overview': c.innerHTML = renderAdminOverview(); break;
-        case 'ingresos': c.innerHTML = renderAdminIngresos(); break;
-        case 'usuarios': c.innerHTML = renderAdminUsuarios(); break;
-        case 'rentas': c.innerHTML = renderAdminRentas(); break;
-        case 'flota': c.innerHTML = renderAdminFlota(); break;
-        case 'correos': c.innerHTML = renderAdminCorreos(); break;
-    }
-    setTimeout(() => { document.querySelectorAll('.chart-bar[data-h]').forEach(b => { b.style.height = b.dataset.h; }); }, 50);
-}
-
-function renderAdminOverview() {
-    const tr = monthlyRevenue.reduce((s,m) => s+m.amount, 0);
-    const maxBar = Math.max(...monthlyRevenue.map(m=>m.amount), 1);
-    return `
-    <div class="flex items-center justify-between mb-8">
-        <div><h2 class="text-3xl font-black">Panel de Control</h2><p class="text-sm" style="color:var(--muted);">Vista general del negocio.</p></div>
-        <div class="text-sm" style="color:var(--muted);"><i class="fas fa-clock mr-1"></i>${new Date().toLocaleDateString('es-GT',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(34,197,94,0.1);color:var(--success);"><i class="fas fa-money-bill"></i></div></div><div class="text-3xl font-black" style="color:var(--success);">Q${tr.toLocaleString()}</div><div class="text-sm" style="color:var(--muted);">Ingresos Totales</div></div>
-        <div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(108,171,221,0.1);color:var(--accent);"><i class="fas fa-key"></i></div></div><div class="text-3xl font-black" style="color:var(--accent);">${rentals.length}</div><div class="text-sm" style="color:var(--muted);">Rentas Totales</div></div>
-        <div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(245,158,11,0.1);color:var(--warning);"><i class="fas fa-users"></i></div></div><div class="text-3xl font-black" style="color:var(--warning);">${registeredUsers.length}</div><div class="text-sm" style="color:var(--muted);">Usuarios Registrados</div></div>
-        <div class="admin-stat-card"><div class="flex items-center justify-between mb-4"><div class="admin-stat-icon" style="background:rgba(168,85,247,0.1);color:#a855f7;"><i class="fas fa-car"></i></div></div><div class="text-3xl font-black" style="color:#a855f7;">${vehicles.length}</div><div class="text-sm" style="color:var(--muted);">Vehículos en Flota</div></div>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div class="lg:col-span-2 p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-            <h3 class="font-bold mb-6">Ingresos Mensuales (Q)</h3>
-            <div class="flex items-end gap-2" style="height:200px;">
-                ${monthlyRevenue.map(m => {
-                    const p = maxBar > 0 ? (m.amount/maxBar)*90 : 0;
-                    return `<div class="flex-1 flex flex-col items-center gap-1">
-                        <div class="chart-bar w-full" data-h="${p}%" style="height:0;background:linear-gradient(180deg,var(--accent),rgba(108,171,221,0.3));"></div>
-                        <span class="text-xs" style="color:var(--muted);">${m.month}</span>
-                    </div>`;
-                }).join('')}
-            </div>
-        </div>
-        <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-            <h3 class="font-bold mb-4">Actividad Reciente</h3>
-            ${activityLog.length === 0
-                ? '<p class="text-sm text-center py-8" style="color:var(--muted);">Aún no hay actividad.</p>'
-                : `<div class="space-y-3">${activityLog.slice(0,5).map(a => {
-                    const colors={renta:'var(--accent)',usuario:'var(--success)',pago:'var(--warning)',devolucion:'var(--muted)',cancelacion:'var(--danger)'};
-                    return `<div class="flex items-center gap-3 p-3 rounded-xl" style="background:var(--bg-elevated);">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${colors[a.type]||'var(--muted)'}20;color:${colors[a.type]||'var(--muted)'};"><i class="fas ${a.icon} text-xs"></i></div>
-                        <div class="flex-1 text-sm truncate">${a.text}</div>
-                        <div class="text-xs whitespace-nowrap" style="color:var(--muted);">${a.time}</div>
-                    </div>`;
-                }).join('')}</div>`
-            }
-        </div>
-    </div>`;
-}
-
-function renderAdminIngresos() {
-    const t = monthlyRevenue.reduce((s,m)=>s+m.amount, 0);
-    const avg = t / 12;
-    const mx = monthlyRevenue.reduce((a,b)=>a.amount>b.amount?a:b);
-    return `
-    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Ingresos (Q)</h2></div>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-        <div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(34,197,94,0.1);color:var(--success);"><i class="fas fa-chart-line"></i></div><div class="text-3xl font-black" style="color:var(--success);">Q${t.toLocaleString()}</div><div class="text-sm" style="color:var(--muted);">Total Anual</div></div>
-        <div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(108,171,221,0.1);color:var(--accent);"><i class="fas fa-calculator"></i></div><div class="text-3xl font-black" style="color:var(--accent);">Q${Math.round(avg).toLocaleString()}</div><div class="text-sm" style="color:var(--muted);">Promedio Mensual</div></div>
-        <div class="admin-stat-card"><div class="admin-stat-icon mb-4" style="background:rgba(245,158,11,0.1);color:var(--warning);"><i class="fas fa-trophy"></i></div><div class="text-3xl font-black" style="color:var(--warning);">${mx.amount>0?mx.month:'—'}</div><div class="text-sm" style="color:var(--muted);">Mejor Mes ${mx.amount>0?'(Q'+mx.amount.toLocaleString()+')':''}</div></div>
-    </div>
-    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-        <h3 class="font-bold mb-4">Detalle Mensual</h3>
-        <div class="overflow-x-auto"><table class="admin-table">
-            <thead><tr><th>Mes</th><th>Ingreso (Q)</th><th>Rentas</th></tr></thead>
-            <tbody>${monthlyRevenue.map((m,i)=>{
-                const r=rentals.filter(x=>new Date(x.pickupDate).getMonth()===i).length;
-                return `<tr><td class="font-semibold">${m.month} 2025</td><td style="color:var(--accent);font-weight:700;">Q${m.amount.toLocaleString()}</td><td>${r}</td></tr>`;
-            }).join('')}</tbody>
-        </table></div>
-    </div>`;
-}
-
-function renderAdminUsuarios() {
-    return `
-    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Usuarios</h2></div>
-    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-        ${registeredUsers.length === 0
-            ? '<div class="text-center py-16"><i class="fas fa-users text-5xl mb-4" style="color:var(--border);"></i><p class="font-bold text-lg mb-2" style="color:var(--muted);">Sin usuarios registrados</p></div>'
-            : `<div class="overflow-x-auto"><table class="admin-table">
-                <thead><tr><th>Usuario</th><th>Email</th><th>Teléfono</th><th>Registro</th><th>Rentas</th><th>Gastado</th><th>Estado</th><th>Acciones</th></tr></thead>
-                <tbody>${registeredUsers.map(u=>`
-                    <tr class="${u.blocked?'user-blocked':''}">
-                        <td><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:rgba(108,171,221,0.15);color:var(--accent);">${u.name.charAt(0)}</div><span class="font-semibold">${u.name}</span></div></td>
-                        <td>${u.email}</td>
-                        <td>${u.phone}</td>
-                        <td>${u.joindate}</td>
-                        <td>${u.rentals}</td>
-                        <td style="color:var(--accent);font-weight:600;">Q${(u.totalSpent||0).toLocaleString()}</td>
-                        <td><span class="rental-status ${u.blocked?'cancelada':'activa'}"><span class="dot"></span>${u.blocked?'Bloqueado':'Activo'}</span></td>
-                        <td class="flex gap-1">
-                            <button onclick="toggleBlockUser(${u.id})" class="text-xs px-3 py-1 rounded-lg font-semibold transition-all" style="${u.blocked?'background:rgba(34,197,94,0.1);color:var(--success);border:1px solid rgba(34,197,94,0.3);':'background:rgba(245,158,11,0.1);color:var(--warning);border:1px solid rgba(245,158,11,0.3);'}">
-                                <i class="fas ${u.blocked?'fa-unlock':'fa-ban'} mr-1"></i>${u.blocked?'Desbloquear':'Bloquear'}
-                            </button>
-                            <button onclick="openAdminEmailTo('${u.email}','${u.name}')" class="text-xs px-3 py-1 rounded-lg font-semibold" style="background:rgba(108,171,221,0.1);color:var(--accent);border:1px solid rgba(108,171,221,0.3);">
-                                <i class="fas fa-envelope mr-1"></i>Email
-                            </button>
-                        </td>
-                    </tr>`).join('')}
-                </tbody>
-            </table></div>`
-        }
-    </div>`;
-}
-
-function toggleBlockUser(id) {
-    const users = loadUsers();
-    const u = users.find(x => x.id === id);
-    if (!u) return;
-    u.blocked = !u.blocked;
-    u.status = u.blocked ? 'bloqueado' : 'activo';
-    saveUsers(users);
-    registeredUsers = users;
-    if (currentSessionUser && currentSessionUser.id === id) currentSessionUser.blocked = u.blocked;
-    activityLog.unshift({time:"Ahora",icon:u.blocked?'fa-ban':'fa-unlock',text:`Usuario ${u.blocked?'bloqueado':'desbloqueado'}: ${u.name}`,type:'usuario'});
-    renderAdminTab('usuarios');
-    showToast(`Usuario ${u.blocked?'bloqueado':'desbloqueado'}: ${u.name}`, u.blocked?'warning':'success');
-}
-
-function renderAdminRentas() {
-    return `
-    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Rentas</h2></div>
-    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-        ${rentals.length === 0
-            ? '<div class="text-center py-16"><i class="fas fa-key text-5xl mb-4" style="color:var(--border);"></i><p class="font-bold text-lg mb-2" style="color:var(--muted);">Sin rentas registradas</p></div>'
-            : `<div class="overflow-x-auto"><table class="admin-table">
-                <thead><tr><th>ID</th><th>Vehículo</th><th>Cliente</th><th>Email</th><th>Fechas</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
-                <tbody>${rentals.map(r=>`
-                    <tr>
-                        <td class="font-mono text-xs">#${String(r.id).padStart(4,'0')}</td>
-                        <td class="font-semibold">${r.vehicleName}</td>
-                        <td>${r.customerName}</td>
-                        <td class="text-xs">${r.customerEmail}</td>
-                        <td class="text-xs">${r.pickupDate} → ${r.returnDate}</td>
-                        <td style="color:var(--accent);font-weight:600;">Q${r.totalPrice.toLocaleString()}</td>
-                        <td><span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></td>
-                        <td class="flex gap-1">
-                            <button onclick="openAdminEmailTo('${r.customerEmail}','${r.customerName}')" class="text-xs px-2 py-1 rounded-lg" style="background:rgba(108,171,221,0.1);color:var(--accent);border:1px solid rgba(108,171,221,0.3);"><i class="fas fa-envelope"></i></button>
-                            <button onclick="adminDeleteRental(${r.id})" class="btn-danger text-xs py-1 px-2"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>`).join('')}
-                </tbody>
-            </table></div>`
-        }
-    </div>`;
-}
-
-function adminDeleteRental(id) {
-    if (!confirm('¿Eliminar esta reserva?')) return;
-    const allRentals = loadRentals();
-    const idx = allRentals.findIndex(r => r.id === id);
-    if (idx === -1) return;
-    const r = allRentals[idx];
-    const rev = loadRevenue();
-    const month = new Date(r.pickupDate).getMonth();
-    rev[month].amount = Math.max(0, rev[month].amount - r.totalPrice);
-    saveRevenue(rev);
-    monthlyRevenue = rev;
-    allRentals.splice(idx, 1);
-    saveRentals(allRentals);
-    rentals = allRentals;
-    activityLog.unshift({time:"Ahora",icon:"fa-trash",text:`Renta eliminada: ${r.vehicleName} — ${r.customerName}`,type:'cancelacion'});
-    renderAdminTab('rentas');
-    updateRentalBadge();
-    showToast('Reserva eliminada', 'info');
-}
-
-function renderAdminFlota() {
-    return `
-    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Flota</h2></div>
-    <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-        <div class="overflow-x-auto"><table class="admin-table">
-            <thead><tr><th>Vehículo</th><th>Categoría</th><th>Precio/Día</th><th>Año</th><th>Rating</th></tr></thead>
-            <tbody>${vehicles.map(v=>`
-                <tr>
-                    <td><div class="flex items-center gap-3"><img src="${v.img}" class="w-10 h-8 rounded object-cover" onerror="this.onerror=null;this.style.background='var(--card)'"><span class="font-semibold">${v.name}</span></div></td>
-                    <td>${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</td>
-                    <td style="color:var(--accent);font-weight:600;">Q${v.price.toLocaleString()}</td>
-                    <td>${v.year}</td>
-                    <td><i class="fas fa-star" style="color:var(--accent);"></i> ${v.rating}</td>
-                </tr>`).join('')}
-            </tbody>
-        </table></div>
-    </div>`;
-}
-
-function renderAdminCorreos() {
-    const users = loadUsers();
-    return `
-    <div class="mb-8"><h2 class="text-3xl font-black mb-2">Enviar Correos</h2></div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-            <h3 class="font-bold mb-4 text-lg"><i class="fas fa-broadcast-tower mr-2" style="color:var(--accent);"></i>Correo Masivo</h3>
-            <p class="text-sm mb-4" style="color:var(--muted);">Envía un correo a todos los usuarios (${users.length} usuarios).</p>
-            <div class="mb-3"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Asunto</label>
-            <input type="text" id="massEmailSubject" class="input-field" placeholder="Asunto del correo masivo"></div>
-            <div class="mb-4"><label class="block text-xs font-semibold mb-2" style="color:var(--muted);">Mensaje</label>
-            <textarea id="massEmailBody" class="input-field" rows="5" placeholder="Escribe el mensaje..."></textarea></div>
-            <button onclick="sendMassEmail()" class="btn-primary w-full"><i class="fas fa-paper-plane mr-2"></i>Enviar a todos (${users.length})</button>
-        </div>
-        <div class="p-6 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
-            <h3 class="font-bold mb-4 text-lg"><i class="fas fa-user mr-2" style="color:var(--accent);"></i>Correo Individual</h3>
-            ${users.length === 0
-                ? '<p class="text-sm text-center py-8" style="color:var(--muted);">No hay usuarios registrados.</p>'
-                : `<div class="space-y-2 max-h-64 overflow-y-auto">${users.map(u=>`
-                    <div class="flex items-center justify-between p-3 rounded-xl" style="background:var(--bg-elevated);border:1px solid var(--border);">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:rgba(108,171,221,0.15);color:var(--accent);">${u.name.charAt(0)}</div>
-                            <div><div class="text-sm font-semibold">${u.name}</div><div class="text-xs" style="color:var(--muted);">${u.email}</div></div>
-                        </div>
-                        <button onclick="openAdminEmailTo('${u.email}','${u.name}')" class="btn-primary btn-sm text-xs"><i class="fas fa-envelope mr-1"></i>Enviar</button>
-                    </div>`).join('')}</div>`
-            }
-        </div>
-    </div>`;
-}
-
-function openAdminEmailTo(email, name) {
-    adminEmailTarget = { email, name };
-    document.getElementById('emailToDisplay').innerHTML = `<span class="email-chip"><i class="fas fa-user mr-1"></i>${name} &lt;${email}&gt;</span>`;
-    document.getElementById('adminEmailSubject').value = '';
-    document.getElementById('adminEmailBody').value = '';
-    openModal('adminEmailModal');
-}
-
-function sendAdminEmail() {
-    const subject = document.getElementById('adminEmailSubject').value.trim();
-    const body = document.getElementById('adminEmailBody').value.trim();
-    if (!subject) { showToast('Por favor ingresa un asunto', 'warning'); return; }
-    if (!body) { showToast('El mensaje no puede estar vacío', 'warning'); return; }
-    if (!adminEmailTarget) { showToast('Error: destinatario no definido', 'warning'); return; }
-    const mailtoSubject = encodeURIComponent(subject);
-    const mailtoBody = encodeURIComponent(`Para: ${adminEmailTarget.name}\n\n${body}\n\n---\nAutoMacky Guatemala\nTel: +502 3812-4414\n${CONTACT_EMAIL}`);
-    window.location.href = `mailto:${adminEmailTarget.email}?subject=${mailtoSubject}&body=${mailtoBody}&from=${CONTACT_EMAIL}`;
-    closeModal('adminEmailModal');
-    activityLog.unshift({time:"Ahora",icon:"fa-envelope",text:`Correo enviado a: ${adminEmailTarget.name}`,type:"usuario"});
-    showToast(`Correo preparado para ${adminEmailTarget.name}`, 'success');
-}
-
-function sendMassEmail() {
-    const subject = document.getElementById('massEmailSubject')?.value.trim();
-    const body = document.getElementById('massEmailBody')?.value.trim();
-    const users = loadUsers();
-    if (!subject) { showToast('Por favor ingresa un asunto', 'warning'); return; }
-    if (!body) { showToast('El mensaje no puede estar vacío', 'warning'); return; }
-    if (users.length === 0) { showToast('No hay usuarios registrados', 'warning'); return; }
-    const emails = users.map(u => u.email).join(',');
-    const mailtoSubject = encodeURIComponent(subject);
-    const mailtoBody = encodeURIComponent(`${body}\n\n---\nAutoMacky Guatemala\nTel: +502 3812-4414\n${CONTACT_EMAIL}`);
-    window.location.href = `mailto:${emails}?subject=${mailtoSubject}&body=${mailtoBody}&from=${CONTACT_EMAIL}`;
-    activityLog.unshift({time:"Ahora",icon:"fa-broadcast-tower",text:`Correo masivo enviado a ${users.length} usuarios`,type:"usuario"});
-    showToast(`Correo preparado para ${users.length} usuarios`, 'success');
-}
-
-// ==================== COMENTARIOS ====================
-function setCommentRating(r) {
-    commentRating = r;
-    document.querySelectorAll('.star-btn').forEach((btn, i) => {
-        btn.style.color = i < r ? 'var(--accent)' : 'var(--border)';
-    });
-}
-
-function submitComment() {
-    const name = document.getElementById('commentName').value.trim();
-    const location = document.getElementById('commentLocation').value.trim() || 'Guatemala';
-    const text = document.getElementById('commentText').value.trim();
-    if (!name) { showToast('Por favor ingresa tu nombre', 'warning'); return; }
-    if (!text) { showToast('Por favor escribe tu comentario', 'warning'); return; }
-    if (commentRating === 0) { showToast('Por favor selecciona una calificación', 'warning'); return; }
-    if (text.length < 10) { showToast('Por favor escribe una reseña más detallada', 'warning'); return; }
-    const allTestimonials = loadTestimonials();
-    const newComment = {
-        id: Date.now(), name, location, text,
-        rating: commentRating,
-        date: new Date().toLocaleDateString('es-GT', {day:'2-digit',month:'short',year:'numeric'}),
-        isNew: true
-    };
-    allTestimonials.unshift(newComment);
-    saveTestimonials(allTestimonials);
-    testimonials = allTestimonials;
-    activityLog.unshift({time:"Ahora",icon:"fa-star",text:`Nueva opinión de ${name} — ${commentRating}★`,type:'calificacion'});
-    document.getElementById('commentName').value = '';
-    document.getElementById('commentLocation').value = '';
-    document.getElementById('commentText').value = '';
-    commentRating = 0;
-    setCommentRating(0);
-    renderTestimonials();
-    showToast('¡Gracias por tu opinión!', 'success');
-}
-
-function renderTestimonials() {
-    const grid = document.getElementById('testimonialGrid');
-    if (!grid) return;
-    const allT = loadTestimonials();
-    grid.innerHTML = allT.slice(0, 9).map(t => `
-        <div class="testimonial-card">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="stars">${'<i class="fas fa-star"></i>'.repeat(t.rating)}${'<i class="far fa-star"></i>'.repeat(5-t.rating)}</div>
-                ${t.isNew ? '<span class="live-dot ml-auto" title="Reciente"></span>' : ''}
-            </div>
-            <p class="mb-4 leading-relaxed text-sm" style="color:var(--muted);">"${t.text}"</p>
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style="background:rgba(108,171,221,0.2);color:var(--accent);">${t.name.charAt(0).toUpperCase()}</div>
-                    <div><div class="font-semibold text-sm">${t.name}</div><div class="text-xs" style="color:var(--muted);">${t.location}</div></div>
-                </div>
-                <div class="text-xs" style="color:var(--muted);">${t.date}</div>
-            </div>
-        </div>`).join('');
-}
-
-// ==================== PARTÍCULAS / NAV / SCROLL ====================
-function createParticles() {
-    const c = document.getElementById('particles');
-    if (!c) return;
-    for (let i=0; i<20; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const s = Math.random()*4+2;
-        p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:-10px;animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*6}s;`;
-        c.appendChild(p);
-    }
-}
-
-function setupNavScroll() {
-    const n = document.getElementById('navbar');
-    if (!n) return;
-    window.addEventListener('scroll', () => { n.classList.toggle('scrolled', window.scrollY > 50); });
-}
-
-function setupScrollAnimations() {
-    const o = new IntersectionObserver(e => {
-        e.forEach(en => {
-            if (en.isIntersecting) {
-                en.target.classList.add('visible');
-                if (en.target.querySelector('.stat-value')) animateCounters(en.target);
-            }
-        });
-    }, {threshold:0.15});
-    document.querySelectorAll('.reveal').forEach(el => o.observe(el));
-}
-
-function animateCounters(c) {
-    c.querySelectorAll('.stat-value').forEach(el => {
-        if (el.dataset.animated) return;
-        el.dataset.animated = 'true';
-        const t = parseInt(el.dataset.target), s = el.dataset.suffix || '';
-        let cur = 0, steps = 60, inc = t/steps, st = 0;
-        const timer = setInterval(() => {
-            st++; cur += inc;
-            if (st >= steps) { cur = t; clearInterval(timer); }
-            el.textContent = Math.floor(cur).toLocaleString() + s;
-        }, 25);
-    });
-}
-
-// ==================== VEHÍCULOS ====================
-// Fallback por si alguna imagen de motor1 falla — usamos placehold con el nombre del vehículo
-function getVehicleFallback(name) {
-    return `https://placehold.co/600x400/111d36/6CABDD?text=${encodeURIComponent(name)}`;
-}
-
-function renderVehicles() {
-    const g = document.getElementById('vehicleGrid');
-    const f = vehicles.filter(v => (currentFilter==='todos'||v.category===currentFilter) && v.price<=maxPrice);
-    if (!f.length) {
-        g.innerHTML = '<div class="col-span-full text-center py-20"><i class="fas fa-car-crash text-5xl mb-4" style="color:var(--muted);"></i><p class="text-xl font-bold" style="color:var(--muted);">No se encontraron vehículos</p></div>';
-        return;
-    }
-    g.innerHTML = f.map(v => `
-        <div class="vehicle-card">
-            <div class="card-img-wrap relative">
-                <img src="${v.img}" alt="${v.name}" loading="lazy"
-                     onerror="this.onerror=null;this.src='${getVehicleFallback(v.name)}'">
-                <div class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);">${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</div>
-                <div class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:var(--navy-dark);"><i class="fas fa-star text-xs"></i> ${v.rating}</div>
-                <button class="absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-110" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);" onclick="toggleCompare(${v.id})"><i class="fas fa-exchange-alt text-sm" style="${compareList.includes(v.id)?'color:var(--accent);':'color:white;'}"></i></button>
-            </div>
-            <div class="p-5">
-                <div class="flex items-start justify-between mb-2">
-                    <div class="min-w-0"><h3 class="text-lg font-bold truncate">${v.name}</h3><p class="text-xs" style="color:var(--muted);">${v.brand} · ${v.year}</p></div>
-                    <div class="text-right flex-shrink-0 ml-2"><span class="text-xl font-black" style="color:var(--accent);">Q${v.price.toLocaleString()}</span><span class="text-xs block" style="color:var(--muted);">/día</span></div>
-                </div>
-                <div class="flex gap-4 my-4 text-xs" style="color:var(--muted);">
-                    <span class="whitespace-nowrap"><i class="fas fa-user mr-1"></i>${v.seats}</span>
-                    <span class="whitespace-nowrap"><i class="fas fa-cog mr-1"></i>${v.transmission}</span>
-                    <span class="whitespace-nowrap"><i class="fas fa-gas-pump mr-1"></i>${v.fuel}</span>
-                </div>
-                <div class="flex gap-2">
-                    <button class="btn-primary text-sm py-2 flex-1" onclick="openVehicleDetail(${v.id})">Ver Detalle</button>
-                    <button class="btn-secondary text-sm py-2 px-4" onclick="quickReserve(${v.id})">Reservar</button>
-                </div>
-            </div>
-        </div>`).join('');
-}
-
-function filterVehicles(c, b) {
-    currentFilter = c;
-    document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    renderVehicles();
-}
-
-function updatePriceFilter(v) {
-    maxPrice = parseInt(v);
-    document.getElementById('priceLabel').textContent = `Q${parseInt(v).toLocaleString()}/día`;
-    renderVehicles();
-}
-
-function openVehicleDetail(id) {
-    const v = vehicles.find(x => x.id === id);
-    if (!v) return;
-    document.getElementById('vehicleModalContent').innerHTML = `
-        <div class="relative">
-            <img src="${v.img}" class="w-full h-64 object-cover" style="border-radius:20px 20px 0 0;"
-                 onerror="this.onerror=null;this.src='${getVehicleFallback(v.name)}'">
-            <button onclick="closeModal('vehicleModal')" class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.6);"><i class="fas fa-times text-white"></i></button>
-            <div class="absolute bottom-4 left-4 px-4 py-2 rounded-xl" style="background:linear-gradient(135deg,var(--accent),var(--accent-light));color:var(--navy-dark);font-weight:800;font-size:20px;">Q${v.price.toLocaleString()}<span style="font-size:12px;font-weight:400;">/día</span></div>
-        </div>
-        <div class="p-6">
-            <div class="flex items-start justify-between mb-4">
-                <div><h3 class="text-2xl font-black">${v.name}</h3><p style="color:var(--muted);">${v.brand} · ${v.year} · ${v.hp} HP</p></div>
-                <div class="flex items-center gap-1 px-3 py-1 rounded-full" style="background:rgba(108,171,221,0.1);"><i class="fas fa-star text-sm" style="color:var(--accent);"></i><span class="font-bold" style="color:var(--accent);">${v.rating}</span></div>
-            </div>
-            <div class="grid grid-cols-3 gap-4 mb-6">
-                <div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-user mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.seats} asientos</div></div>
-                <div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-cog mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.transmission}</div></div>
-                <div class="text-center p-3 rounded-xl" style="background:var(--card);"><i class="fas fa-gas-pump mb-1" style="color:var(--accent);"></i><div class="text-sm font-semibold">${v.fuel}</div></div>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">${v.features.map(ft=>`<span class="px-3 py-1 rounded-full text-xs font-medium" style="background:var(--card);border:1px solid var(--border);">${ft}</span>`).join('')}</div>
-            <div class="flex gap-4 mb-6">
-                <div class="flex-1"><label class="block text-xs font-semibold mb-1" style="color:var(--muted);">Inicio</label><input type="date" class="input-field text-sm" id="calcStart" min="${new Date().toISOString().split('T')[0]}" onchange="calculateCost(${v.price},${v.id})"></div>
-                <div class="flex-1"><label class="block text-xs font-semibold mb-1" style="color:var(--muted);">Fin</label><input type="date" class="input-field text-sm" id="calcEnd" min="${new Date().toISOString().split('T')[0]}" onchange="calculateCost(${v.price},${v.id})"></div>
-            </div>
-            <div class="p-4 rounded-xl mb-6" style="background:var(--card);border:1px solid var(--border);">
-                <div class="flex justify-between items-center"><span style="color:var(--muted);">Costo estimado:</span><span class="text-2xl font-black" style="color:var(--accent);" id="calcResult">--</span></div>
-                <div id="calcDateError" class="hidden text-xs mt-2" style="color:var(--danger);">La fecha de devolución debe ser posterior a la recogida.</div>
-            </div>
-            <button class="btn-primary w-full text-base" onclick="quickReserve(${v.id});closeModal('vehicleModal');"><i class="fas fa-car mr-2"></i>Reservar Ahora</button>
-        </div>`;
-    openModal('vehicleModal');
-}
-
-function calculateCost(p, vid) {
-    const s = document.getElementById('calcStart').value;
-    const e = document.getElementById('calcEnd').value;
-    const errDiv = document.getElementById('calcDateError');
-    if (!s || !e) return;
-    if (document.getElementById('calcEnd')) document.getElementById('calcEnd').min = s;
-    if (new Date(e) <= new Date(s)) {
-        document.getElementById('calcResult').textContent = '--';
-        errDiv.classList.remove('hidden'); return;
-    }
-    errDiv.classList.add('hidden');
-    const d = Math.max(1, Math.ceil((new Date(e)-new Date(s))/(1000*60*60*24)));
-    document.getElementById('calcResult').textContent = `Q${(d*p).toLocaleString()} (${d} día${d>1?'s':''})`;
-}
-
-// ==================== COMPARAR ====================
-function toggleCompare(id) {
-    const i = compareList.indexOf(id);
-    if (i > -1) compareList.splice(i, 1);
-    else { if (compareList.length >= 3) { showToast('Máximo 3 vehículos', 'warning'); return; } compareList.push(id); }
-    updateCompareBar(); renderVehicles();
-}
-
-function updateCompareBar() {
-    const b = document.getElementById('compareBar'), items = document.getElementById('compareItems');
-    if (compareList.length > 0) {
-        b.classList.add('visible');
-        items.innerHTML = compareList.map(id => {
-            const v = vehicles.find(x => x.id === id);
-            return `<span class="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap" style="background:rgba(108,171,221,0.1);border:1px solid rgba(108,171,221,0.3);color:var(--accent);">${v.name}</span>`;
-        }).join('');
-    } else b.classList.remove('visible');
-}
-
-function clearCompare() { compareList = []; updateCompareBar(); renderVehicles(); }
-
-function openCompareModal() {
-    if (compareList.length < 2) { showToast('Selecciona al menos 2 vehículos', 'warning'); return; }
-    const vl = compareList.map(id => vehicles.find(x => x.id === id));
-    document.getElementById('compareModalContent').innerHTML = `
-        <div class="flex items-center justify-between mb-6"><h3 class="text-2xl font-black">Comparar Vehículos</h3><button onclick="closeModal('compareModal')" class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:var(--card);"><i class="fas fa-times" style="color:var(--muted);"></i></button></div>
-        <div class="overflow-x-auto"><table class="admin-table">
-            <thead><tr><th>Atributo</th>${vl.map(v=>`<th class="text-center"><img src="${v.img}" class="w-24 h-16 object-cover rounded-lg mx-auto mb-2" onerror="this.onerror=null;this.src='${getVehicleFallback(v.name)}'"><div class="font-bold">${v.name}</div></th>`).join('')}</tr></thead>
-            <tbody>
-                <tr><td>Precio/día</td>${vl.map(v=>`<td class="text-center font-bold" style="color:var(--accent);">Q${v.price.toLocaleString()}</td>`).join('')}</tr>
-                <tr><td>Categoría</td>${vl.map(v=>`<td class="text-center">${v.category.charAt(0).toUpperCase()+v.category.slice(1)}</td>`).join('')}</tr>
-                <tr><td>HP</td>${vl.map(v=>`<td class="text-center">${v.hp}</td>`).join('')}</tr>
-                <tr><td>Asientos</td>${vl.map(v=>`<td class="text-center">${v.seats}</td>`).join('')}</tr>
-                <tr><td>Combustible</td>${vl.map(v=>`<td class="text-center">${v.fuel}</td>`).join('')}</tr>
-                <tr><td>Rating</td>${vl.map(v=>`<td class="text-center"><i class="fas fa-star" style="color:var(--accent);"></i> ${v.rating}</td>`).join('')}</tr>
-            </tbody>
-        </table></div>`;
-    openModal('compareModal');
-}
-
-// ==================== RENTAS ====================
-function quickReserve(id) {
-    const v = vehicles.find(x => x.id === id);
-    if (!v) return;
-    document.getElementById('reserveVehicle').value = v.name;
-    if (currentSessionUser) {
-        document.getElementById('resName').value = currentSessionUser.name;
-        document.getElementById('resEmail').value = currentSessionUser.email;
-        document.getElementById('resPhone').value = currentSessionUser.phone;
-    }
-    openModal('reserveModal');
-}
-
-function populateReserveSelect() {
-    const s = document.getElementById('reserveVehicle');
-    vehicles.forEach(v => {
-        const o = document.createElement('option');
-        o.value = v.name;
-        o.textContent = `${v.name} — Q${v.price.toLocaleString()}/día`;
-        s.appendChild(o);
-    });
-}
-
-function updateRentalBadge() {
-    const b = document.getElementById('rentalNavBadge');
-    const allRentals = loadRentals();
-    const c = allRentals.filter(r => r.status==='activa'||r.status==='pendiente').length;
-    if (c > 0) { b.textContent = c; b.classList.remove('hidden'); b.classList.add('flex'); }
-    else { b.classList.add('hidden'); b.classList.remove('flex'); }
-}
-
-function renderRentals() {
-    rentals = loadRentals();
-    const f = currentRentalTab==='todas' ? rentals : rentals.filter(r => r.status===currentRentalTab);
-    renderRentalSummary();
-    renderRentalList(f);
-}
-
-function renderRentalSummary() {
-    const allRentals = loadRentals();
-    document.getElementById('rentalSummary').innerHTML = `
-        <div class="p-3 rounded-xl text-center" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);"><div class="text-2xl font-black" style="color:var(--success);">${allRentals.filter(r=>r.status==='activa').length}</div><div class="text-xs" style="color:var(--muted);">Activas</div></div>
-        <div class="p-3 rounded-xl text-center" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);"><div class="text-2xl font-black" style="color:var(--warning);">${allRentals.filter(r=>r.status==='pendiente').length}</div><div class="text-xs" style="color:var(--muted);">Pendientes</div></div>
-        <div class="p-3 rounded-xl text-center" style="background:rgba(108,171,221,0.08);border:1px solid rgba(108,171,221,0.2);"><div class="text-2xl font-black" style="color:var(--accent);">${allRentals.filter(r=>r.status==='completada').length}</div><div class="text-xs" style="color:var(--muted);">Completadas</div></div>`;
-}
-
-function renderRentalList(f) {
-    const c = document.getElementById('rentalList');
-    if (!f.length) {
-        c.innerHTML = '<div class="text-center py-12"><i class="fas fa-key text-4xl mb-4" style="color:var(--border);"></i><p class="font-bold" style="color:var(--muted);">No hay rentas en esta categoría</p></div>';
-        return;
-    }
-    c.innerHTML = f.map(r => {
-        const p = getRentalProgress(r);
-        const pc = r.status==='activa'?'var(--success)':r.status==='pendiente'?'var(--warning)':'var(--accent)';
-        return `
-        <div class="rental-card">
-            <div class="flex flex-col sm:flex-row">
-                <div class="sm:w-48 h-36 sm:h-auto flex-shrink-0"><img src="${r.vehicleImg}" class="w-full h-full object-cover" style="border-radius:16px 0 0 16px;" onerror="this.onerror=null;this.style.background='var(--card)'"></div>
-                <div class="flex-1 p-5">
-                    <div class="flex items-start justify-between mb-3">
-                        <div><h4 class="text-lg font-bold">${r.vehicleName}</h4><p class="text-xs" style="color:var(--muted);">#${String(r.id).padStart(4,'0')}</p></div>
-                        <span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span>
-                    </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-xs">
-                        <div><span style="color:var(--muted);">Recogida</span><div class="font-semibold">${r.pickupDate}</div></div>
-                        <div><span style="color:var(--muted);">Devolución</span><div class="font-semibold">${r.returnDate}</div></div>
-                        <div><span style="color:var(--muted);">Ubicación</span><div class="font-semibold">${r.location}</div></div>
-                        <div><span style="color:var(--muted);">Total</span><div class="font-semibold" style="color:var(--accent);">Q${r.totalPrice.toLocaleString()}</div></div>
-                    </div>
-                    <div class="mb-3"><div class="flex justify-between text-xs mb-1"><span style="color:var(--muted);">Progreso</span><span>${p}%</span></div><div class="progress-bar"><div class="progress-bar-fill" style="width:${p}%;background:${pc};"></div></div></div>
-                    <div class="flex gap-2">
-                        <button class="btn-primary btn-sm text-xs" onclick="openRentalDetail(${r.id})"><i class="fas fa-eye mr-1"></i>Detalle</button>
-                        ${r.status==='pendiente'?`<button class="btn-danger text-xs" onclick="cancelRental(${r.id})"><i class="fas fa-times mr-1"></i>Cancelar</button>`:''}
-                    </div>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-function getRentalProgress(r) {
-    if (r.status==='cancelada') return 0;
-    if (r.status==='completada') return 100;
-    return Math.round(r.timeline.filter(t=>t.done).length/r.timeline.length*100);
-}
-
-function switchRentalTab(t, b) {
-    currentRentalTab = t;
-    document.querySelectorAll('.rental-tab').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    renderRentals();
-}
-
-function openRentalDetail(id) {
-    const allRentals = loadRentals();
-    const r = allRentals.find(x => x.id === id);
-    if (!r) return;
-    document.getElementById('rentalDetailContent').innerHTML = `
-        <div class="relative">
-            <img src="${r.vehicleImg}" class="w-full h-48 object-cover" style="border-radius:20px 20px 0 0;" onerror="this.onerror=null;this.style.background='var(--card)'">
-            <button onclick="closeModal('rentalDetailModal')" class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(0,0,0,0.6);"><i class="fas fa-times text-white"></i></button>
-            <div class="absolute bottom-4 left-4"><span class="rental-status ${r.status}"><span class="dot"></span>${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></div>
-        </div>
-        <div class="p-6">
-            <h3 class="text-2xl font-black mb-2">${r.vehicleName}</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                <div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-calendar-alt mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Recogida</div><div class="text-sm font-bold">${r.pickupDate}</div></div>
-                <div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-calendar-check mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Devolución</div><div class="text-sm font-bold">${r.returnDate}</div></div>
-                <div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-map-marker-alt mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Ubicación</div><div class="text-sm font-bold" style="font-size:11px;">${r.location}</div></div>
-                <div class="p-3 rounded-xl text-center" style="background:var(--card);"><i class="fas fa-dollar-sign mb-1" style="color:var(--accent);"></i><div class="text-xs" style="color:var(--muted);">Total</div><div class="text-sm font-bold" style="color:var(--accent);">Q${r.totalPrice.toLocaleString()}</div></div>
-            </div>
-            <div class="flex gap-4 mb-6">
-                <div class="flex flex-col items-center">${r.timeline.map((t,i)=>`<div class="timeline-dot ${t.done?'done':t.current?'current':''}"></div>${i<r.timeline.length-1?`<div class="timeline-line ${t.done?'done':''}"></div>`:''}`).join('')}</div>
-                <div class="flex flex-col gap-3">${r.timeline.map(t=>`<div class="min-h-[30px]"><div class="text-sm font-semibold ${t.done||t.current?'':'opacity-40'}">${t.step}</div><div class="text-xs" style="color:var(--muted);">${t.date}</div></div>`).join('')}</div>
-            </div>
-            <button class="btn-secondary btn-sm" onclick="closeModal('rentalDetailModal')">Cerrar</button>
-        </div>`;
-    openModal('rentalDetailModal');
-}
-
-function cancelRental(id) {
-    const allRentals = loadRentals();
-    const r = allRentals.find(x => x.id === id);
-    if (!r) return;
-    r.status = 'cancelada';
-    r.timeline = r.timeline.map(t => ({...t,done:false,current:false}));
-    saveRentals(allRentals);
-    rentals = allRentals;
-    renderRentals();
-    updateRentalBadge();
-    showToast('Renta cancelada', 'info');
-}
-
-// ==================== MODALES ====================
-function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
-document.querySelectorAll('.modal-overlay').forEach(o => {
-    o.addEventListener('click', e => { if (e.target===o) { o.classList.remove('open'); document.body.style.overflow=''; } });
-});
-
-function showToast(msg, type='info') {
-    const c = document.getElementById('toastContainer');
-    const t = document.createElement('div');
-    t.className = `toast ${type==='success'?'success':''}`;
-    const icon = type==='success'?'fa-check-circle':type==='warning'?'fa-exclamation-triangle':'fa-info-circle';
-    const ic = type==='success'?'var(--success)':type==='warning'?'var(--warning)':'var(--accent)';
-    t.innerHTML = `<i class="fas ${icon}" style="color:${ic};font-size:18px;flex-shrink:0;"></i><span class="text-sm">${msg}</span>`;
-    c.appendChild(t);
-    setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(100px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 4000);
-}
-
-function submitContactForm(e) {
-    e.preventDefault();
-    const name = document.getElementById('contactName')?.value || '';
-    const email = document.getElementById('contactEmail')?.value || '';
-    const subject = document.getElementById('contactSubject')?.value || 'Consulta AutoMacky';
-    const msg = document.getElementById('contactMsg')?.value || '';
-    const mailtoSubject = encodeURIComponent(`${subject} - ${name}`);
-    const mailtoBody = encodeURIComponent(`Nombre: ${name}\nEmail de respuesta: ${email}\n\n${msg}`);
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${mailtoSubject}&body=${mailtoBody}`;
-    e.target.reset();
-    showToast('Redirigiendo a tu correo para enviar el mensaje.', 'success');
-}
-
-function searchVehicles() {
-    const l = document.getElementById('searchLocation').value;
-    document.getElementById('vehiculos').scrollIntoView({behavior:'smooth'});
-    if (l) showToast(`Buscando en ${l}...`, 'info');
-}
-
-// ==================== CHATBOT ====================
-const chatTree = {
-    main: {
-        msg: "¡Hola! Bienvenido a <strong>AutoMacky Guatemala</strong> 🇬🇹. ¿En qué puedo ayudarte hoy?",
-        actions: [
-            {text:"🚗 Ver vehículos", action:"vehiculos"},
-            {text:"📋 Mis rentas", action:"mis_rentas"},
-            {text:"📍 Ubicaciones", action:"ubicaciones"},
-            {text:"💰 Precios y tarifas", action:"precios"},
-            {text:"🛡️ Seguros", action:"seguros"},
-            {text:"📞 Contacto", action:"contacto"}
-        ]
-    },
-    vehiculos: {
-        msg: "Contamos con vehículos para cada necesidad. ¿Qué tipo buscas?",
-        actions: [
-            {text:"🚙 SUVs (Montaña/Petén)", action:"cat_suv"},
-            {text:"🚐 Vans (grupos)", action:"cat_van"},
-            {text:"🛻 Pick-ups (4x4)", action:"cat_pickup"},
-            {text:"🚗 Sedanes/Compactos", action:"cat_sedan"},
-            {text:"⬅️ Menú principal", action:"main"}
-        ]
-    },
-    cat_suv: {msg:"Nuestras SUVs son ideales para montaña, Petén, y carreteras guatemaltecas. Precios desde <strong>Q620/día</strong>.",actions:[{text:"Reservar SUV",action:"reservar"},{text:"⬅️ Tipos",action:"vehiculos"}]},
-    cat_van: {msg:"Toyota HiAce hasta <strong>12 pasajeros</strong>. Desde <strong>Q1,200/día</strong>.",actions:[{text:"Reservar van",action:"reservar"},{text:"⬅️ Tipos",action:"vehiculos"}]},
-    cat_pickup: {msg:"Pick-ups 4x4 desde <strong>Q850/día</strong>.",actions:[{text:"Reservar pick-up",action:"reservar"},{text:"⬅️ Tipos",action:"vehiculos"}]},
-    cat_sedan: {msg:"Vehículos económicos desde <strong>Q280/día</strong>.",actions:[{text:"Reservar sedan",action:"reservar"},{text:"⬅️ Tipos",action:"vehiculos"}]},
-    mis_rentas: {
-        msg:"Puedes ver el estado de tus reservas, seguimiento en tiempo real y cancelar si necesitas.",
-        actions:[{text:"📂 Abrir mis rentas",action:"abrir_rentas"},{text:"❌ ¿Cómo cancelo?",action:"cancelar_renta"},{text:"⬅️ Menú principal",action:"main"}]
-    },
-    cancelar_renta: {msg:"Ve a <strong>'Mis Rentas'</strong> → selecciona la renta pendiente → toca <strong>'Cancelar'</strong>.",actions:[{text:"📂 Ir a Mis Rentas",action:"abrir_rentas"},{text:"⬅️ Volver",action:"mis_rentas"}]},
-    ubicaciones: {
-        msg:"Tenemos puntos de entrega en toda Guatemala:",
-        actions:[{text:"✈️ Aeropuerto La Aurora",action:"loc_aeropuerto"},{text:"🌺 Antigua Guatemala",action:"loc_antigua"},{text:"🌿 Petén / Flores",action:"loc_peten"},{text:"🏔️ Quetzaltenango",action:"loc_xela"},{text:"⬅️ Menú principal",action:"main"}]
-    },
-    loc_aeropuerto: {msg:"Punto principal en <strong>Aeropuerto Internacional La Aurora</strong>. El vehículo te espera a tu llegada.",actions:[{text:"Reservar aquí",action:"reservar"},{text:"⬅️ Ubicaciones",action:"ubicaciones"}]},
-    loc_antigua: {msg:"Sucursal Antigua Guatemala para el centro histórico y alrededores.",actions:[{text:"Reservar en Antigua",action:"reservar"},{text:"⬅️ Ubicaciones",action:"ubicaciones"}]},
-    loc_peten: {msg:"Sucursal Petén / Flores para Tikal y reservas mayas. Recomendamos 4x4.",actions:[{text:"Ver SUVs/Pick-ups",action:"cat_suv"},{text:"⬅️ Ubicaciones",action:"ubicaciones"}]},
-    loc_xela: {msg:"Sucursal Quetzaltenango para el altiplano guatemalteco.",actions:[{text:"Reservar en Xela",action:"reservar"},{text:"⬅️ Ubicaciones",action:"ubicaciones"}]},
-    precios: {
-        msg:"Tarifas en Quetzales (GTQ):<br>🚗 Compactos: desde <strong style='color:var(--accent)'>Q280/día</strong><br>🚙 Sedanes: desde <strong style='color:var(--accent)'>Q350/día</strong><br>🚗 SUVs: desde <strong style='color:var(--accent)'>Q620/día</strong><br>🛻 Pick-ups: desde <strong style='color:var(--accent)'>Q850/día</strong><br>🚐 Vans: desde <strong style='color:var(--accent)'>Q1,200/día</strong>",
-        actions:[{text:"💳 ¿Qué incluye?",action:"incluye"},{text:"📅 Descuentos",action:"descuentos"},{text:"⬅️ Menú principal",action:"main"}]
-    },
-    descuentos: {msg:"<strong>Descuentos:</strong><br>• 3–6 días: 5% off<br>• 7–13 días: 10% off<br>• 14+ días: 15% off<br><br>Aplica contactando por WhatsApp.",actions:[{text:"💬 WhatsApp",action:"whatsapp"},{text:"⬅️ Precios",action:"precios"}]},
-    incluye: {msg:"✅ Seguro básico<br>✅ Tanque lleno<br>✅ Asistencia 24/7<br>✅ Sin límite de kilómetros<br><br>Seguro total (+Q150/día) cubre colisión y robo.",actions:[{text:"📋 Reservar",action:"reservar"},{text:"⬅️ Menú principal",action:"main"}]},
-    seguros: {msg:"<strong>Básico (incluido):</strong> Daños a terceros + asistencia.<br><strong>Total (+Q150/día):</strong> Colisión, robo, daños propios y grúa.",actions:[{text:"📋 Reservar con seguro total",action:"reservar"},{text:"⬅️ Menú principal",action:"main"}]},
-    contacto: {msg:"📱 <strong>WhatsApp:</strong> +502 3812-4414<br>📧 <strong>Email:</strong> infoautomaky@gmail.com<br>📍 <strong>Aeropuerto La Aurora</strong>",actions:[{text:"💬 Abrir WhatsApp",action:"whatsapp"},{text:"📧 Enviar email",action:"email"},{text:"⬅️ Menú principal",action:"main"}]},
-    default: {msg:"No entendí bien tu consulta. Aquí las opciones:",actions:[{text:"🚗 Vehículos",action:"vehiculos"},{text:"💰 Precios",action:"precios"},{text:"📞 Contacto",action:"contacto"},{text:"📋 Mis rentas",action:"mis_rentas"}]}
-};
-
-function toggleChat() {
-    chatOpen = !chatOpen;
-    const w = document.getElementById('chatWindow');
-    const ic = document.getElementById('chatIcon');
-    const bg = document.getElementById('chatBadge');
-    if (chatOpen) {
-        w.classList.add('open');
-        ic.className = 'fas fa-times text-xl';
-        ic.style.color = 'var(--navy-dark)';
-        bg.style.display = 'none';
-        if (!chatInitialized) { initChat(); chatInitialized = true; }
-    } else {
-        w.classList.remove('open');
-        ic.className = 'fas fa-comments text-xl';
-        ic.style.color = 'var(--navy-dark)';
-    }
-}
-
-function initChat() { addBotMessage(chatTree.main.msg); showQuickActions(chatTree.main.actions); }
-function addBotMessage(t) { const m=document.getElementById('chatMessages'); const b=document.createElement('div'); b.className='chat-bubble bot'; b.innerHTML=t; m.appendChild(b); m.scrollTop=m.scrollHeight; }
-function addUserMessage(t) { const m=document.getElementById('chatMessages'); const b=document.createElement('div'); b.className='chat-bubble user'; b.textContent=t; m.appendChild(b); m.scrollTop=m.scrollHeight; }
-function showQuickActions(actions) { document.getElementById('quickActions').innerHTML=actions.map(x=>`<button class="quick-btn" onclick="handleChatAction('${x.action}','${x.text}')">${x.text}</button>`).join(''); }
-function handleChatAction(action, label) { addUserMessage(label); setTimeout(()=>processChatAction(action),400); }
-
-function processChatAction(action) {
-    if (action==='abrir_rentas') { openModal('rentalsModal'); renderRentals(); addBotMessage("Abriendo tus rentas... ¿Algo más?"); showQuickActions(chatTree.main.actions); return; }
-    if (action==='reservar') { openModal('reserveModal'); addBotMessage("Abriendo el formulario de reserva. ¡Espero que encuentres el vehículo perfecto!"); showQuickActions([{text:"⬅️ Menú principal",action:"main"}]); return; }
-    if (action==='whatsapp') { window.open('https://wa.me/50238124414','_blank'); addBotMessage("Abriendo WhatsApp... ¡Estamos para ayudarte!"); showQuickActions([{text:"⬅️ Menú principal",action:"main"}]); return; }
-    if (action==='email') { window.location.href=`mailto:${CONTACT_EMAIL}?subject=Consulta AutoMacky`; addBotMessage("Abriendo tu correo. 📧"); showQuickActions([{text:"⬅️ Menú principal",action:"main"}]); return; }
-    const node = chatTree[action] || chatTree.default;
-    addBotMessage(node.msg);
-    showQuickActions(node.actions);
-}
-
-function sendChatMessage() {
-    const i = document.getElementById('chatInput');
-    const t = i.value.trim();
-    if (!t) return;
-    addUserMessage(t); i.value = '';
-    setTimeout(() => {
-        const l = t.toLowerCase();
-        let action = 'default';
-        if (l.includes('hola')||l.includes('buenos')||l.includes('hi')) action='main';
-        else if (l.includes('renta')||l.includes('reserva')||l.includes('mis rent')) action='mis_rentas';
-        else if (l.includes('suv')||l.includes('camioneta')) action='cat_suv';
-        else if (l.includes('pick')||l.includes('4x4')) action='cat_pickup';
-        else if (l.includes('van')||l.includes('grupo')) action='cat_van';
-        else if (l.includes('sedan')||l.includes('compacto')||l.includes('auto')) action='cat_sedan';
-        else if (l.includes('precio')||l.includes('costo')||l.includes('cuanto')) action='precios';
-        else if (l.includes('descuento')) action='descuentos';
-        else if (l.includes('seguro')||l.includes('cobertura')) action='seguros';
-        else if (l.includes('ubicacion')||l.includes('donde')||l.includes('aeropuerto')) action='ubicaciones';
-        else if (l.includes('contacto')||l.includes('telefono')||l.includes('whatsapp')) action='contacto';
-        else if (l.includes('cancel')) action='cancelar_renta';
-        else if (l.includes('incluye')||l.includes('incluido')) action='incluye';
-        processChatAction(action);
-    }, 500);
+/* ============================== INICIO ============================== */
+if (typeof math === 'undefined' || typeof katex === 'undefined') {
+  document.getElementById('cdn-error').style.display = 'block';
+} else {
+  updateBadges();
+  recompute();
+  draw();
 }
 </script>
 </body>
