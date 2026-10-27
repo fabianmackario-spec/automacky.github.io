@@ -28,13 +28,14 @@
   .presets button{border:1px solid #d4d4d8;background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-family:ui-monospace,monospace;cursor:pointer;color:#3f3f46}
   .presets button:hover{background:#f4f4f5}
   .hint{font-size:11px;color:#71717a;line-height:1.6;margin-top:10px}
-  .trow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .trow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
   .trow .lbl{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
   .trow .lbl svg{color:#71717a;flex-shrink:0}
   .trow small{display:block;font-size:12px;color:#71717a;font-weight:400}
   .badge{font-family:ui-monospace,monospace;font-size:12px;border-radius:999px;padding:3px 10px;background:#f4f4f5;color:#71717a;white-space:nowrap}
   .badge.on-k{background:#059669;color:#fff}
   .badge.on-h{background:#d97706;color:#fff}
+  .badge.on-a{background:#7c3aed;color:#fff}
   .switch{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
   .switch input{opacity:0;width:0;height:0}
   .slider-bg{position:absolute;inset:0;background:#d4d4d8;border-radius:999px;transition:.2s;cursor:pointer}
@@ -45,6 +46,7 @@
   .sld-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
   input[type=range]{width:100%;accent-color:#059669;cursor:pointer;height:22px}
   #sl-h{accent-color:#d97706}
+  #sl-a{accent-color:#7c3aed}
   .range-ends{display:flex;justify-content:space-between;font-size:11px;color:#a1a1aa;margin-top:2px}
   .btn-reset{display:inline-flex;align-items:center;gap:6px;border:1px solid #d4d4d8;background:#fff;border-radius:10px;padding:8px 14px;font-size:13px;cursor:pointer;color:#3f3f46}
   .btn-reset:hover{background:#f4f4f5}
@@ -55,13 +57,38 @@
   .fx-box .tag{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
   .fx-box .tag{color:#1565C0}.fx-box.g .tag{color:#D32F2F}
   .fx-box .math{font-size:16px;min-height:24px}
-  .steps{margin-top:12px}
-  .steps p{font-size:12px;font-weight:600;margin-bottom:8px}
+  .g-hero{margin-top:12px;border:1px solid #fecaca;background:linear-gradient(180deg,#fff5f5,#fff);border-radius:12px;padding:12px 14px;text-align:center}
+  .g-hero .gtag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#b91c1c;margin-bottom:6px}
+  .g-hero .math{font-size:18px;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;justify-content:center}
+  .tags span{font-size:11px;font-weight:600;border-radius:999px;padding:4px 10px}
+  .tg-refl{background:#fee2e2;color:#b91c1c}
+  .tg-a{background:#ede9fe;color:#6d28d9}
+  .tg-h{background:#ffedd5;color:#c2410c}
+  .tg-k{background:#d1fae5;color:#047857}
+  .tg-none{background:#f4f4f5;color:#71717a}
+  .steps{margin-top:14px}
+  .steps .st-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#52525b;margin-bottom:8px}
   .steps ol{list-style:none;display:flex;flex-direction:column;gap:8px}
-  .steps li{border:1px solid #e4e4e7;background:#fff;border-radius:9px;padding:8px 12px}
-  .steps li small{font-size:11px;color:#71717a;line-height:1.5;display:block}
-  .steps li .math{font-size:13px;margin-top:4px;min-height:20px}
+  .steps li{border:1px solid #e4e4e7;background:#fafafa;border-radius:10px;padding:10px 12px;display:flex;gap:10px}
+  .steps .num{width:22px;height:22px;border-radius:50%;background:#059669;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+  .steps .s-body{flex:1;min-width:0}
+  .steps .s-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .steps .s-head b{font-size:13px}
+  .steps .mini-badge{font-family:ui-monospace,monospace;font-size:11px;border-radius:999px;padding:2px 8px;background:#f4f4f5;color:#3f3f46;font-weight:700;white-space:nowrap}
+  .steps .s-desc{font-size:11.5px;color:#71717a;line-height:1.5;margin-top:2px}
+  .steps .s-rule{display:inline-block;border:1px dashed #d4d4d8;background:#fff;border-radius:6px;padding:2px 8px;margin-top:6px}
+  .steps .math{font-size:13.5px;margin-top:5px;overflow-x:auto}
   .identity{font-size:12px;font-style:italic;color:#71717a;margin-top:10px}
+  .vtable-wrap{margin-top:14px;overflow-x:auto}
+  .vtable-wrap .vt-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#52525b;margin-bottom:8px}
+  table.vtable{width:100%;border-collapse:collapse;font-size:12.5px}
+  .vtable th,.vtable td{border:1px solid #e4e4e7;padding:6px 10px;text-align:center;font-family:ui-monospace,monospace}
+  .vtable th{background:#fafafa;font-size:11.5px;font-weight:700}
+  .vtable th.hf{color:#1565C0;background:#eff6ff}
+  .vtable th.hg{color:#D32F2F;background:#fef2f2}
+  .vtable td:first-child{font-weight:600;background:#fafafa}
+  .legend .bar.dash{background:transparent;border-top:2.5px dashed;border-radius:0;height:1px}
   .graph-card{background:#fff;border:1px solid #e4e4e7;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04);position:sticky;top:76px}
   @media(max-width:1023px){.graph-card{position:static}}
   .graph-body{position:relative;height:420px}
@@ -87,7 +114,7 @@
     <div class="logo">Σ</div>
     <div>
       <h1>Transformaciones de Funciones</h1>
-      <p>Reflexión sobre el eje X · Traslación vertical y horizontal · Gráfica interactiva estilo GeoGebra</p>
+      <p>Reflexión eje X · Ampliación y reducción · Traslación vertical y horizontal · Gráfica interactiva estilo GeoGebra</p>
     </div>
   </div>
 </header>
@@ -119,7 +146,7 @@
           <span class="lbl">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m8 7 4-4 4 4"/><path d="m8 17 4 4 4-4"/></svg>
             Reflexión sobre el eje X
-            <small>Invierte la gráfica verticalmente: <span style="font-family:ui-monospace">g(x) = −f(x)</span></small>
+            <small>Invierte la gráfica verticalmente: cada valor y cambia de signo</small>
           </span>
         </div>
         <label class="switch"><input type="checkbox" id="reflect" checked><span class="slider-bg"></span></label>
@@ -128,6 +155,16 @@
       <hr class="sep">
 
       <div class="sld-head">
+        <span class="lbl" style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10V3"/><path d="m8 7 4-4 4 4"/><path d="M12 14v7"/><path d="m8 17 4 4 4-4"/></svg>
+          Ampliación / Reducción (a)
+        </span>
+        <span class="badge" id="badge-a">× 1 · sin cambio</span>
+      </div>
+      <input type="range" id="sl-a" min="0.1" max="5" step="0.1" value="1" aria-label="Factor de ampliación o reducción vertical">
+      <div class="range-ends"><span>a &lt; 1 reduce (comprime)</span><span>a &gt; 1 amplía (estira)</span></div>
+
+      <div class="sld-head" style="margin-top:18px">
         <span class="lbl" style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m8 8 4-4 4 4"/><path d="m8 16 4 4 4-4"/></svg>
           Traslación vertical (k)
@@ -154,7 +191,10 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           Restablecer transformaciones
         </button>
-        <label class="vec-lbl"><input type="checkbox" id="show-vec" checked> Vector T(h, k)</label>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label class="vec-lbl"><input type="checkbox" id="show-vec" checked> Vector T(h, k)</label>
+          <label class="vec-lbl"><input type="checkbox" id="show-steps-g" checked> Pasos intermedios en la gráfica</label>
+        </div>
       </div>
     </section>
 
@@ -162,12 +202,19 @@
     <section class="card" id="card-formulas">
       <h2><span class="chip">3</span> Función transformada</h2>
       <p class="desc">Regla general: <span style="font-family:ui-monospace">g(x) = a·f(x − h) + k</span></p>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
-        <div class="fx-box"><p class="tag">Original</p><div class="math" id="tex-f"></div></div>
-        <div class="fx-box g"><p class="tag">Transformada</p><div class="math" id="tex-g"></div></div>
+
+      <div class="g-hero">
+        <p class="gtag">Resultado final</p>
+        <div class="math" id="tex-g"></div>
       </div>
+
+      <div class="tags" id="tags"></div>
+
+      <div class="fx-box" style="margin-top:12px"><p class="tag">Función original</p><div class="math" id="tex-f"></div></div>
+
       <div class="steps" id="steps"></div>
       <p class="identity" id="identity" style="display:none">No se ha aplicado ninguna transformación: g coincide con f.</p>
+      <div class="vtable-wrap" id="vtable-wrap"></div>
     </section>
   </div>
 
@@ -175,10 +222,7 @@
   <div class="graph-card">
     <div class="graph-body" id="graph-body">
       <canvas id="graph" aria-label="Gráfica de la función original y la función transformada"></canvas>
-      <div class="legend">
-        <div><span class="bar" style="background:#1565C0"></span><span style="color:#1565C0">f(x) — original</span></div>
-        <div><span class="bar" style="background:#D32F2F"></span><span style="color:#D32F2F">g(x) — transformada</span></div>
-      </div>
+      <div class="legend" id="legend"></div>
       <div class="toolbar">
         <button id="z-in" title="Acercar" aria-label="Acercar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6M8 11h6"/></svg></button>
         <button id="z-out" title="Alejar" aria-label="Alejar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg></button>
@@ -190,7 +234,7 @@
   </div>
 </main>
 
-<footer><div>Transformaciones geométricas de funciones · Reflexión sobre el eje X · Traslación vertical k · Traslación horizontal h · g(x) = a·f(x − h) + k</div></footer>
+<footer><div>Transformaciones geométricas de funciones · Reflexión eje X · Ampliación / reducción a · Traslación vertical k · Traslación horizontal h · g(x) = a·f(x − h) + k</div></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/mathjs@13/lib/browser/math.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -198,8 +242,9 @@
 'use strict';
 /* ============================= ESTADO ============================= */
 const COLOR_F = '#1565C0', COLOR_G = '#D32F2F', COLOR_VEC = '#7C3AED';
-const state = { reflect: true, h: 2, k: 0, showVec: true };
+const state = { reflect: true, h: 2, k: 0, a: 1, showVec: true, showSteps: true };
 let currentF = null, currentG = null, currentNode = null;
+let stepCurves = [];
 
 /* ======================= UTILIDADES MATEMÁTICAS ======================= */
 function fmtNum(n){
@@ -231,13 +276,24 @@ function compileExpression(input){
     return { ok: false, error: 'No se pudo interpretar la función. Revisa la sintaxis. (' + err.message + ')' };
   }
 }
-function makeTransformedFn(base, reflect, h, k){
+function makeTransformedFn(base, reflect, h, k, a){
   return x => {
     const y = base(x - h);
     if (y === null) return null;
-    const out = (reflect ? -y : y) + k;
+    const out = (reflect ? -y : y) * a + k;
     return isFinite(out) ? out : null;
   };
+}
+function computeStepCurves(){
+  stepCurves = [];
+  if (!state.showSteps || !currentF) return;
+  const base = currentF;
+  const f1 = x => base(x - state.h);
+  const f2 = x => { const y = f1(x); return y === null ? null : state.a * y; };
+  const f3 = x => { const y = f2(x); return y === null ? null : (state.reflect ? -y : y); };
+  if (state.h !== 0) stepCurves.push({ fn: f1, color: '#EA580C' });
+  if (state.a !== 1) stepCurves.push({ fn: f2, color: '#059669' });
+  if (state.reflect) stepCurves.push({ fn: f3, color: '#DB2777' });
 }
 /* Sustituye x por (x - h) en el árbol de la expresión */
 function substituteX(node, h){
@@ -253,38 +309,81 @@ function substituteX(node, h){
     return n;
   });
 }
-function buildFormulas(node, reflect, h, k){
+/* Multiplica un término LaTeX por un coeficiente positivo (con paréntesis cuando hace falta) */
+function mulTex(coef, t){
+  if (t.charAt(0) === '-') return '-' + coef + t.slice(1);
+  if (/^[0-9.]/.test(t) || t.slice(0, 5) === '\\frac') return coef + ' \\cdot ' + t;
+  return coef + ' ' + t;
+}
+function buildFormulas(node, reflect, h, k, a){
   const fTex = 'f\\left(x\\right) = ' + node.toTex({ implicit: 'hide' });
   const substituted = substituteX(node, h);
-  const subTex = substituted.toTex({ implicit: 'hide' });
-  const needsParens = !!substituted.isOperatorNode && (substituted.op === '+' || substituted.op === '-');
-  const wrapped = needsParens ? '\\left(' + subTex + '\\right)' : subTex;
-  const gTex = 'g\\left(x\\right) = ' + (reflect ? '-' + wrapped : wrapped) + fmtKTerm(k);
+  let cur = substituted.toTex({ implicit: 'hide' });
+  const steps = [], tags = [];
+  let n = 0, lastName = 'f';
+  const nextName = () => { n++; return 'y_' + n; };
 
-  const steps = [];
-  let current = subTex;
+  /* 1 · traslación horizontal */
   if (h !== 0) {
+    const out = nextName();
     steps.push({
-      label: h > 0
-        ? 'Traslación horizontal: ' + fmtNum(h) + ' unidades a la derecha → y = f(x - ' + fmtNum(h) + ')'
-        : 'Traslación horizontal: ' + fmtNum(Math.abs(h)) + ' unidades a la izquierda → y = f(x + ' + fmtNum(Math.abs(h)) + ')',
-      tex: 'y_1 = ' + current
+      title: 'Traslación horizontal',
+      badge: (h > 0 ? '→ ' : '← ') + fmtNum(Math.abs(h)),
+      desc: h > 0
+        ? 'Se desplaza la gráfica ' + fmtNum(h) + ' unidades hacia la derecha: cada x se reemplaza por x − ' + fmtNum(h) + '.'
+        : 'Se desplaza la gráfica ' + fmtNum(Math.abs(h)) + ' unidades hacia la izquierda: cada x se reemplaza por x + ' + fmtNum(Math.abs(h)) + '.',
+      rule: out + '(x) = f(x ' + (h > 0 ? '-' : '+') + ' ' + fmtNum(Math.abs(h)) + ')',
+      tex: out + ' = ' + cur
     });
+    lastName = out;
+    tags.push({ cls: 'tg-h', text: (h > 0 ? 'Horizontal → ' : 'Horizontal ← ') + fmtNum(Math.abs(h)) });
   }
+  /* 2 · ampliación / reducción vertical */
+  if (a !== 1) {
+    const out = nextName();
+    cur = mulTex(fmtNum(a), cur);
+    steps.push({
+      title: a > 1 ? 'Ampliación vertical' : 'Reducción vertical',
+      badge: '× ' + fmtNum(a),
+      desc: a > 1
+        ? 'Cada ordenada se multiplica por ' + fmtNum(a) + ': la gráfica se estira y se aleja del eje X.'
+        : 'Cada ordenada se multiplica por ' + fmtNum(a) + ': la gráfica se comprime y se acerca al eje X.',
+      rule: out + '(x) = ' + fmtNum(a) + '\\,' + lastName + '(x)',
+      tex: out + ' = ' + cur
+    });
+    lastName = out;
+    tags.push({ cls: 'tg-a', text: (a > 1 ? 'Ampliación × ' : 'Reducción × ') + fmtNum(a) });
+  }
+  /* 3 · reflexión sobre el eje X */
   if (reflect) {
-    current = needsParens ? '-\\left(' + current + '\\right)' : '-' + current;
-    steps.push({ label: 'Reflexión sobre el eje X: se invierte verticalmente → y = -y', tex: 'y_2 = ' + current });
-  }
-  if (k !== 0) {
-    current += k > 0 ? ' + ' + fmtNum(k) : ' - ' + fmtNum(Math.abs(k));
+    const out = nextName();
+    cur = (cur.charAt(0) === '-') ? cur.slice(1) : '-' + cur;
     steps.push({
-      label: k > 0
-        ? 'Traslación vertical: ' + fmtNum(k) + ' unidades hacia arriba → y = y + ' + fmtNum(k)
-        : 'Traslación vertical: ' + fmtNum(Math.abs(k)) + ' unidades hacia abajo → y = y - ' + fmtNum(Math.abs(k)),
-      tex: 'y_3 = ' + current
+      title: 'Reflexión sobre el eje X',
+      badge: 'y → −y',
+      desc: 'Cada ordenada cambia de signo: la gráfica se voltea verticalmente.',
+      rule: out + '(x) = -' + lastName + '(x)',
+      tex: out + ' = ' + cur
     });
+    lastName = out;
+    tags.push({ cls: 'tg-refl', text: 'Reflexión eje X' });
   }
-  return { fTex, gTex, steps, isIdentity: !reflect && h === 0 && k === 0 };
+  /* 4 · traslación vertical */
+  if (k !== 0) {
+    cur += k > 0 ? ' + ' + fmtNum(k) : ' - ' + fmtNum(Math.abs(k));
+    steps.push({
+      title: 'Traslación vertical',
+      badge: (k > 0 ? '↑ ' : '↓ ') + fmtNum(Math.abs(k)),
+      desc: k > 0
+        ? 'Se desplaza la gráfica ' + fmtNum(k) + ' unidades hacia arriba.'
+        : 'Se desplaza la gráfica ' + fmtNum(Math.abs(k)) + ' unidades hacia abajo.',
+      rule: 'g(x) = ' + lastName + '(x) ' + (k > 0 ? '+' : '-') + ' ' + fmtNum(Math.abs(k)),
+      tex: 'g = ' + cur
+    });
+    tags.push({ cls: 'tg-k', text: (k > 0 ? 'Vertical ↑ ' : 'Vertical ↓ ') + fmtNum(Math.abs(k)) });
+  }
+  const gTex = 'g\\left(x\\right) = ' + cur;
+  return { fTex, gTex, steps, tags, isIdentity: !reflect && h === 0 && k === 0 && a === 1 };
 }
 
 /* ============================== GRÁFICO ============================== */
@@ -379,8 +478,9 @@ function draw(){
   }
 
   /* curvas (con detección de asíntotas) */
-  function drawCurve(fn, color){
-    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+  function drawCurve(fn, color, lw, dash){
+    ctx.strokeStyle = color; ctx.lineWidth = lw || 2.5;
+    if (dash) ctx.setLineDash(dash);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     ctx.beginPath();
     let penDown = false, prevY = null;
