@@ -318,6 +318,7 @@ function draw(){
   const { cx, cy, ppu } = view;
   const xmin = cx - W / 2 / ppu, xmax = cx + W / 2 / ppu;
   const ymin = cy - H / 2 / ppu, ymax = cy + H / 2 / ppu;
+  const margin = ymax - ymin;
   const toSX = x => W / 2 + (x - cx) * ppu;
   const toSY = y => H / 2 - (y - cy) * ppu;
 
@@ -396,6 +397,12 @@ function draw(){
       prevY = y;
     }
     ctx.stroke();
+    if (dash) ctx.setLineDash([]);
+  }
+
+  /* curvas de los pasos intermedios (y₁, y₂, y₃) */
+  if (state.showSteps && stepCurves.length) {
+    for (const sc of stepCurves) drawCurve(sc.fn, sc.color, 1.8, [6, 5]);
   }
   if (currentF) drawCurve(currentF, COLOR_F);
   if (currentG) drawCurve(currentG, COLOR_G);
@@ -565,31 +572,70 @@ const errBox = document.getElementById('err');
 const exprInput = document.getElementById('expr');
 
 function updateBadges(){
-  const bk = document.getElementById('badge-k'), bh = document.getElementById('badge-h');
+  const bk = document.getElementById('badge-k'), bh = document.getElementById('badge-h'), ba = document.getElementById('badge-a');
   bk.textContent = (state.k > 0 ? '↑ ' : state.k < 0 ? '↓ ' : '· ') + fmtNum(state.k);
   bh.textContent = (state.h > 0 ? '→ ' : state.h < 0 ? '← ' : '· ') + fmtNum(state.h);
+  ba.textContent = state.a === 1 ? '× 1 · sin cambio' : '× ' + fmtNum(state.a);
   bk.className = 'badge' + (state.k !== 0 ? ' on-k' : '');
   bh.className = 'badge' + (state.h !== 0 ? ' on-h' : '');
+  ba.className = 'badge' + (state.a !== 1 ? ' on-a' : '');
 }
 function renderFormulas(){
   if (!currentNode) return;
-  const f = buildFormulas(currentNode, state.reflect, state.h, state.k);
-  tex(document.getElementById('tex-f'), f.fTex);
+  const f = buildFormulas(currentNode, state.reflect, state.h, state.k, state.a);
   tex(document.getElementById('tex-g'), f.gTex);
+  tex(document.getElementById('tex-f'), f.fTex);
+  const tagsEl = document.getElementById('tags');
+  tagsEl.innerHTML = f.isIdentity
+    ? '<span class="tg-none">Sin transformaciones · g(x) = f(x)</span>'
+    : f.tags.map(t => '<span class="' + t.cls + '">' + t.text + '</span>').join('');
   const stepsEl = document.getElementById('steps');
   const idEl = document.getElementById('identity');
-  document.getElementById('card-formulas').style.display = 'block';
   if (f.isIdentity) {
     stepsEl.innerHTML = '';
     idEl.style.display = 'block';
   } else {
     idEl.style.display = 'none';
-    stepsEl.innerHTML = '<p>Desglose de pasos</p><ol>' +
+    stepsEl.innerHTML = '<p class="st-title">Paso a paso</p><ol>' +
       f.steps.map((s, i) =>
-        '<li><small>' + (i + 1) + '. ' + s.label + '</small><div class="math" id="step-' + i + '"></div></li>'
+        '<li><span class="num">' + (i + 1) + '</span><div class="s-body">' +
+          '<div class="s-head"><b>' + s.title + '</b><span class="mini-badge">' + s.badge + '</span></div>' +
+          '<p class="s-desc">' + s.desc + '</p>' +
+          '<div class="s-rule" id="rule-' + i + '"></div>' +
+          '<div class="math" id="step-' + i + '"></div>' +
+        '</div></li>'
       ).join('') + '</ol>';
-    f.steps.forEach((s, i) => tex(document.getElementById('step-' + i), s.tex));
+    f.steps.forEach((s, i) => {
+      tex(document.getElementById('rule-' + i), s.rule);
+      tex(document.getElementById('step-' + i), s.tex);
+    });
   }
+  renderTable();
+  renderLegend();
+}
+function renderTable(){
+  const wrapEl = document.getElementById('vtable-wrap');
+  if (!currentF || !currentG) { wrapEl.innerHTML = ''; return; }
+  const xs = [...new Set([state.h - 1, state.h, state.h + 1, 0, 1])].sort((p, q) => p - q).slice(0, 6);
+  let html = '<p class="vt-title">Tabla de valores</p><table class="vtable"><tr><th>x</th><th class="hf">f(x)</th><th class="hg">g(x)</th></tr>';
+  for (const xv of xs) {
+    const fv = currentF(xv), gv = currentG(xv);
+    html += '<tr><td>' + fmtNum(xv) + '</td><td>' + (fv === null ? '—' : fmtNum(fv)) + '</td><td>' + (gv === null ? '—' : fmtNum(gv)) + '</td></tr>';
+  }
+  wrapEl.innerHTML = html + '</table>';
+}
+function renderLegend(){
+  const el = document.getElementById('legend');
+  let html = '';
+  if (currentF) html += '<div><span class="bar" style="background:#1565C0"></span><span style="color:#1565C0">f(x) — original</span></div>';
+  if (currentG) html += '<div><span class="bar" style="background:#D32F2F"></span><span style="color:#D32F2F">g(x) — transformada</span></div>';
+  if (state.showSteps && currentF) {
+    if (state.h !== 0) html += '<div><span class="bar dash" style="border-color:#EA580C"></span><span style="color:#EA580C">traslación horiz.</span></div>';
+    if (state.a !== 1) html += '<div><span class="bar dash" style="border-color:#059669"></span><span style="color:#059669">ampliación / reducción</span></div>';
+    if (state.reflect) html += '<div><span class="bar dash" style="border-color:#DB2777"></span><span style="color:#DB2777">reflexión</span></div>';
+  }
+  if (state.showVec && (state.h !== 0 || state.k !== 0)) html += '<div><span class="bar dash" style="border-color:#7C3AED"></span><span style="color:#7C3AED">T(h, k)</span></div>';
+  el.innerHTML = html;
 }
 function recompute(){
   const res = compileExpression(exprInput.value);
@@ -597,11 +643,13 @@ function recompute(){
     errBox.textContent = res.error;
     errBox.style.display = 'block';
     currentF = currentG = currentNode = null;
+    stepCurves = [];
   } else {
     errBox.style.display = 'none';
     currentNode = res.node;
     currentF = res.fn;
-    currentG = makeTransformedFn(res.fn, state.reflect, state.h, state.k);
+    computeStepCurves();
+    currentG = makeTransformedFn(res.fn, state.reflect, state.h, state.k, state.a);
     renderFormulas();
   }
   draw();
@@ -610,12 +658,15 @@ function recompute(){
 /* eventos de controles */
 exprInput.addEventListener('input', recompute);
 document.getElementById('reflect').addEventListener('change', e => { state.reflect = e.target.checked; recompute(); });
+document.getElementById('sl-a').addEventListener('input', e => { state.a = parseFloat(e.target.value); updateBadges(); recompute(); });
 document.getElementById('sl-k').addEventListener('input', e => { state.k = parseFloat(e.target.value); updateBadges(); recompute(); });
 document.getElementById('sl-h').addEventListener('input', e => { state.h = parseFloat(e.target.value); updateBadges(); recompute(); });
-document.getElementById('show-vec').addEventListener('change', e => { state.showVec = e.target.checked; draw(); });
+document.getElementById('show-vec').addEventListener('change', e => { state.showVec = e.target.checked; renderLegend(); draw(); });
+document.getElementById('show-steps-g').addEventListener('change', e => { state.showSteps = e.target.checked; computeStepCurves(); renderLegend(); draw(); });
 document.getElementById('btn-reset').addEventListener('click', () => {
-  state.reflect = false; state.h = 0; state.k = 0;
+  state.reflect = false; state.h = 0; state.k = 0; state.a = 1;
   document.getElementById('reflect').checked = false;
+  document.getElementById('sl-a').value = 1;
   document.getElementById('sl-h').value = 0;
   document.getElementById('sl-k').value = 0;
   updateBadges(); recompute();
